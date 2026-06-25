@@ -1,0 +1,9 @@
+{
+  "platforms": ["apple", "android"],
+  "apple": {
+    "modules": ["ReactNativeBleNfcReaderModule"]
+  },
+  "android": {
+    "modules": ["expo.modules.blenfcreader.ReactNativeBleNfcReaderModule"]
+  }
+}
