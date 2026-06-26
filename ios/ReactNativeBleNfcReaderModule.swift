@@ -4,7 +4,7 @@ import ExpoModulesCore
 public class ReactNativeBleNfcReaderModule: Module {
   private var bluetoothManager: CBCentralManager?
   private var bluetoothDelegate: ReaderPermissionDelegate?
-  private var pendingPermissionPromise: Promise?
+  private var pendingPermissionPromises: [Promise] = []
 
   public func definition() -> ModuleDefinition {
     Name("ReactNativeBleNfcReader")
@@ -21,11 +21,14 @@ public class ReactNativeBleNfcReaderModule: Module {
         return
       }
 
-      self.pendingPermissionPromise = promise
-      self.bluetoothDelegate = ReaderPermissionDelegate { [weak self] in
-        self?.resolvePendingPermissionPromise()
+      self.pendingPermissionPromises.append(promise)
+
+      if self.bluetoothManager == nil {
+        self.bluetoothDelegate = ReaderPermissionDelegate { [weak self] in
+          self?.resolvePendingPermissionPromises()
+        }
+        self.bluetoothManager = CBCentralManager(delegate: self.bluetoothDelegate, queue: nil)
       }
-      self.bluetoothManager = CBCentralManager(delegate: self.bluetoothDelegate, queue: nil)
     }
     .runOnQueue(.main)
   }
@@ -43,13 +46,21 @@ public class ReactNativeBleNfcReaderModule: Module {
     }
   }
 
-  private func resolvePendingPermissionPromise() {
-    guard let promise = pendingPermissionPromise else {
+  private func resolvePendingPermissionPromises() {
+    let status = readerPermissionStatus()
+
+    if status == "undetermined" {
       return
     }
 
-    pendingPermissionPromise = nil
-    promise.resolve(readerPermissionStatus())
+    let promises = pendingPermissionPromises
+    pendingPermissionPromises = []
+    bluetoothManager = nil
+    bluetoothDelegate = nil
+
+    promises.forEach { promise in
+      promise.resolve(status)
+    }
   }
 }
 

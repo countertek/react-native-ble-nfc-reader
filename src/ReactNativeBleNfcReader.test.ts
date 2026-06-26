@@ -103,6 +103,21 @@ describe('public native wrappers', () => {
     await expect(scanReaders()).rejects.toBeInstanceOf(BleNfcReaderError);
   });
 
+  it('maps missing native permission setup to typed errors', async () => {
+    mockNativeModule.getReaderPermissionStatus = jest.fn(async () => {
+      const error = new Error('Required Reader Bluetooth permissions are missing');
+      Object.assign(error, { code: 'READER_PERMISSION_MISSING' });
+      throw error;
+    });
+
+    await expect(getReaderPermissionStatus()).rejects.toEqual(
+      expect.objectContaining({
+        code: 'READER_PERMISSION_MISSING',
+      })
+    );
+    await expect(getReaderPermissionStatus()).rejects.toBeInstanceOf(BleNfcReaderError);
+  });
+
   it('normalizes card UIDs returned from native', async () => {
     mockNativeModule.readCardUid = jest.fn(async () => 'deadbeef');
 

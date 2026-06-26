@@ -20,6 +20,13 @@ Add the config plugin to your app config:
 
 The plugin adds Android BLE permissions and iOS Bluetooth usage descriptions.
 
+## Reader permissions
+
+Use `getReaderPermissionStatus()` before scanning and `requestReaderPermissions()`
+when the app needs to prompt. Android reports missing runtime Bluetooth/location
+permission as `denied` even before the first request; call
+`requestReaderPermissions()` to ask for access.
+
 ## ACS SDK
 
 ACS SDK binaries are bundled in the native package setup:
