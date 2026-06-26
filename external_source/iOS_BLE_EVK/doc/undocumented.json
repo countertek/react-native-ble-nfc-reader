@@ -1,0 +1,40 @@
+{
+  "warnings": [
+    {
+      "file": "/Users/godfrey/SmartCardIO/ACSSmartCardIO/ACSSmartCardIO/BluetoothTerminalManager.swift",
+      "line": 506,
+      "symbol": "BluetoothTerminalManager.centralManagerDidUpdateState(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/godfrey/SmartCardIO/ACSSmartCardIO/ACSSmartCardIO/BluetoothTerminalManager.swift",
+      "line": 510,
+      "symbol": "BluetoothTerminalManager.centralManager(_:didDiscover:advertisementData:rssi:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/godfrey/SmartCardIO/ACSSmartCardIO/ACSSmartCardIO/BluetoothTerminalManager.swift",
+      "line": 544,
+      "symbol": "BluetoothTerminalManager.centralManager(_:didConnect:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/godfrey/SmartCardIO/ACSSmartCardIO/ACSSmartCardIO/BluetoothTerminalManager.swift",
+      "line": 556,
+      "symbol": "BluetoothTerminalManager.centralManager(_:didFailToConnect:error:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/godfrey/SmartCardIO/ACSSmartCardIO/ACSSmartCardIO/BluetoothTerminalManager.swift",
+      "line": 570,
+      "symbol": "BluetoothTerminalManager.centralManager(_:didDisconnectPeripheral:error:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    }
+  ],
+  "source_directory": "/Users/godfrey/SmartCardIO/ACSSmartCardIO"
+}

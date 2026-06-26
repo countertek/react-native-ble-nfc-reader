@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>CardTerminal Protocol Reference</title>
+    <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
+    <meta charset='utf-8'>
+    <script src="../js/jquery.min.js" defer></script>
+    <script src="../js/jazzy.js" defer></script>
+    
+    <script src="../js/lunr.min.js" defer></script>
+    <script src="../js/typeahead.jquery.js" defer></script>
+    <script src="../js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+    <a name="//apple_ref/swift/Protocol/CardTerminal" class="dashAnchor"></a>
+    <a title="CardTerminal Protocol Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p><a href="../index.html">ACSSmartCardIO 0.6.0 Docs</a> (96% documented)</p>
+        <div class="header-right">
+          <form role="search" action="../search.json">
+            <input type="text" placeholder="Search documentation" data-typeahead>
+          </form>
+        </div>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="../index.html">ACSSmartCardIO Reference</a>
+        <img id="carat" src="../img/carat.png" alt=""/>
+        CardTerminal Protocol Reference
+      </p>
+    </div>
+    <div class="content-wrapper">
+      <nav class="sidebar">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a href="../SmartCardIO.html">SmartCardIO</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Classes/ATR.html">ATR</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/Card.html">Card</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/CardChannel.html">CardChannel</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/CardError.html">CardError</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/CardState.html">CardState</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/CardTerminal.html">CardTerminal</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/CardTerminals.html">CardTerminals</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/CommandAPDU.html">CommandAPDU</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/Provider.html">Provider</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/ResponseAPDU.html">ResponseAPDU</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/TerminalFactory.html">TerminalFactory</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/TerminalFactorySpi.html">TerminalFactorySpi</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../ACSSmartCardIO%20Options.html">ACSSmartCardIO Options</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Classes/TerminalTimeouts.html">TerminalTimeouts</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/TransmitOptions.html">TransmitOptions</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Bluetooth.html">Bluetooth</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Classes/AcsBluetooth.html">AcsBluetooth</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/Amr220cConstants.html">Amr220cConstants</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/BluetoothFactorySpi.html">BluetoothFactorySpi</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/BluetoothSmartCard.html">BluetoothSmartCard</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/BluetoothTerminalManager.html">BluetoothTerminalManager</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/BluetoothTerminalManager/TerminalType.html">– TerminalType</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/BluetoothTerminalManager/BatteryStatus.html">– BatteryStatus</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/BluetoothTerminalManager/DeviceInfoType.html">– DeviceInfoType</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/BluetoothTerminalManagerDelegate.html">BluetoothTerminalManagerDelegate</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+        <section>
+          <section class="section">
+            <h1>CardTerminal</h1>
+              <div class="declaration">
+                <div class="language">
+                  
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">CardTerminal</span> <span class="p">:</span> <span class="kt">AnyObject</span></code></pre>
+
+                </div>
+              </div>
+            <p>A Smart Card terminal, sometimes referred to as a Smart Card Reader. A
+CardTerminal object can be obtained by calling <code><a href="../Protocols/CardTerminals.html#/s:11SmartCardIO0B9TerminalsP4listSayAA0B8Terminal_pGyKF">CardTerminals.list()</a></code> or
+<code><a href="../Protocols/CardTerminals.html#/s:11SmartCardIO0B9TerminalsP8terminal4nameAA0B8Terminal_pSgSS_tF">CardTerminals.terminal(name:)</a></code>.</p>
+
+<p>Note that physical card readers with slots for multiple cards are
+represented by one <code>CardTerminal</code> object per such slot.</p>
+<div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <p><code><a href="../Protocols/CardTerminals.html">CardTerminals</a></code></p>
+
+</div><div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <p><code><a href="../Classes/TerminalFactory.html">TerminalFactory</a></code></p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>Andreas Sterbenz</p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>JSR 268 Expert Group</p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>Godfrey Chung</p>
+
+</div><div class="aside aside-version">
+    <p class="aside-title">Version</p>
+    <p>1.0</p>
+
+</div><div class="aside aside-date">
+    <p class="aside-title">Date</p>
+    <p>6 Nov 2017</p>
+
+</div>
+
+          </section>
+          <section class="section task-group-section">
+            <div class="task-group">
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO0B8TerminalP4nameSSvp"></a>
+                    <a name="//apple_ref/swift/Property/name" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO0B8TerminalP4nameSSvp">name</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Returns the unique name of this terminal.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">var</span> <span class="nv">name</span><span class="p">:</span> <span class="kt">String</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO0B8TerminalP7connect14protocolStringAA0B0_pSS_tKF"></a>
+                    <a name="//apple_ref/swift/Method/connect(protocolString:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO0B8TerminalP7connect14protocolStringAA0B0_pSS_tKF">connect(protocolString:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Establishes a connection to the card. If a connection has previously
+established using the specified protocol, this method returns the same
+Card object as the previous call.</p>
+<div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <code>CardError.illegalArgument</code> if protocol is an invalid protocol
+specification;
+<code>CardError.cardNotPresent</code> if no card is present in this terminal;
+<code>CardError.operationFailed</code> if a connection could not be established
+using the specified protocol or if a connection has previously been
+established using a different protocol
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">connect</span><span class="p">(</span><span class="nv">protocolString</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Protocols/Card.html">Card</a></span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>protocolString</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the protocol to use (&ldquo;T=0&rdquo;, &ldquo;T=1&rdquo;, or
+&ldquo;T=CL&rdquo;), or &ldquo;*&rdquo; to connect using any available protocol.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>the Card object</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO0B8TerminalP02isB7PresentSbyKF"></a>
+                    <a name="//apple_ref/swift/Method/isCardPresent()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO0B8TerminalP02isB7PresentSbyKF">isCardPresent()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Returns whether a card is present in this terminal.</p>
+<div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <code>CardError.operationFailed</code> if the status could not be determined
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">isCardPresent</span><span class="p">()</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>whether a card is present in this terminal</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO0B8TerminalP07waitForB7Present7timeoutSbSi_tKF"></a>
+                    <a name="//apple_ref/swift/Method/waitForCardPresent(timeout:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO0B8TerminalP07waitForB7Present7timeoutSbSi_tKF">waitForCardPresent(timeout:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Waits until a card is present in this terminal or the timeout expires.
+If the method returns due to an expired timeout, it returns <code>false</code>.
+Otherwise it returns <code>true</code>.</p>
+
+<p>If a card is present in this terminal when this method is called, it
+returns immediately.</p>
+<div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <code>CardError.illegalArgument</code> if timeout is negative;
+<code>CardError.operationFailed</code> if the operation failed
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">waitForCardPresent</span><span class="p">(</span><span class="nv">timeout</span><span class="p">:</span> <span class="kt">Int</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>timeout</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>if positive, block for up to <code>timeout</code>
+milliseconds; if zero, block indefinitely; must not be negative</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p><code>false</code> if the method returns due to an expired timeout,
+<code>true</code> otherwise</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO0B8TerminalP07waitForB6Absent7timeoutSbSi_tKF"></a>
+                    <a name="//apple_ref/swift/Method/waitForCardAbsent(timeout:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO0B8TerminalP07waitForB6Absent7timeoutSbSi_tKF">waitForCardAbsent(timeout:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Waits until a card is absent in this terminal or the timeout expires.
+If the method returns due to an expired timeout, it returns <code>false</code>.
+Otherwise it returns <code>true</code>.</p>
+
+<p>If no card is present in this terminal when this method is called, it
+returns immediately.</p>
+<div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <code>CardError.illegalArgument</code> if timeout is negative;
+<code>CardError.operationFailed</code> if the operation failed
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">waitForCardAbsent</span><span class="p">(</span><span class="nv">timeout</span><span class="p">:</span> <span class="kt">Int</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>timeout</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>if positive, block for up to <code>timeout</code>
+milliseconds; if zero, block indefinitely; must not be negative</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p><code>false</code> if the method returns due to an expired timeout,
+<code>true</code> otherwise</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </section>
+        </section>
+        <section id="footer">
+          <p>Copyright (c) 2017-2024, Advanced Card Systems Ltd. All rights reserved.<br> Copyright (c) 1996-2014, Oracle and/or its affiliates. All rights reserved.</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.4</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
+        </section>
+      </article>
+    </div>
+  </body>
+</html>

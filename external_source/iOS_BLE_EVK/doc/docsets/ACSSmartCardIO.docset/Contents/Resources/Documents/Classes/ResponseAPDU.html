@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>ResponseAPDU Class Reference</title>
+    <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
+    <meta charset='utf-8'>
+    <script src="../js/jquery.min.js" defer></script>
+    <script src="../js/jazzy.js" defer></script>
+    
+    <script src="../js/lunr.min.js" defer></script>
+    <script src="../js/typeahead.jquery.js" defer></script>
+    <script src="../js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+    <a name="//apple_ref/swift/Class/ResponseAPDU" class="dashAnchor"></a>
+    <a title="ResponseAPDU Class Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p><a href="../index.html">ACSSmartCardIO 0.6.0 Docs</a> (96% documented)</p>
+        <div class="header-right">
+          <form role="search" action="../search.json">
+            <input type="text" placeholder="Search documentation" data-typeahead>
+          </form>
+        </div>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="../index.html">ACSSmartCardIO Reference</a>
+        <img id="carat" src="../img/carat.png" alt=""/>
+        ResponseAPDU Class Reference
+      </p>
+    </div>
+    <div class="content-wrapper">
+      <nav class="sidebar">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a href="../SmartCardIO.html">SmartCardIO</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Classes/ATR.html">ATR</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/Card.html">Card</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/CardChannel.html">CardChannel</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/CardError.html">CardError</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/CardState.html">CardState</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/CardTerminal.html">CardTerminal</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/CardTerminals.html">CardTerminals</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/CommandAPDU.html">CommandAPDU</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/Provider.html">Provider</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/ResponseAPDU.html">ResponseAPDU</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/TerminalFactory.html">TerminalFactory</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/TerminalFactorySpi.html">TerminalFactorySpi</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../ACSSmartCardIO%20Options.html">ACSSmartCardIO Options</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Classes/TerminalTimeouts.html">TerminalTimeouts</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/TransmitOptions.html">TransmitOptions</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Bluetooth.html">Bluetooth</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Classes/AcsBluetooth.html">AcsBluetooth</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/Amr220cConstants.html">Amr220cConstants</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/BluetoothFactorySpi.html">BluetoothFactorySpi</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/BluetoothSmartCard.html">BluetoothSmartCard</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/BluetoothTerminalManager.html">BluetoothTerminalManager</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/BluetoothTerminalManager/TerminalType.html">– TerminalType</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/BluetoothTerminalManager/BatteryStatus.html">– BatteryStatus</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/BluetoothTerminalManager/DeviceInfoType.html">– DeviceInfoType</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/BluetoothTerminalManagerDelegate.html">BluetoothTerminalManagerDelegate</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+        <section>
+          <section class="section">
+            <h1>ResponseAPDU</h1>
+              <div class="declaration">
+                <div class="language">
+                  
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="kt">ResponseAPDU</span></code></pre>
+
+                </div>
+              </div>
+            <p>A response APDU as defined in ISO/IEC 7816-4. It consists of a conditional
+body and a two byte trailer. This class does not attempt to verify that the
+APDU encodes a semantically valid response.</p>
+
+<p>Instances of this class are immutable. Where data is passed in or out via
+byte arrays, defensive cloning is performed.</p>
+<div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <p><code><a href="../Classes/CommandAPDU.html">CommandAPDU</a></code></p>
+
+</div><div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <p><code><a href="../Protocols/CardChannel.html#/s:11SmartCardIO0B7ChannelP8transmit4apduAA12ResponseAPDUCAA07CommandH0C_tKF">CardChannel.transmit(apdu:)</a></code></p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>Andreas Sterbenz</p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>JSR 268 Expert Group</p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>Godfrey Chung</p>
+
+</div><div class="aside aside-version">
+    <p class="aside-title">Version</p>
+    <p>1.0</p>
+
+</div><div class="aside aside-date">
+    <p class="aside-title">Date</p>
+    <p>6 Nov 2017</p>
+
+</div>
+
+          </section>
+          <section class="section task-group-section">
+            <div class="task-group">
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO12ResponseAPDUC2nrSivp"></a>
+                    <a name="//apple_ref/swift/Property/nr" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO12ResponseAPDUC2nrSivp">nr</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Returns the number of data bytes in the response body (Nr) or 0 if this
+APDU has no body. This call is equivalent to <code>data.count</code>.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">nr</span><span class="p">:</span> <span class="kt">Int</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO12ResponseAPDUC4dataSays5UInt8VGvp"></a>
+                    <a name="//apple_ref/swift/Property/data" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO12ResponseAPDUC4dataSays5UInt8VGvp">data</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Returns a copy of the data bytes in the response body. If this APDU as
+no body, this method returns a byte array with a length of zero.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">data</span><span class="p">:</span> <span class="p">[</span><span class="kt">UInt8</span><span class="p">]</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO12ResponseAPDUC3sw1s5UInt8Vvp"></a>
+                    <a name="//apple_ref/swift/Property/sw1" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO12ResponseAPDUC3sw1s5UInt8Vvp">sw1</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Returns the value of the status byte SW1 as a value between 0 and 255.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">sw1</span><span class="p">:</span> <span class="kt">UInt8</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO12ResponseAPDUC3sw2s5UInt8Vvp"></a>
+                    <a name="//apple_ref/swift/Property/sw2" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO12ResponseAPDUC3sw2s5UInt8Vvp">sw2</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Returns the value of the status byte SW2 as a value between 0 and 255.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">sw2</span><span class="p">:</span> <span class="kt">UInt8</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO12ResponseAPDUC2sws6UInt16Vvp"></a>
+                    <a name="//apple_ref/swift/Property/sw" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO12ResponseAPDUC2sws6UInt16Vvp">sw</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Returns the value of the status bytes SW1 and SW2 as a single status
+word SW. It is defined as <code>UInt16(sw1) &lt;&lt; 8 | UInt16(sw2)</code>.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">sw</span><span class="p">:</span> <span class="kt">UInt16</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO12ResponseAPDUC5bytesSays5UInt8VGvp"></a>
+                    <a name="//apple_ref/swift/Property/bytes" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO12ResponseAPDUC5bytesSays5UInt8VGvp">bytes</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Returns a copy of the bytes in this APDU.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">bytes</span><span class="p">:</span> <span class="p">[</span><span class="kt">UInt8</span><span class="p">]</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO12ResponseAPDUC4apduACSays5UInt8VG_tKcfc"></a>
+                    <a name="//apple_ref/swift/Method/init(apdu:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO12ResponseAPDUC4apduACSays5UInt8VG_tKcfc">init(apdu:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Constructs a ResponseAPDU from a byte array containing the complete APDU
+contents (conditional body and trailed).</p>
+
+<p>Note that the byte array is cloned to protect against subsequent
+modification.</p>
+<div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <code>CardError.illegalArgument</code> if apdu.length is less than 2
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">apdu</span><span class="p">:</span> <span class="p">[</span><span class="kt">UInt8</span><span class="p">])</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>apdu</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the complete response APDU</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </section>
+        </section>
+        <section id="footer">
+          <p>Copyright (c) 2017-2024, Advanced Card Systems Ltd. All rights reserved.<br> Copyright (c) 1996-2014, Oracle and/or its affiliates. All rights reserved.</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.4</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
+        </section>
+      </article>
+    </div>
+  </body>
+</html>

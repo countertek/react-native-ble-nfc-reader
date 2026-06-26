@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>CommandAPDU Class Reference</title>
+    <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
+    <meta charset='utf-8'>
+    <script src="../js/jquery.min.js" defer></script>
+    <script src="../js/jazzy.js" defer></script>
+    
+    <script src="../js/lunr.min.js" defer></script>
+    <script src="../js/typeahead.jquery.js" defer></script>
+    <script src="../js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+    <a name="//apple_ref/swift/Class/CommandAPDU" class="dashAnchor"></a>
+    <a title="CommandAPDU Class Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p><a href="../index.html">ACSSmartCardIO 0.6.0 Docs</a> (96% documented)</p>
+        <div class="header-right">
+          <form role="search" action="../search.json">
+            <input type="text" placeholder="Search documentation" data-typeahead>
+          </form>
+        </div>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="../index.html">ACSSmartCardIO Reference</a>
+        <img id="carat" src="../img/carat.png" alt=""/>
+        CommandAPDU Class Reference
+      </p>
+    </div>
+    <div class="content-wrapper">
+      <nav class="sidebar">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a href="../SmartCardIO.html">SmartCardIO</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Classes/ATR.html">ATR</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/Card.html">Card</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/CardChannel.html">CardChannel</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/CardError.html">CardError</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/CardState.html">CardState</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/CardTerminal.html">CardTerminal</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/CardTerminals.html">CardTerminals</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/CommandAPDU.html">CommandAPDU</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/Provider.html">Provider</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/ResponseAPDU.html">ResponseAPDU</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/TerminalFactory.html">TerminalFactory</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/TerminalFactorySpi.html">TerminalFactorySpi</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../ACSSmartCardIO%20Options.html">ACSSmartCardIO Options</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Classes/TerminalTimeouts.html">TerminalTimeouts</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/TransmitOptions.html">TransmitOptions</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Bluetooth.html">Bluetooth</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Classes/AcsBluetooth.html">AcsBluetooth</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/Amr220cConstants.html">Amr220cConstants</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/BluetoothFactorySpi.html">BluetoothFactorySpi</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/BluetoothSmartCard.html">BluetoothSmartCard</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/BluetoothTerminalManager.html">BluetoothTerminalManager</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/BluetoothTerminalManager/TerminalType.html">– TerminalType</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/BluetoothTerminalManager/BatteryStatus.html">– BatteryStatus</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/BluetoothTerminalManager/DeviceInfoType.html">– DeviceInfoType</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/BluetoothTerminalManagerDelegate.html">BluetoothTerminalManagerDelegate</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+        <section>
+          <section class="section">
+            <h1>CommandAPDU</h1>
+              <div class="declaration">
+                <div class="language">
+                  
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="kt">CommandAPDU</span></code></pre>
+
+                </div>
+              </div>
+            <p>A command APDU following the structure defined in ISO/IEC 7816-4. It
+consists of a four byte header and a conditional body of variable length.
+This class does not attempt to verify that the APDU encodes a semantically
+valid command.</p>
+
+<p>Note that when the expected length of the response APDU is specified in the
+constructors, the actual length (Ne) must be specified, not its encoded form
+(Le). Similarly, <code>ne</code> returns the actual value Ne. In other words, a value
+of 0 means &ldquo;no data in the response APDU&rdquo; rather than &ldquo;maximum length&rdquo;.</p>
+
+<p>This class supports both the short and extended forms of length encoding for
+Ne and Nc. However, note that not all terminals and Smart Cards are capable
+of accepting APDUs that use the extended form.</p>
+
+<p>Instances of this class are immutable. Where data is passed in or out via
+byte arrays, defensive cloning is performed.</p>
+<div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <p><code><a href="../Classes/ResponseAPDU.html">ResponseAPDU</a></code></p>
+
+</div><div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <p><code><a href="../Protocols/CardChannel.html#/s:11SmartCardIO0B7ChannelP8transmit4apduAA12ResponseAPDUCAA07CommandH0C_tKF">CardChannel.transmit(apdu:)</a></code></p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>Andreas Sterbenz</p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>JSR 268 Expert Group</p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>Godfrey Chung</p>
+
+</div><div class="aside aside-version">
+    <p class="aside-title">Version</p>
+    <p>1.0</p>
+
+</div><div class="aside aside-date">
+    <p class="aside-title">Date</p>
+    <p>6 Nov 2017</p>
+
+</div>
+
+          </section>
+          <section class="section task-group-section">
+            <div class="task-group">
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO11CommandAPDUC3clas5UInt8Vvp"></a>
+                    <a name="//apple_ref/swift/Property/cla" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO11CommandAPDUC3clas5UInt8Vvp">cla</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Returns the value of the class byte CLA.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">cla</span><span class="p">:</span> <span class="kt">UInt8</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO11CommandAPDUC3inss5UInt8Vvp"></a>
+                    <a name="//apple_ref/swift/Property/ins" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO11CommandAPDUC3inss5UInt8Vvp">ins</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Returns the value of the instruction byte INS.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">ins</span><span class="p">:</span> <span class="kt">UInt8</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO11CommandAPDUC2p1s5UInt8Vvp"></a>
+                    <a name="//apple_ref/swift/Property/p1" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO11CommandAPDUC2p1s5UInt8Vvp">p1</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Returns the value of the parameter byte P1.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">p1</span><span class="p">:</span> <span class="kt">UInt8</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO11CommandAPDUC2p2s5UInt8Vvp"></a>
+                    <a name="//apple_ref/swift/Property/p2" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO11CommandAPDUC2p2s5UInt8Vvp">p2</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Returns the value of the parameter byte P2.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">p2</span><span class="p">:</span> <span class="kt">UInt8</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO11CommandAPDUC2ncSivp"></a>
+                    <a name="//apple_ref/swift/Property/nc" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO11CommandAPDUC2ncSivp">nc</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Returns the number of data bytes in the command body (Nc) or 0 if this
+APDU has no body. This call is equivalent to <code>data.count</code>.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">private(set)</span> <span class="k">var</span> <span class="nv">nc</span><span class="p">:</span> <span class="kt">Int</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO11CommandAPDUC4dataSays5UInt8VGvp"></a>
+                    <a name="//apple_ref/swift/Property/data" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO11CommandAPDUC4dataSays5UInt8VGvp">data</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Returns a copy of the data bytes in the command body. If this APDU as no
+body, this method returns a byte array with length zero.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">data</span><span class="p">:</span> <span class="p">[</span><span class="kt">UInt8</span><span class="p">]</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO11CommandAPDUC2neSivp"></a>
+                    <a name="//apple_ref/swift/Property/ne" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO11CommandAPDUC2neSivp">ne</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Returns the maximum number of expected data bytes in a response APDU
+(Ne).</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">private(set)</span> <span class="k">var</span> <span class="nv">ne</span><span class="p">:</span> <span class="kt">Int</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO11CommandAPDUC5bytesSays5UInt8VGvp"></a>
+                    <a name="//apple_ref/swift/Property/bytes" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO11CommandAPDUC5bytesSays5UInt8VGvp">bytes</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Returns a copy of the bytes in this APDU.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">bytes</span><span class="p">:</span> <span class="p">[</span><span class="kt">UInt8</span><span class="p">]</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO11CommandAPDUC4apduACSays5UInt8VG_tKcfc"></a>
+                    <a name="//apple_ref/swift/Method/init(apdu:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO11CommandAPDUC4apduACSays5UInt8VG_tKcfc">init(apdu:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Constructs a CommandAPDU from a byte array containing the complete APDU
+contents (header and body).</p>
+
+<p>Note that the apdu bytes are copied to protect against subsequent
+modification.</p>
+<div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <code>CardError.illegalArgument</code> if apdu does not contain a valid command
+APDU
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">apdu</span><span class="p">:</span> <span class="p">[</span><span class="kt">UInt8</span><span class="p">])</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>apdu</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the complete command APDU</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO11CommandAPDUC4apdu0F6Offset0F6LengthACSays5UInt8VG_S2itKcfc"></a>
+                    <a name="//apple_ref/swift/Method/init(apdu:apduOffset:apduLength:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO11CommandAPDUC4apdu0F6Offset0F6LengthACSays5UInt8VG_S2itKcfc">init(apdu:<wbr>apduOffset:<wbr>apduLength:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Constructs a CommandAPDU from a byte array containing the complete APDU
+contents (header and body). The APDU starts at the index <code>apduOffset</code> in
+the byte array and is <code>apduLength</code> bytes long.</p>
+
+<p>Note that the apdu bytes are copied to protect against subsequent
+modification.</p>
+<div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <code>CardError.illegalArgument</code> if apduOffset or apduLength are negative
+or if apduOffset + apduLength are greater than apdu.length, or if the
+specified bytes are not a valid APDU
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">apdu</span><span class="p">:</span> <span class="p">[</span><span class="kt">UInt8</span><span class="p">],</span> <span class="nv">apduOffset</span><span class="p">:</span> <span class="kt">Int</span><span class="p">,</span> <span class="nv">apduLength</span><span class="p">:</span> <span class="kt">Int</span><span class="p">)</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>apdu</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the complete command APDU</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>apduOffset</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the offset in the byte array at which the apdu data
+begins</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>apduLength</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the length of the APDU</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO11CommandAPDUC4apduAC10Foundation4DataV_tKcfc"></a>
+                    <a name="//apple_ref/swift/Method/init(apdu:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO11CommandAPDUC4apduAC10Foundation4DataV_tKcfc">init(apdu:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Creates a CommandAPDU from the Data containing the complete APDU
+contents (header and body).</p>
+
+<p>Note that the data is copied to protect against subsequent modification.</p>
+<div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <code>CardError.illegalArgument</code> if apdu does not contain a valid command
+APDU
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">apdu</span><span class="p">:</span> <span class="kt">Data</span><span class="p">)</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>apdu</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the Data containing the complete APDU</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO11CommandAPDUC3cla3ins2p12p2ACs5UInt8V_A3ItKcfc"></a>
+                    <a name="//apple_ref/swift/Method/init(cla:ins:p1:p2:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO11CommandAPDUC3cla3ins2p12p2ACs5UInt8V_A3ItKcfc">init(cla:<wbr>ins:<wbr>p1:<wbr>p2:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Constructs a CommandAPDU from the four header bytes. This is case 1 in
+ISO 7816, no command body.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">convenience</span> <span class="nf">init</span><span class="p">(</span><span class="nv">cla</span><span class="p">:</span> <span class="kt">UInt8</span><span class="p">,</span>
+                        <span class="nv">ins</span><span class="p">:</span> <span class="kt">UInt8</span><span class="p">,</span>
+                        <span class="nv">p1</span><span class="p">:</span> <span class="kt">UInt8</span><span class="p">,</span>
+                        <span class="nv">p2</span><span class="p">:</span> <span class="kt">UInt8</span><span class="p">)</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>cla</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the class byte CLA</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>ins</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the instruction byte INS</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>p1</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the parameter byte P1</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>p2</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the parameter byte P2</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO11CommandAPDUC3cla3ins2p12p22neACs5UInt8V_A3JSitKcfc"></a>
+                    <a name="//apple_ref/swift/Method/init(cla:ins:p1:p2:ne:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO11CommandAPDUC3cla3ins2p12p22neACs5UInt8V_A3JSitKcfc">init(cla:<wbr>ins:<wbr>p1:<wbr>p2:<wbr>ne:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Constructs a CommandAPDU from the four header bytes and the expected
+response data length. This is case 2 in ISO 7816, empty command data
+field with Ne specified. If Ne is 0, the APDU is encoded as ISO 7816
+case 1.</p>
+<div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <code>CardError.illegalArgument</code> if ne is negative or greater than 65536
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">convenience</span> <span class="nf">init</span><span class="p">(</span><span class="nv">cla</span><span class="p">:</span> <span class="kt">UInt8</span><span class="p">,</span>
+                        <span class="nv">ins</span><span class="p">:</span> <span class="kt">UInt8</span><span class="p">,</span>
+                        <span class="nv">p1</span><span class="p">:</span> <span class="kt">UInt8</span><span class="p">,</span>
+                        <span class="nv">p2</span><span class="p">:</span> <span class="kt">UInt8</span><span class="p">,</span>
+                        <span class="nv">ne</span><span class="p">:</span> <span class="kt">Int</span><span class="p">)</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>cla</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the class byte CLA</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>ins</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the instruction byte INS</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>p1</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the parameter byte P1</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>p2</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the parameter byte P2</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>ne</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the maximum number of expected data bytes in a response APDU</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO11CommandAPDUC3cla3ins2p12p24dataACs5UInt8V_A3JSayAJGtKcfc"></a>
+                    <a name="//apple_ref/swift/Method/init(cla:ins:p1:p2:data:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO11CommandAPDUC3cla3ins2p12p24dataACs5UInt8V_A3JSayAJGtKcfc">init(cla:<wbr>ins:<wbr>p1:<wbr>p2:<wbr>data:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Constructs a CommandAPDU from the four header bytes and command data.
+This is case 3 in ISO 7816, command data present and Ne absent. The
+value Nc is taken as data.length. If <code><a href="../Classes/CommandAPDU.html#/s:11SmartCardIO11CommandAPDUC4dataSays5UInt8VGvp">data</a></code> is null or its
+length is 0, the APDU is encoded as ISO 7816 case 1.</p>
+
+<p>Note that the data bytes are copied to protect against subsequent
+modification.</p>
+<div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <code>CardError.illegalArgument</code> if data.count is greater than 65535
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">convenience</span> <span class="nf">init</span><span class="p">(</span><span class="nv">cla</span><span class="p">:</span> <span class="kt">UInt8</span><span class="p">,</span>
+                        <span class="nv">ins</span><span class="p">:</span> <span class="kt">UInt8</span><span class="p">,</span>
+                        <span class="nv">p1</span><span class="p">:</span> <span class="kt">UInt8</span><span class="p">,</span>
+                        <span class="nv">p2</span><span class="p">:</span> <span class="kt">UInt8</span><span class="p">,</span>
+                        <span class="nv">data</span><span class="p">:</span> <span class="p">[</span><span class="kt">UInt8</span><span class="p">])</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>cla</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the class byte CLA</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>ins</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the instruction byte INS</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>p1</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the parameter byte P1</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>p2</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the parameter byte P2</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>data</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the byte array containing the data bytes of the command body</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO11CommandAPDUC3cla3ins2p12p24data0J6Offset0J6LengthACs5UInt8V_A3LSayALGS2itKcfc"></a>
+                    <a name="//apple_ref/swift/Method/init(cla:ins:p1:p2:data:dataOffset:dataLength:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO11CommandAPDUC3cla3ins2p12p24data0J6Offset0J6LengthACs5UInt8V_A3LSayALGS2itKcfc">init(cla:<wbr>ins:<wbr>p1:<wbr>p2:<wbr>data:<wbr>dataOffset:<wbr>dataLength:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Constructs a CommandAPDU from the four header bytes and command data.
+This is case 3 in ISO 7816, command data present and Ne absent. The
+value Nc is taken as dataLength. If <code>dataLength</code> is 0, the APDU is
+encoded as ISO 7816 case 1.</p>
+
+<p>Note that the data bytes are copied to protect against subsequent
+modification.</p>
+<div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <code>CardError.illegalArgument</code> if dataOffset or dataLength are negative
+or if dataOffset + dataLength are greater than data.count or if
+dataLength is greater than 65535
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">convenience</span> <span class="nf">init</span><span class="p">(</span><span class="nv">cla</span><span class="p">:</span> <span class="kt">UInt8</span><span class="p">,</span>
+                        <span class="nv">ins</span><span class="p">:</span> <span class="kt">UInt8</span><span class="p">,</span>
+                        <span class="nv">p1</span><span class="p">:</span> <span class="kt">UInt8</span><span class="p">,</span>
+                        <span class="nv">p2</span><span class="p">:</span> <span class="kt">UInt8</span><span class="p">,</span>
+                        <span class="nv">data</span><span class="p">:</span> <span class="p">[</span><span class="kt">UInt8</span><span class="p">],</span>
+                        <span class="nv">dataOffset</span><span class="p">:</span> <span class="kt">Int</span><span class="p">,</span>
+                        <span class="nv">dataLength</span><span class="p">:</span> <span class="kt">Int</span><span class="p">)</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>cla</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the class byte CLA</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>ins</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the instruction byte INS</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>p1</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the parameter byte P1</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>p2</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the parameter byte P2</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>data</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the byte array containing the data bytes of the command body</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>dataOffset</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the offset in the byte array at which the data bytes of
+the command body begin</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>dataLength</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the number of the data bytes in the command body</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO11CommandAPDUC3cla3ins2p12p24data2neACs5UInt8V_A3KSayAKGSitKcfc"></a>
+                    <a name="//apple_ref/swift/Method/init(cla:ins:p1:p2:data:ne:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO11CommandAPDUC3cla3ins2p12p24data2neACs5UInt8V_A3KSayAKGSitKcfc">init(cla:<wbr>ins:<wbr>p1:<wbr>p2:<wbr>data:<wbr>ne:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Constructs a CommandAPDU from the four header bytes, command data, and
+expected response data length. This is case 4 in ISO 7816, command data
+and Ne present. The value Nc is taken as data.count if <code><a href="../Classes/CommandAPDU.html#/s:11SmartCardIO11CommandAPDUC4dataSays5UInt8VGvp">data</a></code> is
+non-null and as 0 otherwise. If Ne or Nc are zero, the APDU is encoded
+as case 1, 2, or 3 per ISO 7816.</p>
+
+<p>Note that the data bytes are copied to protect against subsequent
+modification.</p>
+<div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <code>CardError.illegalArgument</code> if data.count is greater than 65535 or if
+ne is negative or greater than 65536
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">convenience</span> <span class="nf">init</span><span class="p">(</span><span class="nv">cla</span><span class="p">:</span> <span class="kt">UInt8</span><span class="p">,</span>
+                        <span class="nv">ins</span><span class="p">:</span> <span class="kt">UInt8</span><span class="p">,</span>
+                        <span class="nv">p1</span><span class="p">:</span> <span class="kt">UInt8</span><span class="p">,</span>
+                        <span class="nv">p2</span><span class="p">:</span> <span class="kt">UInt8</span><span class="p">,</span>
+                        <span class="nv">data</span><span class="p">:</span> <span class="p">[</span><span class="kt">UInt8</span><span class="p">],</span>
+                        <span class="nv">ne</span><span class="p">:</span> <span class="kt">Int</span><span class="p">)</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>cla</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the class byte CLA</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>ins</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the instruction byte INS</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>p1</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the parameter byte P1</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>p2</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the parameter byte P2</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>data</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the byte array containing the data bytes of the command body</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>ne</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the maximum number of expected data bytes in a response APDU</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO11CommandAPDUC3cla3ins2p12p24data0J6Offset0J6Length2neACs5UInt8V_A3MSayAMGS3itKcfc"></a>
+                    <a name="//apple_ref/swift/Method/init(cla:ins:p1:p2:data:dataOffset:dataLength:ne:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO11CommandAPDUC3cla3ins2p12p24data0J6Offset0J6Length2neACs5UInt8V_A3MSayAMGS3itKcfc">init(cla:<wbr>ins:<wbr>p1:<wbr>p2:<wbr>data:<wbr>dataOffset:<wbr>dataLength:<wbr>ne:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Constructs a CommandAPDU from the four header bytes, command data, and
+expected response data length. This is case 4 in ISO 7816, command data
+and Le present. The value Nc is taken as <code>dataLength</code>. If Ne or Nc are
+zero, the APDU is encoded as case 1, 2, or 3 per ISO 7816.</p>
+
+<p>Note that the data bytes are copied to protect against subsequent
+modification.</p>
+<div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <code>CardError.illegalArgument</code> if dataOffset or dataLength are negative
+or if dataOffset + dataLength are greater than data.count, or if ne is
+negative or greater than 65536, or if dataLength is greater than 65535
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">cla</span><span class="p">:</span> <span class="kt">UInt8</span><span class="p">,</span>
+            <span class="nv">ins</span><span class="p">:</span> <span class="kt">UInt8</span><span class="p">,</span>
+            <span class="nv">p1</span><span class="p">:</span> <span class="kt">UInt8</span><span class="p">,</span>
+            <span class="nv">p2</span><span class="p">:</span> <span class="kt">UInt8</span><span class="p">,</span>
+            <span class="nv">data</span><span class="p">:</span> <span class="p">[</span><span class="kt">UInt8</span><span class="p">],</span>
+            <span class="nv">dataOffset</span><span class="p">:</span> <span class="kt">Int</span><span class="p">,</span>
+            <span class="nv">dataLength</span><span class="p">:</span> <span class="kt">Int</span><span class="p">,</span>
+            <span class="nv">ne</span><span class="p">:</span> <span class="kt">Int</span><span class="p">)</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>cla</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the class byte CLA</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>ins</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the instruction byte INS</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>p1</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the parameter byte P1</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>p2</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the parameter byte P2</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>data</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the byte array containing the data bytes of the command body</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>dataOffset</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the offset in the byte array at which the data bytes of
+the command body begin</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>dataLength</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the number of the data bytes in the command body</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>ne</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the maximum number of expected data bytes in a response APDU</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </section>
+        </section>
+        <section id="footer">
+          <p>Copyright (c) 2017-2024, Advanced Card Systems Ltd. All rights reserved.<br> Copyright (c) 1996-2014, Oracle and/or its affiliates. All rights reserved.</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.4</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
+        </section>
+      </article>
+    </div>
+  </body>
+</html>

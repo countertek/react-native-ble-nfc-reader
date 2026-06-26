@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>CardChannel Protocol Reference</title>
+    <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
+    <meta charset='utf-8'>
+    <script src="../js/jquery.min.js" defer></script>
+    <script src="../js/jazzy.js" defer></script>
+    
+    <script src="../js/lunr.min.js" defer></script>
+    <script src="../js/typeahead.jquery.js" defer></script>
+    <script src="../js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+    <a name="//apple_ref/swift/Protocol/CardChannel" class="dashAnchor"></a>
+    <a title="CardChannel Protocol Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p><a href="../index.html">ACSSmartCardIO 0.6.0 Docs</a> (96% documented)</p>
+        <div class="header-right">
+          <form role="search" action="../search.json">
+            <input type="text" placeholder="Search documentation" data-typeahead>
+          </form>
+        </div>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="../index.html">ACSSmartCardIO Reference</a>
+        <img id="carat" src="../img/carat.png" alt=""/>
+        CardChannel Protocol Reference
+      </p>
+    </div>
+    <div class="content-wrapper">
+      <nav class="sidebar">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a href="../SmartCardIO.html">SmartCardIO</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Classes/ATR.html">ATR</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/Card.html">Card</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/CardChannel.html">CardChannel</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/CardError.html">CardError</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/CardState.html">CardState</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/CardTerminal.html">CardTerminal</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/CardTerminals.html">CardTerminals</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/CommandAPDU.html">CommandAPDU</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/Provider.html">Provider</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/ResponseAPDU.html">ResponseAPDU</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/TerminalFactory.html">TerminalFactory</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/TerminalFactorySpi.html">TerminalFactorySpi</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../ACSSmartCardIO%20Options.html">ACSSmartCardIO Options</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Classes/TerminalTimeouts.html">TerminalTimeouts</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/TransmitOptions.html">TransmitOptions</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Bluetooth.html">Bluetooth</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Classes/AcsBluetooth.html">AcsBluetooth</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/Amr220cConstants.html">Amr220cConstants</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/BluetoothFactorySpi.html">BluetoothFactorySpi</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/BluetoothSmartCard.html">BluetoothSmartCard</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/BluetoothTerminalManager.html">BluetoothTerminalManager</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/BluetoothTerminalManager/TerminalType.html">– TerminalType</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/BluetoothTerminalManager/BatteryStatus.html">– BatteryStatus</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/BluetoothTerminalManager/DeviceInfoType.html">– DeviceInfoType</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/BluetoothTerminalManagerDelegate.html">BluetoothTerminalManagerDelegate</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+        <section>
+          <section class="section">
+            <h1>CardChannel</h1>
+              <div class="declaration">
+                <div class="language">
+                  
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">CardChannel</span> <span class="p">:</span> <span class="kt">AnyObject</span></code></pre>
+
+                </div>
+              </div>
+            <p>A logical channel connection to a Smart Card. It is used to exchange APDUs
+with a Smart Card. A CardChannel object can be obtained by calling the
+method <code><a href="../Protocols/Card.html#/s:11SmartCardIO0B0P12basicChannelAA0bE0_pyKF">Card.basicChannel()</a></code> or <code><a href="../Protocols/Card.html#/s:11SmartCardIO0B0P18openLogicalChannelAA0bF0_pyKF">Card.openLogicalChannel()</a></code>.</p>
+<div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <p><code><a href="../Protocols/Card.html">Card</a></code></p>
+
+</div><div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <p><code><a href="../Classes/CommandAPDU.html">CommandAPDU</a></code></p>
+
+</div><div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <p><code><a href="../Classes/ResponseAPDU.html">ResponseAPDU</a></code></p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>Andreas Sterbenz</p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>JSR 268 Expert Group</p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>Godfrey Chung</p>
+
+</div><div class="aside aside-version">
+    <p class="aside-title">Version</p>
+    <p>1.0</p>
+
+</div><div class="aside aside-date">
+    <p class="aside-title">Date</p>
+    <p>6 Nov 2017</p>
+
+</div>
+
+          </section>
+          <section class="section task-group-section">
+            <div class="task-group">
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO0B7ChannelP4cardAA0B0_pvp"></a>
+                    <a name="//apple_ref/swift/Property/card" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO0B7ChannelP4cardAA0B0_pvp">card</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Returns the Card this channel is associated with.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">var</span> <span class="nv">card</span><span class="p">:</span> <span class="kt"><a href="../Protocols/Card.html">Card</a></span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO0B7ChannelP13channelNumbers5UInt8VyKF"></a>
+                    <a name="//apple_ref/swift/Method/channelNumber()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO0B7ChannelP13channelNumbers5UInt8VyKF">channelNumber()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Returns the channel number of this CardChannel. A channel number of 0
+indicates the basic logical channel.</p>
+<div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <code>CardError.illegalState</code> if this channel has been closed or if the
+corresponding Card has been disconnected
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">channelNumber</span><span class="p">()</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">UInt8</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>the channel number of this CardChannel</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO0B7ChannelP8transmit4apduAA12ResponseAPDUCAA07CommandH0C_tKF"></a>
+                    <a name="//apple_ref/swift/Method/transmit(apdu:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO0B7ChannelP8transmit4apduAA12ResponseAPDUCAA07CommandH0C_tKF">transmit(apdu:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Transmits the specified command APDU to the Smart Card and returns the
+response APDU.</p>
+
+<p>The CLA byte of the command APDU is automatically adjusted to match the
+channel number of this CardChannel.</p>
+
+<p>Note that this method cannot be used to transmit <code>MANAGE CHANNEL</code> APDUs.
+Logical channels should be managed using the <code><a href="../Protocols/Card.html#/s:11SmartCardIO0B0P18openLogicalChannelAA0bF0_pyKF">Card.openLogicalChannel()</a></code>
+and <code><a href="../Protocols/CardChannel.html#/s:11SmartCardIO0B7ChannelP5closeyyKF">CardChannel.close()</a></code> methods.</p>
+
+<p>Implementations should transparently handle artifacts of the
+transmission protocol. For example, when using the T=0 protocol, the
+following processing should occur as described in ISO/IEC 7816-4:</p>
+
+<ul>
+<li><p>if the response APDU has an SW1 of <code>61</code>, the implementation should
+issue a <code>GET RESPONSE</code> command using <code>SW2</code> as the <code>Le</code> field. This
+process is repeated as long as an SW1 of <code>61</code> is received. The
+response body of these exchanges is concatenated to form the final
+response body.</p></li>
+<li><p>if the response APDU is <code>6C XX</code>, the implementation should reissue the
+command using <code>XX</code> as the <code>Le</code> field.</p></li>
+</ul>
+
+<p>The <code><a href="../Classes/ResponseAPDU.html">ResponseAPDU</a></code> returned by this method is the result after this
+processing has been performed.</p>
+<div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <code>CardError.illegalState</code> if this channel has been closed or if the
+corresponding Card has been disconnected;
+<code>CardError.illegalArgument</code> if the APDU encodes a <code>MANAGE CHANNEL</code>
+command;
+<code>CardError.operationFailed</code> if the card operation failed
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">transmit</span><span class="p">(</span><span class="nv">apdu</span><span class="p">:</span> <span class="kt"><a href="../Classes/CommandAPDU.html">CommandAPDU</a></span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Classes/ResponseAPDU.html">ResponseAPDU</a></span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>apdu</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the command APDU</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>the response APDU received from the card</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO0B7ChannelP8transmit6bufferSays5UInt8VGAH_tKF"></a>
+                    <a name="//apple_ref/swift/Method/transmit(buffer:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO0B7ChannelP8transmit6bufferSays5UInt8VGAH_tKF">transmit(buffer:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Transmits the command APDU stored in the command data buffer and
+receives the response APDU in the response data buffer.</p>
+
+<p>The command buffer must contain valid command APDU data. Upon return,
+the command buffer&rsquo;s position will be equal to its limit; its limit will
+not have changed. The output buffer will have received the response APDU
+bytes. Its position will have advanced by the number of bytes received,
+which is also the return value of this method.</p>
+
+<p>The CLA byte of the command APDU is automatically adjusted to match the
+channel number of this CardChannel.</p>
+
+<p>Note that this method cannot be used to transmit <code>MANAGE CHANNEL</code> APDUs.
+Logical channels should be managed using the <code><a href="../Protocols/Card.html#/s:11SmartCardIO0B0P18openLogicalChannelAA0bF0_pyKF">Card.openLogicalChannel()</a></code>
+and <code><a href="../Protocols/CardChannel.html#/s:11SmartCardIO0B7ChannelP5closeyyKF">CardChannel.close()</a></code> methods.</p>
+
+<p>See <code><a href="../Protocols/CardChannel.html#/s:11SmartCardIO0B7ChannelP8transmit4apduAA12ResponseAPDUCAA07CommandH0C_tKF">transmit(apdu:)</a></code> for a discussion of the handling of response APDUs
+with the SW1 values <code>61</code> or <code>6C</code>.</p>
+<div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <code>CardError.illegalState</code> if this channel has been closed or if the
+corresponding Card has been disconnected;
+<code>CardError.illegalArgument</code> if command and response are the same
+object, if <code>response</code> may not have sufficient space to receive the
+response APDU or if the APDU encodes a <code>MANAGE CHANNEL</code> command;
+<code>CardError.operationFailed</code> if the card operation failed
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">transmit</span><span class="p">(</span><span class="nv">buffer</span><span class="p">:</span> <span class="p">[</span><span class="kt">UInt8</span><span class="p">])</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="kt">UInt8</span><span class="p">]</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>buffer</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the buffer containing the command APDU</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>the buffer that shall receive the response APDU from the card</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO0B7ChannelP8transmit4data10Foundation4DataVAH_tKF"></a>
+                    <a name="//apple_ref/swift/Method/transmit(data:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO0B7ChannelP8transmit4data10Foundation4DataVAH_tKF">transmit(data:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Transmits the command APDU stored in the command data buffer and
+receives the response APDU in the response data buffer.</p>
+
+<p>The command buffer must contain valid command APDU data. Upon return,
+the command buffer&rsquo;s position will be equal to its limit; its limit will
+not have changed. The output buffer will have received the response APDU
+bytes. Its position will have advanced by the number of bytes received,
+which is also the return value of this method.</p>
+
+<p>The CLA byte of the command APDU is automatically adjusted to match the
+channel number of this CardChannel.</p>
+
+<p>Note that this method cannot be used to transmit <code>MANAGE CHANNEL</code> APDUs.
+Logical channels should be managed using the <code><a href="../Protocols/Card.html#/s:11SmartCardIO0B0P18openLogicalChannelAA0bF0_pyKF">Card.openLogicalChannel()</a></code>
+and <code><a href="../Protocols/CardChannel.html#/s:11SmartCardIO0B7ChannelP5closeyyKF">CardChannel.close()</a></code> methods.</p>
+
+<p>See <code><a href="../Protocols/CardChannel.html#/s:11SmartCardIO0B7ChannelP8transmit4apduAA12ResponseAPDUCAA07CommandH0C_tKF">transmit(apdu:)</a></code> for a discussion of the handling of response APDUs
+with the SW1 values <code>61</code> or <code>6C</code>.</p>
+<div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <code>CardError.illegalState</code> if this channel has been closed or if the
+corresponding Card has been disconnected;
+<code>CardError.illegalArgument</code>if command and response are the same
+object, if <code>response</code> may not have sufficient space to receive the
+response APDU or if the APDU encodes a <code>MANAGE CHANNEL</code> command;
+<code>CardError.operationFailed</code> if the card operation failed
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">transmit</span><span class="p">(</span><span class="nv">data</span><span class="p">:</span> <span class="kt">Data</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">Data</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>data</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the buffer containing the command APDU</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>the buffer that shall receive the response APDU from the card</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO0B7ChannelP5closeyyKF"></a>
+                    <a name="//apple_ref/swift/Method/close()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO0B7ChannelP5closeyyKF">close()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Closes this CardChannel. The logical channel is closed by issuing a
+<code>MANAGE CHANNEL</code> command that should use the format <code>[xx 70 80 0n]</code>
+where <code>n</code> is the channel number of this channel and <code>xx</code> is the <code>CLA</code>
+byte that encodes this logical channel and has all other bits set to 0.
+After this method returns, calling other methods in this class will
+raise a <code>CardError.illegalState</code>.</p>
+
+<p>Note that the basic logical channel cannot be closed using this
+method. It can be closed by calling <code><a href="../Protocols/Card.html#/s:11SmartCardIO0B0P10disconnect5resetySb_tKF">Card.disconnect(reset:)</a></code>.</p>
+<div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <code>CardError.operationFailed</code> if the card operation failed;
+<code>CardError.illegalState</code> if this CardChannel represents a connection
+to the basic logical channel
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">close</span><span class="p">()</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </section>
+        </section>
+        <section id="footer">
+          <p>Copyright (c) 2017-2024, Advanced Card Systems Ltd. All rights reserved.<br> Copyright (c) 1996-2014, Oracle and/or its affiliates. All rights reserved.</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.4</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
+        </section>
+      </article>
+    </div>
+  </body>
+</html>

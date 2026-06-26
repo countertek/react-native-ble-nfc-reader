@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>ACSSmartCardIO  Reference</title>
+    <link rel="stylesheet" type="text/css" href="css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="css/highlight.css" />
+    <meta charset='utf-8'>
+    <script src="js/jquery.min.js" defer></script>
+    <script src="js/jazzy.js" defer></script>
+    
+    <script src="js/lunr.min.js" defer></script>
+    <script src="js/typeahead.jquery.js" defer></script>
+    <script src="js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+    <a title="ACSSmartCardIO  Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p><a href="index.html">ACSSmartCardIO 0.6.0 Docs</a> (96% documented)</p>
+        <div class="header-right">
+          <form role="search" action="search.json">
+            <input type="text" placeholder="Search documentation" data-typeahead>
+          </form>
+        </div>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="index.html">ACSSmartCardIO Reference</a>
+        <img id="carat" src="img/carat.png" alt=""/>
+        ACSSmartCardIO  Reference
+      </p>
+    </div>
+    <div class="content-wrapper">
+      <nav class="sidebar">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a href="SmartCardIO.html">SmartCardIO</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Classes/ATR.html">ATR</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Protocols/Card.html">Card</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Protocols/CardChannel.html">CardChannel</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Enums/CardError.html">CardError</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Enums/CardState.html">CardState</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Protocols/CardTerminal.html">CardTerminal</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Protocols/CardTerminals.html">CardTerminals</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/CommandAPDU.html">CommandAPDU</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/Provider.html">Provider</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/ResponseAPDU.html">ResponseAPDU</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/TerminalFactory.html">TerminalFactory</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Protocols/TerminalFactorySpi.html">TerminalFactorySpi</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="ACSSmartCardIO%20Options.html">ACSSmartCardIO Options</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Classes/TerminalTimeouts.html">TerminalTimeouts</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/TransmitOptions.html">TransmitOptions</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="Bluetooth.html">Bluetooth</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Classes/AcsBluetooth.html">AcsBluetooth</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/Amr220cConstants.html">Amr220cConstants</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/BluetoothFactorySpi.html">BluetoothFactorySpi</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/BluetoothSmartCard.html">BluetoothSmartCard</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/BluetoothTerminalManager.html">BluetoothTerminalManager</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/BluetoothTerminalManager/TerminalType.html">– TerminalType</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/BluetoothTerminalManager/BatteryStatus.html">– BatteryStatus</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/BluetoothTerminalManager/DeviceInfoType.html">– DeviceInfoType</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Protocols/BluetoothTerminalManagerDelegate.html">BluetoothTerminalManagerDelegate</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+        <section>
+          <section class="section">
+            
+            <h1 id='acs-smart-card-i-o-ios-framework' class='heading'>ACS Smart Card I/O iOS Framework</h1>
+
+<p>This framework provides classes and interfaces for communicating with ACS
+Bluetooth readers on iOS 12.0 or above.</p>
+<h2 id='ble-usage-description' class='heading'>BLE Usage Description</h2>
+
+<p>Your app must add the following keys to <code>Info.plist</code> in order to access
+Bluetooth peripheral.</p>
+<pre class="highlight xml"><code><span class="nt">&lt;key&gt;</span>NSBluetoothAlwaysUsageDescription<span class="nt">&lt;/key&gt;</span>
+<span class="nt">&lt;string&gt;</span>$(PRODUCT_NAME) would like to use Bluetooth to connect ACS readers.<span class="nt">&lt;/string&gt;</span>
+<span class="nt">&lt;key&gt;</span>NSBluetoothPeripheralUsageDescription<span class="nt">&lt;/key&gt;</span>
+<span class="nt">&lt;string&gt;</span>$(PRODUCT_NAME) would like to use Bluetooth to connect ACS readers.<span class="nt">&lt;/string&gt;</span>
+</code></pre>
+<h2 id='setting-up-ble' class='heading'>Setting Up BLE</h2>
+
+<p>Before connecting Bluetooth card terminals, your app must import
+<code>ACSSmartCardIO</code> module. You can get an instance of Bluetooth Terminal Manager
+and Terminal Factory from <code><a href="Classes/BluetoothSmartCard.html#/s:14ACSSmartCardIO014BluetoothSmartB0C6sharedACvpZ">BluetoothSmartCard.shared</a></code> object. To receive events
+from <code><a href="Classes/BluetoothTerminalManager.html">BluetoothTerminalManager</a></code> object, your app must assign a delegate object
+to it.</p>
+<pre class="highlight swift"><code><span class="o">...</span>
+
+<span class="kd">import</span> <span class="kt">SmartCardIO</span>
+<span class="kd">import</span> <span class="kt">ACSSmartCardIO</span>
+
+<span class="o">...</span>
+
+<span class="kd">class</span> <span class="kt">ViewController</span><span class="p">:</span> <span class="kt">UIViewController</span> <span class="p">{</span>
+
+    <span class="o">...</span>
+
+    <span class="k">let</span> <span class="nv">manager</span> <span class="o">=</span> <span class="kt">BluetoothSmartCard</span><span class="o">.</span><span class="n">shared</span><span class="o">.</span><span class="n">manager</span>
+    <span class="k">let</span> <span class="nv">factory</span> <span class="o">=</span> <span class="kt">BluetoothSmartCard</span><span class="o">.</span><span class="n">shared</span><span class="o">.</span><span class="n">factory</span>
+
+    <span class="k">override</span> <span class="kd">func</span> <span class="nf">viewDidLoad</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">super</span><span class="o">.</span><span class="nf">viewDidLoad</span><span class="p">()</span>
+        <span class="c1">// Do any additional setup after loading the view, typically from a nib.</span>
+
+        <span class="o">...</span>
+
+        <span class="c1">// Set the delegate.</span>
+        <span class="n">manager</span><span class="o">.</span><span class="n">delegate</span> <span class="o">=</span> <span class="k">self</span>
+
+        <span class="o">...</span>
+    <span class="p">}</span>
+
+    <span class="o">...</span>
+<span class="p">}</span>
+
+<span class="o">...</span>
+</code></pre>
+
+<p>Your app must check the state from <code>CentralManager</code> object and show the message
+if Bluetooth is not supported or other reasons that your app cannot use
+Bluetooth on your iOS device.</p>
+<pre class="highlight swift"><code><span class="c1">// MARK: - BluetoothTerminalManagerDelegate</span>
+<span class="kd">extension</span> <span class="kt">ViewController</span><span class="p">:</span> <span class="kt">BluetoothTerminalManagerDelegate</span> <span class="p">{</span>
+
+    <span class="kd">func</span> <span class="nf">bluetoothTerminalManagerDidUpdateState</span><span class="p">(</span><span class="n">_</span> <span class="nv">manager</span><span class="p">:</span> <span class="kt">BluetoothTerminalManager</span><span class="p">)</span> <span class="p">{</span>
+
+        <span class="k">var</span> <span class="nv">message</span> <span class="o">=</span> <span class="s">""</span>
+
+        <span class="k">switch</span> <span class="n">manager</span><span class="o">.</span><span class="n">centralManager</span><span class="o">.</span><span class="n">state</span> <span class="p">{</span>
+
+        <span class="k">case</span> <span class="o">.</span><span class="n">unknown</span><span class="p">,</span> <span class="o">.</span><span class="nv">resetting</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="s">"The update is being started. Please wait until Bluetooth is ready."</span>
+
+        <span class="k">case</span> <span class="o">.</span><span class="nv">unsupported</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="s">"This device does not support Bluetooth low energy."</span>
+
+        <span class="k">case</span> <span class="o">.</span><span class="nv">unauthorized</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="s">"This app is not authorized to use Bluetooth low energy."</span>
+
+        <span class="k">case</span> <span class="o">.</span><span class="nv">poweredOff</span><span class="p">:</span>
+            <span class="k">if</span> <span class="o">!</span><span class="n">firstRun</span> <span class="p">{</span>
+                <span class="n">message</span> <span class="o">=</span> <span class="s">"You must turn on Bluetooth in Settings in order to use the reader."</span>
+            <span class="p">}</span>
+
+        <span class="k">default</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="o">!</span><span class="n">message</span><span class="o">.</span><span class="n">isEmpty</span> <span class="p">{</span>
+
+            <span class="c1">// TODO: Show the message.</span>
+            <span class="c1">// ...</span>
+        <span class="p">}</span>
+
+        <span class="n">firstRun</span> <span class="o">=</span> <span class="kc">false</span>
+    <span class="p">}</span>
+
+    <span class="o">...</span>
+<span class="p">}</span>
+</code></pre>
+<h2 id='finding-ble-card-terminals' class='heading'>Finding BLE Card Terminals</h2>
+
+<p>To find BLE card terminals, you must use
+<code><a href="Classes/BluetoothTerminalManager.html#/s:14ACSSmartCardIO24BluetoothTerminalManagerC9startScan12terminalTypeyAC0eJ0O_tF">BluetoothTerminalManager.startScan(terminalType:)</a></code> method from your
+<code><a href="Classes/BluetoothTerminalManager.html">BluetoothTerminalManager</a></code> object.</p>
+<pre class="highlight swift"><code><span class="o">...</span>
+
+<span class="k">override</span> <span class="kd">func</span> <span class="nf">prepare</span><span class="p">(</span><span class="k">for</span> <span class="nv">segue</span><span class="p">:</span> <span class="kt">UIStoryboardSegue</span><span class="p">,</span> <span class="nv">sender</span><span class="p">:</span> <span class="kt">Any</span><span class="p">?)</span> <span class="p">{</span>
+
+    <span class="k">if</span> <span class="k">let</span> <span class="nv">identifier</span> <span class="o">=</span> <span class="n">segue</span><span class="o">.</span><span class="n">identifier</span> <span class="p">{</span>
+        <span class="k">switch</span> <span class="n">identifier</span> <span class="p">{</span>
+
+        <span class="k">case</span> <span class="s">"ScanTerminals"</span><span class="p">:</span>
+
+            <span class="o">...</span>
+
+            <span class="c1">// Start the scan.</span>
+            <span class="n">manager</span><span class="o">.</span><span class="nf">startScan</span><span class="p">(</span><span class="nv">terminalType</span><span class="p">:</span> <span class="o">.</span><span class="n">amr220c</span><span class="p">)</span>
+
+            <span class="o">...</span>
+
+        <span class="k">default</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="o">...</span>
+</code></pre>
+
+<p>The Bluetooth Terminal Manager will call
+<code><a href="Protocols/BluetoothTerminalManagerDelegate.html#/s:14ACSSmartCardIO32BluetoothTerminalManagerDelegateP09bluetootheF0_11didDiscoveryAA0deF0C_05SmartbC00bE0_ptF">BluetoothTerminalManagerDelegate.bluetoothTerminalManager(_:didDiscover:)</a></code>
+method from your delegate object to return <code><a href="Protocols/CardTerminal.html">CardTerminal</a></code> object if any card
+terminal is detected.</p>
+<pre class="highlight swift"><code><span class="c1">// MARK: - BluetoothTerminalManagerDelegate</span>
+<span class="kd">extension</span> <span class="kt">ViewController</span><span class="p">:</span> <span class="kt">BluetoothTerminalManagerDelegate</span> <span class="p">{</span>
+
+    <span class="o">...</span>
+
+    <span class="kd">func</span> <span class="nf">bluetoothTerminalManager</span><span class="p">(</span><span class="n">_</span> <span class="nv">manager</span><span class="p">:</span> <span class="kt">BluetoothTerminalManager</span><span class="p">,</span> <span class="n">didDiscover</span> <span class="nv">terminal</span><span class="p">:</span> <span class="kt">CardTerminal</span><span class="p">)</span> <span class="p">{</span>
+
+        <span class="c1">// TODO: Process the card terminal here.</span>
+        <span class="c1">// ...</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>Because continuing to scan drains the battery, you must
+call <code><a href="Classes/BluetoothTerminalManager.html#/s:14ACSSmartCardIO24BluetoothTerminalManagerC8stopScanyyF">BluetoothTerminalManager.stopScan()</a></code> after your card terminal was found.</p>
+<pre class="highlight swift"><code><span class="o">...</span>
+
+<span class="kd">@IBAction</span> <span class="kd">func</span> <span class="nf">unwindToMain</span><span class="p">(</span><span class="nv">segue</span><span class="p">:</span> <span class="kt">UIStoryboardSegue</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="k">if</span> <span class="k">let</span> <span class="nv">identifier</span> <span class="o">=</span> <span class="n">segue</span><span class="o">.</span><span class="n">identifier</span> <span class="p">{</span>
+        <span class="k">switch</span> <span class="n">identifier</span> <span class="p">{</span>
+
+        <span class="k">case</span> <span class="s">"ReturnTerminal"</span><span class="p">:</span>
+
+            <span class="o">...</span>
+
+            <span class="c1">// Stop the scan.</span>
+            <span class="n">manager</span><span class="o">.</span><span class="nf">stopScan</span><span class="p">()</span>
+
+            <span class="o">...</span>
+
+        <span class="o">...</span>
+
+        <span class="k">default</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="o">...</span>
+</code></pre>
+<h2 id='authenticating-a-ble-card-terminal' class='heading'>Authenticating a BLE Card Terminal</h2>
+
+<p>Normally, the BLE card terminal will use the default key in authentication. If
+you have modified the master key, you must call
+<code><a href="Classes/BluetoothTerminalManager.html#/s:14ACSSmartCardIO24BluetoothTerminalManagerC12setMasterKey8terminal06masterI0y05SmartbC00bE0_p_Says5UInt8VGSgtKF">BluetoothTerminalManager.setMasterKey(terminal:masterKey:)</a></code> before connecting
+to a card.</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">newKey</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x01</span><span class="p">,</span> <span class="mh">0x02</span><span class="p">,</span> <span class="mh">0x03</span><span class="p">,</span> <span class="mh">0x04</span><span class="p">,</span> <span class="mh">0x05</span><span class="p">,</span> <span class="mh">0x06</span><span class="p">,</span> <span class="mh">0x08</span><span class="p">,</span>
+    <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x01</span><span class="p">,</span> <span class="mh">0x02</span><span class="p">,</span> <span class="mh">0x03</span><span class="p">,</span> <span class="mh">0x04</span><span class="p">,</span> <span class="mh">0x05</span><span class="p">,</span> <span class="mh">0x06</span><span class="p">,</span> <span class="mh">0x08</span>
+<span class="p">]</span>
+
+<span class="n">manager</span><span class="o">.</span><span class="nf">setMasterKey</span><span class="p">(</span><span class="nv">terminal</span><span class="p">:</span> <span class="n">terminal</span><span class="p">,</span> <span class="nv">masterKey</span><span class="p">:</span> <span class="n">newKey</span><span class="p">)</span>
+</code></pre>
+<h2 id='connecting-to-a-card' class='heading'>Connecting to a Card</h2>
+
+<p>To connect a card, you must call <code><a href="Protocols/CardTerminal.html#/s:11SmartCardIO0B8TerminalP7connect14protocolStringAA0B0_pSS_tKF">CardTerminal.connect(protocolString:)</a></code> from
+your <code><a href="Protocols/CardTerminal.html">CardTerminal</a></code> object to return a <code><a href="Protocols/Card.html">Card</a></code> object. The available protocols
+are T=0, T=1, T=0 or T=1 and direct.</p>
+<pre class="highlight swift"><code><span class="c1">// Protocol:</span>
+<span class="c1">// "T=0"    - T=0</span>
+<span class="c1">// "T=1"    - T=1</span>
+<span class="c1">// "*"      - T=0 or T=1</span>
+<span class="c1">// "direct" - Direct mode</span>
+<span class="k">do</span> <span class="p">{</span>
+    <span class="kt">Card</span> <span class="n">card</span> <span class="o">=</span> <span class="k">try</span> <span class="n">terminal</span><span class="o">.</span><span class="nf">connect</span><span class="p">(</span><span class="nv">protocolString</span><span class="p">:</span> <span class="s">"*"</span><span class="p">)</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">{</span>
+    <span class="nf">print</span><span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">localizedDescription</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre>
+<h2 id='disconnecting-from-the-card' class='heading'>Disconnecting from the Card</h2>
+
+<p>After using the card, you can disconnect it by calling <code><a href="Protocols/Card.html#/s:11SmartCardIO0B0P10disconnect5resetySb_tKF">Card.disconnect(reset:)</a></code>
+from the <code><a href="Protocols/Card.html">Card</a></code> object. If you want to reset the card after disconnecting, you
+can pass <code>true</code> to the parameter.</p>
+<pre class="highlight swift"><code><span class="k">do</span> <span class="p">{</span>
+    <span class="k">try</span> <span class="n">card</span><span class="o">.</span><span class="nf">disconnect</span><span class="p">(</span><span class="nv">reset</span><span class="p">:</span> <span class="kc">false</span><span class="p">)</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">{</span>
+    <span class="nf">print</span><span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">localizedDescription</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre>
+<h2 id='transmitting-apdus' class='heading'>Transmitting APDUs</h2>
+
+<p>If the card is connected successfully, you must open a channel to transmit
+APDUs. You can call either <code><a href="Protocols/Card.html#/s:11SmartCardIO0B0P12basicChannelAA0bE0_pyKF">Card.basicChannel()</a></code> or
+<code><a href="Protocols/Card.html#/s:11SmartCardIO0B0P18openLogicalChannelAA0bF0_pyKF">Card.openLogicalChannel()</a></code> from the <code><a href="Protocols/Card.html">Card</a></code> object. After a <code><a href="Protocols/CardChannel.html">CardChannel</a></code> object
+is returned, you can transmit APDUs using <code><a href="Protocols/CardChannel.html#/s:11SmartCardIO0B7ChannelP8transmit4apduAA12ResponseAPDUCAA07CommandH0C_tKF">CardChannel.transmit(apdu:)</a></code>,
+<code><a href="Protocols/CardChannel.html#/s:11SmartCardIO0B7ChannelP8transmit6bufferSays5UInt8VGAH_tKF">CardChannel.transmit(buffer:)</a></code> or <code><a href="Protocols/CardChannel.html#/s:11SmartCardIO0B7ChannelP8transmit4data10Foundation4DataVAH_tKF">CardChannel.transmit(data:)</a></code> from
+<code><a href="Protocols/CardChannel.html">CardChannel</a></code> object.</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">command</span><span class="p">:</span> <span class="p">[</span><span class="kt">UInt8</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x84</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x08</span> <span class="p">]</span>
+
+<span class="k">do</span> <span class="p">{</span>
+
+    <span class="k">let</span> <span class="nv">card</span> <span class="o">=</span> <span class="k">try</span> <span class="n">terminal</span><span class="o">.</span><span class="nf">connect</span><span class="p">(</span><span class="nv">protocolString</span><span class="p">:</span> <span class="s">"*"</span><span class="p">)</span>
+    <span class="k">let</span> <span class="nv">channel</span> <span class="o">=</span> <span class="k">try</span> <span class="n">card</span><span class="o">.</span><span class="nf">basicChannel</span><span class="p">()</span>
+    <span class="k">let</span> <span class="nv">commandAPDU</span> <span class="o">=</span> <span class="k">try</span> <span class="kt">CommandAPDU</span><span class="p">(</span><span class="nv">apdu</span><span class="p">:</span> <span class="n">command</span><span class="p">)</span>
+    <span class="k">let</span> <span class="nv">responseAPDU</span> <span class="o">=</span> <span class="k">try</span> <span class="n">channel</span><span class="o">.</span><span class="nf">transmit</span><span class="p">(</span><span class="nv">apdu</span><span class="p">:</span> <span class="n">commandAPDU</span><span class="p">)</span>
+
+<span class="p">}</span> <span class="k">catch</span> <span class="p">{</span>
+
+    <span class="nf">print</span><span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">localizedDescription</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>These methods issue a GET RESPONSE command using SW2 as the Le field if 61 XX is
+received and reissue the command using SW2 as the Le field if 6C XX is received.
+To modify the default behaviour, you can set the option by calling methods from
+<code><a href="Classes/TransmitOptions.html">TransmitOptions</a></code> class.</p>
+<pre class="highlight swift"><code><span class="kt">TransmitOptions</span><span class="o">.</span><span class="n">t0GetResponse</span> <span class="o">=</span> <span class="kc">false</span>
+<span class="kt">TransmitOptions</span><span class="o">.</span><span class="n">t1GetResponse</span> <span class="o">=</span> <span class="kc">false</span>
+</code></pre>
+<h2 id='transmitting-control-commands' class='heading'>Transmitting Control Commands</h2>
+
+<p>If the card is connected successfully, you can call
+<code><a href="Protocols/Card.html#/s:11SmartCardIO0B0P22transmitControlCommand11controlCode7commandSays5UInt8VGSi_AItKF">Card.transmitControlCommand(controlCode:command:)</a></code> from the <code><a href="Protocols/Card.html">Card</a></code> object to
+transmit control commands.</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">controlCode</span> <span class="o">=</span> <span class="kt">BluetoothTerminalManager</span><span class="o">.</span><span class="n">ioctlEscape</span>
+
+<span class="k">do</span> <span class="p">{</span>
+
+    <span class="k">let</span> <span class="nv">card</span> <span class="o">=</span> <span class="k">try</span> <span class="n">terminal</span><span class="o">.</span><span class="nf">connect</span><span class="p">(</span><span class="nv">protocolString</span><span class="p">:</span> <span class="s">"direct"</span><span class="p">)</span>
+    <span class="k">let</span> <span class="nv">response</span> <span class="o">=</span> <span class="k">try</span> <span class="n">card</span><span class="o">.</span><span class="nf">transmitControlCommand</span><span class="p">(</span><span class="nv">controlCode</span><span class="p">:</span> <span class="n">controlCode</span><span class="p">,</span>
+                                                   <span class="nv">command</span><span class="p">:</span> <span class="n">command</span><span class="p">)</span>
+
+<span class="p">}</span> <span class="k">catch</span> <span class="p">{</span>
+
+    <span class="nf">print</span><span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">localizedDescription</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre>
+<h2 id='modifying-the-timeout-settings' class='heading'>Modifying the Timeout Settings</h2>
+
+<p>To get the timeout settings of the card terminal, you must call
+<code><a href="Classes/BluetoothTerminalManager.html#/s:14ACSSmartCardIO24BluetoothTerminalManagerC8timeouts8terminalAA0E8TimeoutsC05SmartbC00bE0_p_tKF">BluetoothTerminalManager.timeouts(terminal:)</a></code> from the
+<code><a href="Classes/BluetoothTerminalManager.html">BluetoothTerminalManager</a></code> object to return <code><a href="Classes/TerminalTimeouts.html">TerminalTimeouts</a></code> object.</p>
+
+<p>You can modify the timeout from the following properties:</p>
+
+<ul>
+<li><code><a href="Classes/TerminalTimeouts.html#/s:14ACSSmartCardIO16TerminalTimeoutsC17connectionTimeoutSivp">TerminalTimeouts.connectionTimeout</a></code></li>
+<li><code><a href="Classes/TerminalTimeouts.html#/s:14ACSSmartCardIO16TerminalTimeoutsC12powerTimeoutSivp">TerminalTimeouts.powerTimeout</a></code></li>
+<li><code><a href="Classes/TerminalTimeouts.html#/s:14ACSSmartCardIO16TerminalTimeoutsC15protocolTimeoutSivp">TerminalTimeouts.protocolTimeout</a></code></li>
+<li><code><a href="Classes/TerminalTimeouts.html#/s:14ACSSmartCardIO16TerminalTimeoutsC11apduTimeoutSivp">TerminalTimeouts.apduTimeout</a></code></li>
+<li><code><a href="Classes/TerminalTimeouts.html#/s:14ACSSmartCardIO16TerminalTimeoutsC14controlTimeoutSivp">TerminalTimeouts.controlTimeout</a></code></li>
+</ul>
+<pre class="highlight swift"><code><span class="k">do</span> <span class="p">{</span>
+
+    <span class="k">let</span> <span class="nv">timeouts</span> <span class="o">=</span> <span class="k">try</span> <span class="n">manager</span><span class="o">.</span><span class="nf">timeouts</span><span class="p">(</span><span class="nv">terminal</span><span class="p">:</span> <span class="n">terminal</span><span class="p">)</span>
+    <span class="n">timeouts</span><span class="o">.</span><span class="n">apduTimeout</span> <span class="o">=</span> <span class="mi">20000</span>
+
+<span class="p">}</span> <span class="k">catch</span> <span class="p">{</span>
+
+    <span class="nf">print</span><span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">localizedDescription</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre>
+<h2 id='getting-the-battery-status' class='heading'>Getting the Battery Status</h2>
+
+<p>You can call <code><a href="Classes/BluetoothTerminalManager.html#/s:14ACSSmartCardIO24BluetoothTerminalManagerC13batteryStatus8terminal7timeoutAC07BatteryH0O05SmartbC00bE0_p_SitKF">BluetoothTerminalManager.batteryStatus(terminal:timeout:)</a></code> from
+the <code><a href="Classes/BluetoothTerminalManager.html">BluetoothTerminalManager</a></code> object to return the battery status. If the card
+terminal does not support the battery status, it will return
+<code><a href="Classes/BluetoothTerminalManager/BatteryStatus.html#/s:14ACSSmartCardIO24BluetoothTerminalManagerC13BatteryStatusO12notSupportedyA2EmF">BluetoothTerminalManager.BatteryStatus.notSupported</a></code>.</p>
+<pre class="highlight swift"><code><span class="k">do</span> <span class="p">{</span>
+    <span class="k">let</span> <span class="nv">batteryStatus</span> <span class="o">=</span> <span class="k">try</span> <span class="n">manager</span><span class="o">.</span><span class="nf">batteryStatus</span><span class="p">(</span><span class="nv">terminal</span><span class="p">:</span> <span class="n">terminal</span><span class="p">,</span>
+                                                  <span class="nv">timeout</span><span class="p">:</span> <span class="mi">10000</span><span class="p">)</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">{</span>
+    <span class="nf">print</span><span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">localizedDescription</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre>
+<h2 id='getting-the-battery-level' class='heading'>Getting the Battery Level</h2>
+
+<p>You can call <code><a href="Classes/BluetoothTerminalManager.html#/s:14ACSSmartCardIO24BluetoothTerminalManagerC12batteryLevel8terminal7timeoutSi05SmartbC00bE0_p_SitKF">BluetoothTerminalManager.batteryLevel(terminal:timeout:)</a></code> from the
+<code><a href="Classes/BluetoothTerminalManager.html">BluetoothTerminalManager</a></code> object to return the battery level. If the card
+terminal does not support the battery level, it will return -1.</p>
+<pre class="highlight swift"><code><span class="k">do</span> <span class="p">{</span>
+    <span class="k">let</span> <span class="nv">batteryLevel</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="nf">batteryLevel</span><span class="p">(</span><span class="nv">terminal</span><span class="p">:</span> <span class="n">terminal</span><span class="p">,</span>
+                                            <span class="nv">timeout</span><span class="p">:</span> <span class="mi">10000</span><span class="p">)</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">{</span>
+    <span class="nf">print</span><span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">localizedDescription</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre>
+<h2 id='getting-the-device-information' class='heading'>Getting the Device Information</h2>
+
+<p>You can call <code><a href="Classes/BluetoothTerminalManager.html#/s:14ACSSmartCardIO24BluetoothTerminalManagerC10deviceInfo8terminal4type7timeoutSSSg05SmartbC00bE0_p_AC06DeviceH4TypeOSitKF">BluetoothTerminalManager.deviceInfo(terminal:type:timeout:)</a></code> from
+the <code><a href="Classes/BluetoothTerminalManager.html">BluetoothTerminalManager</a></code> object to return the device information. If the
+card terminal does not support the device information, it will return <code>nil</code>.</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">type</span> <span class="o">=</span> <span class="kt">BluetoothTerminalManager</span><span class="o">.</span><span class="kt">DeviceInfoType</span><span class="o">.</span><span class="n">modelNumberString</span>
+
+<span class="k">do</span> <span class="p">{</span>
+    <span class="k">let</span> <span class="nv">deviceInfo</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="nf">deviceInfo</span><span class="p">(</span><span class="nv">terminal</span><span class="p">:</span> <span class="n">terminal</span><span class="p">,</span>
+                                        <span class="nv">type</span><span class="p">:</span> <span class="n">type</span><span class="p">,</span>
+                                        <span class="nv">timeout</span><span class="p">:</span> <span class="mi">10000</span><span class="p">)</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">{</span>
+    <span class="nf">print</span><span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">localizedDescription</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre>
+<h2 id='disconnecting-from-ble-card-terminal' class='heading'>Disconnecting from BLE Card Terminal</h2>
+
+<p>The library connects BLE card terminal automatically when calling
+<code><a href="Protocols/CardTerminal.html#/s:11SmartCardIO0B8TerminalP7connect14protocolStringAA0B0_pSS_tKF">CardTerminal.connect(protocolString:)</a></code> from the <code><a href="Protocols/CardTerminal.html">CardTerminal</a></code> object. To
+terminate the Bluetooth connection manually, you must call
+<code><a href="Classes/BluetoothTerminalManager.html#/s:14ACSSmartCardIO24BluetoothTerminalManagerC10disconnect8terminaly05SmartbC00bE0_p_tKF">BluetoothTerminalManager.disconnect(terminal:)</a></code> from <code><a href="Classes/BluetoothTerminalManager.html">BluetoothTerminalManager</a></code>
+object.</p>
+<pre class="highlight swift"><code><span class="k">do</span> <span class="p">{</span>
+    <span class="k">try</span> <span class="n">manager</span><span class="o">.</span><span class="nf">disconnect</span><span class="p">(</span><span class="nv">terminal</span><span class="p">:</span> <span class="n">terminal</span><span class="p">)</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">{</span>
+    <span class="nf">print</span><span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">localizedDescription</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre>
+
+          </section>
+        </section>
+        <section id="footer">
+          <p>Copyright (c) 2017-2024, Advanced Card Systems Ltd. All rights reserved.<br> Copyright (c) 1996-2014, Oracle and/or its affiliates. All rights reserved.</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.4</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
+        </section>
+      </article>
+    </div>
+  </body>
+</html>

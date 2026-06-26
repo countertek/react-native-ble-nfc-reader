@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>SmartCardIO  Reference</title>
+    <link rel="stylesheet" type="text/css" href="css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="css/highlight.css" />
+    <meta charset='utf-8'>
+    <script src="js/jquery.min.js" defer></script>
+    <script src="js/jazzy.js" defer></script>
+    
+    <script src="js/lunr.min.js" defer></script>
+    <script src="js/typeahead.jquery.js" defer></script>
+    <script src="js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+    <a name="//apple_ref/swift/Section/SmartCardIO" class="dashAnchor"></a>
+    <a title="SmartCardIO  Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p><a href="index.html">ACSSmartCardIO 0.6.0 Docs</a> (96% documented)</p>
+        <div class="header-right">
+          <form role="search" action="search.json">
+            <input type="text" placeholder="Search documentation" data-typeahead>
+          </form>
+        </div>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="index.html">ACSSmartCardIO Reference</a>
+        <img id="carat" src="img/carat.png" alt=""/>
+        SmartCardIO  Reference
+      </p>
+    </div>
+    <div class="content-wrapper">
+      <nav class="sidebar">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a href="SmartCardIO.html">SmartCardIO</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Classes/ATR.html">ATR</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Protocols/Card.html">Card</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Protocols/CardChannel.html">CardChannel</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Enums/CardError.html">CardError</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Enums/CardState.html">CardState</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Protocols/CardTerminal.html">CardTerminal</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Protocols/CardTerminals.html">CardTerminals</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/CommandAPDU.html">CommandAPDU</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/Provider.html">Provider</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/ResponseAPDU.html">ResponseAPDU</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/TerminalFactory.html">TerminalFactory</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Protocols/TerminalFactorySpi.html">TerminalFactorySpi</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="ACSSmartCardIO%20Options.html">ACSSmartCardIO Options</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Classes/TerminalTimeouts.html">TerminalTimeouts</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/TransmitOptions.html">TransmitOptions</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="Bluetooth.html">Bluetooth</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Classes/AcsBluetooth.html">AcsBluetooth</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/Amr220cConstants.html">Amr220cConstants</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/BluetoothFactorySpi.html">BluetoothFactorySpi</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/BluetoothSmartCard.html">BluetoothSmartCard</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/BluetoothTerminalManager.html">BluetoothTerminalManager</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/BluetoothTerminalManager/TerminalType.html">– TerminalType</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/BluetoothTerminalManager/BatteryStatus.html">– BatteryStatus</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/BluetoothTerminalManager/DeviceInfoType.html">– DeviceInfoType</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Protocols/BluetoothTerminalManagerDelegate.html">BluetoothTerminalManagerDelegate</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+        <section>
+          <section class="section">
+            <h1>SmartCardIO</h1>
+            <!--
+ Copyright (c) 2005, 2006, Oracle and/or its affiliates. All rights reserved.
+ Copyright (c) 2018, Advanced Card Systems Ltd. All rights reserved.
+ DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+
+ This code is free software; you can redistribute it and/or modify it
+ under the terms of the GNU General Public License version 2 only, as
+ published by the Free Software Foundation.  Oracle designates this
+ particular file as subject to the "Classpath" exception as provided
+ by Oracle in the LICENSE file that accompanied this code.
+
+ This code is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ version 2 for more details (a copy is included in the LICENSE file that
+ accompanied this code).
+
+ You should have received a copy of the GNU General Public License version
+ 2 along with this work; if not, write to the Free Software Foundation,
+ Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+
+ Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ or visit www.oracle.com if you need additional information or have any
+ questions.
+-->
+
+<p>This specification describes the Java Smart Card I/O API defined by
+<a href="http://jcp.org/en/jsr/detail?id=268">JSR 268</a>.</p>
+
+<p>It defines a Java API for communication with Smart Cards using ISO/IEC 7816-4
+APDUs. It thereby allows Java applications to interact with applications running
+on the Smart Card, to store and retrieve data on the card, etc.</p>
+
+<p>The API is defined by classes in the module <code>SmartCardIO</code>. They can be
+classified as follows:</p>
+
+<p>Classes describing the corresponding Smart Card structures<br>
+<code><a href="Classes/ATR.html">ATR</a></code>, <code><a href="Classes/CommandAPDU.html">CommandAPDU</a></code>, <code><a href="Classes/ResponseAPDU.html">ResponseAPDU</a></code></p>
+
+<p>Factory to obtain implementations<br>
+<code><a href="Classes/TerminalFactory.html">TerminalFactory</a></code></p>
+
+<p>Main classes for card and terminal functions<br>
+<code><a href="Protocols/CardTerminals.html">CardTerminals</a></code>, <code><a href="Protocols/CardTerminal.html">CardTerminal</a></code>, <code><a href="Protocols/Card.html">Card</a></code>, <code><a href="Protocols/CardChannel.html">CardChannel</a></code></p>
+
+<p>Enumerations for error handling<br>
+<code><a href="Enums/CardError.html">CardError</a></code></p>
+
+<p>Service provider interface, not accessed directly by applications<br>
+<code><a href="Protocols/TerminalFactorySpi.html">TerminalFactorySpi</a></code></p>
+<h2 id='api-example' class='heading'>API Example</h2>
+
+<p>A simple example of using the API is:</p>
+<pre class="highlight swift"><code><span class="c1">// show the list of available terminals</span>
+<span class="k">let</span> <span class="nv">factory</span> <span class="o">=</span> <span class="k">try</span> <span class="kt">TerminalFactory</span><span class="o">.</span><span class="nf">shared</span><span class="p">(</span><span class="nv">type</span><span class="p">:</span> <span class="s">"MyType"</span><span class="p">,</span>
+                                         <span class="nv">params</span><span class="p">:</span> <span class="n">params</span><span class="p">,</span>
+                                         <span class="nv">provider</span><span class="p">:</span> <span class="n">provider</span><span class="p">)</span>
+<span class="k">let</span> <span class="nv">terminals</span> <span class="o">=</span> <span class="k">try</span> <span class="n">factory</span><span class="o">.</span><span class="nf">terminals</span><span class="p">()</span><span class="o">.</span><span class="nf">list</span><span class="p">()</span>
+<span class="nf">print</span><span class="p">(</span><span class="s">"Terminals: "</span> <span class="o">+</span> <span class="n">terminals</span><span class="p">)</span>
+
+<span class="c1">// get the first terminal</span>
+<span class="k">let</span> <span class="nv">terminal</span> <span class="o">=</span> <span class="n">terminals</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c1">// establish a connection with the card</span>
+<span class="k">let</span> <span class="nv">card</span> <span class="o">=</span> <span class="k">try</span> <span class="n">terminal</span><span class="o">.</span><span class="nf">connect</span><span class="p">(</span><span class="nv">protocolString</span><span class="p">:</span> <span class="s">"T=0"</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="s">"card: "</span> <span class="o">+</span> <span class="n">card</span><span class="p">)</span>
+<span class="k">let</span> <span class="nv">channel</span> <span class="o">=</span> <span class="k">try</span> <span class="n">card</span><span class="o">.</span><span class="nf">basicChannel</span><span class="p">()</span>
+<span class="k">let</span> <span class="nv">r</span> <span class="o">=</span> <span class="k">try</span> <span class="n">channel</span><span class="o">.</span><span class="nf">transmit</span><span class="p">(</span><span class="kt">CommandAPDU</span><span class="p">(</span><span class="nv">apdu</span><span class="p">:</span> <span class="n">c1</span><span class="p">))</span>
+<span class="nf">print</span><span class="p">(</span><span class="s">"response: "</span> <span class="o">+</span> <span class="nf">toString</span><span class="p">(</span><span class="nv">buffer</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">bytes</span><span class="p">))</span>
+
+<span class="c1">// disconnect</span>
+<span class="k">try</span> <span class="n">card</span><span class="o">.</span><span class="nf">disconnect</span><span class="p">(</span><span class="nv">reset</span><span class="p">:</span> <span class="kc">false</span><span class="p">)</span>
+</code></pre>
+
+          </section>
+          <section class="section task-group-section">
+            <div class="task-group">
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO3ATRC"></a>
+                    <a name="//apple_ref/swift/Class/ATR" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO3ATRC">ATR</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>A Smart Card&rsquo;s answer-to-reset bytes. A Card&rsquo;s ATR object can be obtained
+by calling <code><a href="Protocols/Card.html#/s:11SmartCardIO0B0P3atrAA3ATRCvp">Card.atr</a></code>. This class does not attempt to verify that the ATR
+encodes a semantically valid structure.</p>
+
+<p>Instances of this class are immutable. Where data is passed in or out
+via byte arrays, defensive cloning is performed.</p>
+<div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <p><code><a href="Protocols/Card.html#/s:11SmartCardIO0B0P3atrAA3ATRCvp">Card.atr</a></code></p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>Andreas Sterbenz</p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>JSR 268 Expert Group</p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>Godfrey Chung</p>
+
+</div><div class="aside aside-version">
+    <p class="aside-title">Version</p>
+    <p>1.0</p>
+
+</div><div class="aside aside-date">
+    <p class="aside-title">Date</p>
+    <p>6 Nov 2017</p>
+
+</div>
+
+                        <a href="Classes/ATR.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="kt">ATR</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO0B0P"></a>
+                    <a name="//apple_ref/swift/Protocol/Card" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO0B0P">Card</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>A Smart Card with which a connection has been established. Card objects are
+obtained by calling <code><a href="Protocols/CardTerminal.html#/s:11SmartCardIO0B8TerminalP7connect14protocolStringAA0B0_pSS_tKF">CardTerminal.connect(protocolString:)</a></code>.</p>
+<div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <p><code><a href="Protocols/CardTerminal.html">CardTerminal</a></code></p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>Andreas Sterbenz</p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>JSR 268 Expert Group</p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>Godfrey Chung</p>
+
+</div><div class="aside aside-version">
+    <p class="aside-title">Version</p>
+    <p>1.0</p>
+
+</div><div class="aside aside-date">
+    <p class="aside-title">Date</p>
+    <p>6 Nov 2017</p>
+
+</div>
+
+                        <a href="Protocols/Card.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">Card</span> <span class="p">:</span> <span class="kt">AnyObject</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO0B7ChannelP"></a>
+                    <a name="//apple_ref/swift/Protocol/CardChannel" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO0B7ChannelP">CardChannel</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>A logical channel connection to a Smart Card. It is used to exchange APDUs
+with a Smart Card. A CardChannel object can be obtained by calling the
+method <code><a href="Protocols/Card.html#/s:11SmartCardIO0B0P12basicChannelAA0bE0_pyKF">Card.basicChannel()</a></code> or <code><a href="Protocols/Card.html#/s:11SmartCardIO0B0P18openLogicalChannelAA0bF0_pyKF">Card.openLogicalChannel()</a></code>.</p>
+<div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <p><code><a href="Protocols/Card.html">Card</a></code></p>
+
+</div><div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <p><code><a href="Classes/CommandAPDU.html">CommandAPDU</a></code></p>
+
+</div><div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <p><code><a href="Classes/ResponseAPDU.html">ResponseAPDU</a></code></p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>Andreas Sterbenz</p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>JSR 268 Expert Group</p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>Godfrey Chung</p>
+
+</div><div class="aside aside-version">
+    <p class="aside-title">Version</p>
+    <p>1.0</p>
+
+</div><div class="aside aside-date">
+    <p class="aside-title">Date</p>
+    <p>6 Nov 2017</p>
+
+</div>
+
+                        <a href="Protocols/CardChannel.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">CardChannel</span> <span class="p">:</span> <span class="kt">AnyObject</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO0B5ErrorO"></a>
+                    <a name="//apple_ref/swift/Enum/CardError" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO0B5ErrorO">CardError</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Errors that occur during communication with the Smart Card stack or the card
+itself.</p>
+<div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    Andreas Sterbenz
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    JSR 268 Expert Group
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    Godfrey Chung
+
+</div><div class="aside aside-version">
+    <p class="aside-title">Version</p>
+    1.0
+
+</div><div class="aside aside-date">
+    <p class="aside-title">Date</p>
+    6 Nov 2017
+
+</div>
+
+                        <a href="Enums/CardError.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">CardError</span> <span class="p">:</span> <span class="kt">Error</span></code></pre>
+<pre class="highlight swift"><code><span class="kd">extension</span> <span class="kt">CardError</span><span class="p">:</span> <span class="kt">LocalizedError</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO0B5StateO"></a>
+                    <a name="//apple_ref/swift/Enum/CardState" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO0B5StateO">CardState</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Enumeration of attributes of a CardTerminal. It is used as a parameter to
+the <code><a href="Protocols/CardTerminals.html#/s:11SmartCardIO0B9TerminalsP4listSayAA0B8Terminal_pGyKF">CardTerminals.list()</a></code> method.</p>
+
+                        <a href="Enums/CardState.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">CardState</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO0B8TerminalP"></a>
+                    <a name="//apple_ref/swift/Protocol/CardTerminal" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO0B8TerminalP">CardTerminal</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>A Smart Card terminal, sometimes referred to as a Smart Card Reader. A
+CardTerminal object can be obtained by calling <code><a href="Protocols/CardTerminals.html#/s:11SmartCardIO0B9TerminalsP4listSayAA0B8Terminal_pGyKF">CardTerminals.list()</a></code> or
+<code><a href="Protocols/CardTerminals.html#/s:11SmartCardIO0B9TerminalsP8terminal4nameAA0B8Terminal_pSgSS_tF">CardTerminals.terminal(name:)</a></code>.</p>
+
+<p>Note that physical card readers with slots for multiple cards are
+represented by one <code>CardTerminal</code> object per such slot.</p>
+<div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <p><code><a href="Protocols/CardTerminals.html">CardTerminals</a></code></p>
+
+</div><div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <p><code><a href="Classes/TerminalFactory.html">TerminalFactory</a></code></p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>Andreas Sterbenz</p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>JSR 268 Expert Group</p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>Godfrey Chung</p>
+
+</div><div class="aside aside-version">
+    <p class="aside-title">Version</p>
+    <p>1.0</p>
+
+</div><div class="aside aside-date">
+    <p class="aside-title">Date</p>
+    <p>6 Nov 2017</p>
+
+</div>
+
+                        <a href="Protocols/CardTerminal.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">CardTerminal</span> <span class="p">:</span> <span class="kt">AnyObject</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO0B9TerminalsP"></a>
+                    <a name="//apple_ref/swift/Protocol/CardTerminals" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO0B9TerminalsP">CardTerminals</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The set of terminals supported by a TerminalFactory. This class allows
+applications to enumerate the available CardTerminals, obtain a specific
+CardTerminal, or wait for the insertion or removal of cards.</p>
+
+<p>This class is multi-threading safe and can be used by multiple threads
+concurrently. However, this object keeps track of the card presence state of
+each of its terminals. Multiple objects should be used if independent calls
+to <code>waitForChange()</code> are required.</p>
+
+<p>Applications can obtain instances of this class by calling
+<code><a href="Classes/TerminalFactory.html#/s:11SmartCardIO15TerminalFactoryC9terminalsAA0B9Terminals_pyF">TerminalFactory.terminals()</a></code>.</p>
+<div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <p><code><a href="Classes/TerminalFactory.html">TerminalFactory</a></code></p>
+
+</div><div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <p><code><a href="Protocols/CardTerminal.html">CardTerminal</a></code></p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>Andreas Sterbenz</p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>JSR 268 Expert Group</p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>Godfrey Chung</p>
+
+</div><div class="aside aside-version">
+    <p class="aside-title">Version</p>
+    <p>1.0</p>
+
+</div><div class="aside aside-date">
+    <p class="aside-title">Date</p>
+    <p>6 Nov 2017</p>
+
+</div>
+
+                        <a href="Protocols/CardTerminals.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">CardTerminals</span> <span class="p">:</span> <span class="kt">AnyObject</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO11CommandAPDUC"></a>
+                    <a name="//apple_ref/swift/Class/CommandAPDU" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO11CommandAPDUC">CommandAPDU</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>A command APDU following the structure defined in ISO/IEC 7816-4. It
+consists of a four byte header and a conditional body of variable length.
+This class does not attempt to verify that the APDU encodes a semantically
+valid command.</p>
+
+<p>Note that when the expected length of the response APDU is specified in the
+constructors, the actual length (Ne) must be specified, not its encoded form
+(Le). Similarly, <code>ne</code> returns the actual value Ne. In other words, a value
+of 0 means &ldquo;no data in the response APDU&rdquo; rather than &ldquo;maximum length&rdquo;.</p>
+
+<p>This class supports both the short and extended forms of length encoding for
+Ne and Nc. However, note that not all terminals and Smart Cards are capable
+of accepting APDUs that use the extended form.</p>
+
+<p>Instances of this class are immutable. Where data is passed in or out via
+byte arrays, defensive cloning is performed.</p>
+<div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <p><code><a href="Classes/ResponseAPDU.html">ResponseAPDU</a></code></p>
+
+</div><div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <p><code><a href="Protocols/CardChannel.html#/s:11SmartCardIO0B7ChannelP8transmit4apduAA12ResponseAPDUCAA07CommandH0C_tKF">CardChannel.transmit(apdu:)</a></code></p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>Andreas Sterbenz</p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>JSR 268 Expert Group</p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>Godfrey Chung</p>
+
+</div><div class="aside aside-version">
+    <p class="aside-title">Version</p>
+    <p>1.0</p>
+
+</div><div class="aside aside-date">
+    <p class="aside-title">Date</p>
+    <p>6 Nov 2017</p>
+
+</div>
+
+                        <a href="Classes/CommandAPDU.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="kt">CommandAPDU</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO8ProviderC"></a>
+                    <a name="//apple_ref/swift/Class/Provider" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO8ProviderC">Provider</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>This class represents a &ldquo;provider&rdquo; for the Smart Card I/O API.</p>
+<div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    Benjamin Renaud
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    Andreas Sterbenz
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    Godfrey Chung
+
+</div><div class="aside aside-version">
+    <p class="aside-title">Version</p>
+    1.0
+
+</div><div class="aside aside-date">
+    <p class="aside-title">Date</p>
+    16 Aug 2018
+
+</div>
+
+                        <a href="Classes/Provider.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">open</span> <span class="kd">class</span> <span class="kt">Provider</span></code></pre>
+<pre class="highlight swift"><code><span class="kd">extension</span> <span class="kt">Provider</span><span class="p">:</span> <span class="kt">CustomStringConvertible</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO12ResponseAPDUC"></a>
+                    <a name="//apple_ref/swift/Class/ResponseAPDU" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO12ResponseAPDUC">ResponseAPDU</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>A response APDU as defined in ISO/IEC 7816-4. It consists of a conditional
+body and a two byte trailer. This class does not attempt to verify that the
+APDU encodes a semantically valid response.</p>
+
+<p>Instances of this class are immutable. Where data is passed in or out via
+byte arrays, defensive cloning is performed.</p>
+<div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <p><code><a href="Classes/CommandAPDU.html">CommandAPDU</a></code></p>
+
+</div><div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <p><code><a href="Protocols/CardChannel.html#/s:11SmartCardIO0B7ChannelP8transmit4apduAA12ResponseAPDUCAA07CommandH0C_tKF">CardChannel.transmit(apdu:)</a></code></p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>Andreas Sterbenz</p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>JSR 268 Expert Group</p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>Godfrey Chung</p>
+
+</div><div class="aside aside-version">
+    <p class="aside-title">Version</p>
+    <p>1.0</p>
+
+</div><div class="aside aside-date">
+    <p class="aside-title">Date</p>
+    <p>6 Nov 2017</p>
+
+</div>
+
+                        <a href="Classes/ResponseAPDU.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="kt">ResponseAPDU</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO15TerminalFactoryC"></a>
+                    <a name="//apple_ref/swift/Class/TerminalFactory" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO15TerminalFactoryC">TerminalFactory</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>A factory for CardTerminal objects.</p>
+
+<p>It allows an application to obtain a TerminalFactory by calling
+<code>shared(type:params:provider:)</code> method and use this TerminalFactory object
+to access the CardTerminals by calling the <code>terminals()</code> method.</p>
+
+<p>Each TerminalFactory has a <code>type</code> indicating how it was implemented. It must
+be specified when the implementation is obtained using a
+<code>shared(type:params:provider:)</code> method and can be retrieved via the <code>type</code>
+property.</p>
+
+<p>TerminalFactory utilizes an extensible service provider framework.
+Service providers that wish to add a new implementation should see the
+<code><a href="Protocols/TerminalFactorySpi.html">TerminalFactorySpi</a></code> class for more information.</p>
+<div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <p><code><a href="Protocols/CardTerminals.html">CardTerminals</a></code></p>
+
+</div><div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <p><code><a href="Classes/Provider.html">Provider</a></code></p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>Andreas Sterbenz</p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>JSR 268 Expert Group</p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>Godfrey Chung</p>
+
+</div><div class="aside aside-version">
+    <p class="aside-title">Version</p>
+    <p>1.0</p>
+
+</div><div class="aside aside-date">
+    <p class="aside-title">Date</p>
+    <p>8 Dec 2017</p>
+
+</div>
+
+                        <a href="Classes/TerminalFactory.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="kt">TerminalFactory</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11SmartCardIO18TerminalFactorySpiP"></a>
+                    <a name="//apple_ref/swift/Protocol/TerminalFactorySpi" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11SmartCardIO18TerminalFactorySpiP">TerminalFactorySpi</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The <code>TerminalFactorySpi</code> class defines the service provider interface.
+Applications do not access this class directly, instead see
+<code><a href="Classes/TerminalFactory.html">TerminalFactory</a></code>.</p>
+
+<p>Service providers that want to write a new implementation should define
+a concrete subclass of TerminalFactorySpi with a constructor that takes
+an <code>Any</code> as parameter. That class needs to be registered in a <code><a href="Classes/Provider.html">Provider</a></code>.
+The engine type is <code><a href="Classes/TerminalFactory.html">TerminalFactory</a></code>. Service providers also need to
+implement subclasses of the protocol classes <code><a href="Protocols/CardTerminals.html">CardTerminals</a></code>,
+<code><a href="Protocols/CardTerminal.html">CardTerminal</a></code>, <code><a href="Protocols/Card.html">Card</a></code>, and <code><a href="Protocols/CardChannel.html">CardChannel</a></code>.</p>
+
+<p>For example:</p>
+
+<p>module MyModule</p>
+
+<p>file MyProvider.swift:</p>
+<pre class="highlight swift"><code><span class="kd">import</span> <span class="kt">SmartCardIO</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="kt">MyProvider</span><span class="p">:</span> <span class="kt">Provider</span> <span class="p">{</span>
+    <span class="kd">public</span> <span class="nf">init</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">super</span><span class="o">.</span><span class="nf">init</span><span class="p">(</span><span class="nv">name</span><span class="p">:</span> <span class="s">"MyProvider"</span><span class="p">,</span>
+                   <span class="nv">version</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+                   <span class="nv">info</span><span class="p">:</span> <span class="s">"Smart Card Example"</span><span class="p">)</span>
+        <span class="nf">put</span><span class="p">(</span><span class="nv">key</span><span class="p">:</span> <span class="s">"TerminalFactory.MyType"</span><span class="p">,</span>
+            <span class="nv">value</span><span class="p">:</span> <span class="s">"MyModule.MySpi"</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>file MySpi.swift:</p>
+<pre class="highlight swift"><code><span class="kd">import</span> <span class="kt">SmartCardIO</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="kt">MySpi</span><span class="p">:</span> <span class="kt">TerminalFactoySpi</span> <span class="p">{</span>
+    <span class="kd">public</span> <span class="kd">required</span> <span class="nf">init</span><span class="p">(</span><span class="nv">parameter</span><span class="p">:</span> <span class="kt">Any</span><span class="p">)</span> <span class="k">throws</span> <span class="p">{</span>
+        <span class="c1">// initialize as appropriate</span>
+    <span class="p">}</span>
+    <span class="kd">public</span> <span class="kd">func</span> <span class="nf">engineTerminals</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">CardTerminals</span> <span class="p">{</span>
+        <span class="c1">// add implementation code here</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <p><code><a href="Classes/TerminalFactory.html">TerminalFactory</a></code></p>
+
+</div><div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <p><code><a href="Classes/Provider.html">Provider</a></code></p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>Andreas Sterbenz</p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>JSR 268 Expert Group</p>
+
+</div><div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    <p>Godfrey Chung</p>
+
+</div><div class="aside aside-version">
+    <p class="aside-title">Version</p>
+    <p>1.0</p>
+
+</div><div class="aside aside-date">
+    <p class="aside-title">Date</p>
+    <p>8 Dec 2017</p>
+
+</div>
+
+                        <a href="Protocols/TerminalFactorySpi.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">TerminalFactorySpi</span> <span class="p">:</span> <span class="kt">AnyObject</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </section>
+        </section>
+        <section id="footer">
+          <p>Copyright (c) 2017-2024, Advanced Card Systems Ltd. All rights reserved.<br> Copyright (c) 1996-2014, Oracle and/or its affiliates. All rights reserved.</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.4</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
+        </section>
+      </article>
+    </div>
+  </body>
+</html>

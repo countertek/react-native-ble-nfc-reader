@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>BluetoothTerminalManager Class Reference</title>
+    <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
+    <meta charset='utf-8'>
+    <script src="../js/jquery.min.js" defer></script>
+    <script src="../js/jazzy.js" defer></script>
+    
+    <script src="../js/lunr.min.js" defer></script>
+    <script src="../js/typeahead.jquery.js" defer></script>
+    <script src="../js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+    <a name="//apple_ref/swift/Class/BluetoothTerminalManager" class="dashAnchor"></a>
+    <a title="BluetoothTerminalManager Class Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p><a href="../index.html">ACSSmartCardIO 0.6.0 Docs</a> (96% documented)</p>
+        <div class="header-right">
+          <form role="search" action="../search.json">
+            <input type="text" placeholder="Search documentation" data-typeahead>
+          </form>
+        </div>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="../index.html">ACSSmartCardIO Reference</a>
+        <img id="carat" src="../img/carat.png" alt=""/>
+        BluetoothTerminalManager Class Reference
+      </p>
+    </div>
+    <div class="content-wrapper">
+      <nav class="sidebar">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a href="../SmartCardIO.html">SmartCardIO</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Classes/ATR.html">ATR</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/Card.html">Card</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/CardChannel.html">CardChannel</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/CardError.html">CardError</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/CardState.html">CardState</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/CardTerminal.html">CardTerminal</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/CardTerminals.html">CardTerminals</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/CommandAPDU.html">CommandAPDU</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/Provider.html">Provider</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/ResponseAPDU.html">ResponseAPDU</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/TerminalFactory.html">TerminalFactory</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/TerminalFactorySpi.html">TerminalFactorySpi</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../ACSSmartCardIO%20Options.html">ACSSmartCardIO Options</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Classes/TerminalTimeouts.html">TerminalTimeouts</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/TransmitOptions.html">TransmitOptions</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Bluetooth.html">Bluetooth</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Classes/AcsBluetooth.html">AcsBluetooth</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/Amr220cConstants.html">Amr220cConstants</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/BluetoothFactorySpi.html">BluetoothFactorySpi</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/BluetoothSmartCard.html">BluetoothSmartCard</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/BluetoothTerminalManager.html">BluetoothTerminalManager</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/BluetoothTerminalManager/TerminalType.html">– TerminalType</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/BluetoothTerminalManager/BatteryStatus.html">– BatteryStatus</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/BluetoothTerminalManager/DeviceInfoType.html">– DeviceInfoType</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/BluetoothTerminalManagerDelegate.html">BluetoothTerminalManagerDelegate</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+        <section>
+          <section class="section">
+            <h1>BluetoothTerminalManager</h1>
+              <div class="declaration">
+                <div class="language">
+                  
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">class</span> <span class="kt">BluetoothTerminalManager</span> <span class="p">:</span> <span class="kt">NSObject</span></code></pre>
+<pre class="highlight swift"><code><span class="kd">extension</span> <span class="kt">BluetoothTerminalManager</span><span class="p">:</span> <span class="kt">CBCentralManagerDelegate</span></code></pre>
+
+                </div>
+              </div>
+            <p>The <code>BluetoothTerminalManager</code> class manages card terminals.</p>
+<div class="aside aside-author">
+    <p class="aside-title">Author</p>
+    Godfrey Chung
+
+</div><div class="aside aside-version">
+    <p class="aside-title">Version</p>
+    1.0
+
+</div><div class="aside aside-date">
+    <p class="aside-title">Date</p>
+    17 Nov 2017
+
+</div>
+
+          </section>
+          <section class="section task-group-section">
+            <div class="task-group">
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14ACSSmartCardIO24BluetoothTerminalManagerC0E4TypeO"></a>
+                    <a name="//apple_ref/swift/Enum/TerminalType" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14ACSSmartCardIO24BluetoothTerminalManagerC0E4TypeO">TerminalType</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The terminal type</p>
+
+                        <a href="../Classes/BluetoothTerminalManager/TerminalType.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">TerminalType</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14ACSSmartCardIO24BluetoothTerminalManagerC11ioctlEscapeSivpZ"></a>
+                    <a name="//apple_ref/swift/Variable/ioctlEscape" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14ACSSmartCardIO24BluetoothTerminalManagerC11ioctlEscapeSivpZ">ioctlEscape</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>This control code is to send escape command.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="k">let</span> <span class="nv">ioctlEscape</span><span class="p">:</span> <span class="kt">Int</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14ACSSmartCardIO24BluetoothTerminalManagerC13BatteryStatusO"></a>
+                    <a name="//apple_ref/swift/Enum/BatteryStatus" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14ACSSmartCardIO24BluetoothTerminalManagerC13BatteryStatusO">BatteryStatus</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Battery status</p>
+<div class="aside aside-since">
+    <p class="aside-title">Since</p>
+    0.4
+
+</div>
+
+                        <a href="../Classes/BluetoothTerminalManager/BatteryStatus.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">BatteryStatus</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14ACSSmartCardIO24BluetoothTerminalManagerC14DeviceInfoTypeO"></a>
+                    <a name="//apple_ref/swift/Enum/DeviceInfoType" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14ACSSmartCardIO24BluetoothTerminalManagerC14DeviceInfoTypeO">DeviceInfoType</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The device information type</p>
+<div class="aside aside-since">
+    <p class="aside-title">Since</p>
+    0.5
+
+</div>
+
+                        <a href="../Classes/BluetoothTerminalManager/DeviceInfoType.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">DeviceInfoType</span> <span class="p">:</span> <span class="kt">Int</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14ACSSmartCardIO24BluetoothTerminalManagerC8delegateAA0deF8Delegate_pSgvp"></a>
+                    <a name="//apple_ref/swift/Property/delegate" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14ACSSmartCardIO24BluetoothTerminalManagerC8delegateAA0deF8Delegate_pSgvp">delegate</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The delegate object you want to receive Bluetooth terminal manager
+events.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">delegate</span><span class="p">:</span> <span class="kt"><a href="../Protocols/BluetoothTerminalManagerDelegate.html">BluetoothTerminalManagerDelegate</a></span><span class="p">?</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14ACSSmartCardIO24BluetoothTerminalManagerC07centralF0So09CBCentralF0CSgvp"></a>
+                    <a name="//apple_ref/swift/Property/centralManager" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14ACSSmartCardIO24BluetoothTerminalManagerC07centralF0So09CBCentralF0CSgvp">centralManager</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The central manager</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">private(set)</span> <span class="k">var</span> <span class="nv">centralManager</span><span class="p">:</span> <span class="kt">CBCentralManager</span><span class="o">!</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14ACSSmartCardIO24BluetoothTerminalManagerC9startScan12terminalTypeyAC0eJ0O_tF"></a>
+                    <a name="//apple_ref/swift/Method/startScan(terminalType:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14ACSSmartCardIO24BluetoothTerminalManagerC9startScan12terminalTypeyAC0eJ0O_tF">startScan(terminalType:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Starts the scanning for available card terminals.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">startScan</span><span class="p">(</span><span class="nv">terminalType</span><span class="p">:</span> <span class="kt"><a href="../Classes/BluetoothTerminalManager/TerminalType.html">TerminalType</a></span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>terminalType</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the terminal type. It can be
+<code><a href="../Classes/BluetoothTerminalManager/TerminalType.html#/s:14ACSSmartCardIO24BluetoothTerminalManagerC0E4TypeO10acr3901us1yA2EmF">TerminalType.acr3901us1</a></code>, <code><a href="../Classes/BluetoothTerminalManager/TerminalType.html#/s:14ACSSmartCardIO24BluetoothTerminalManagerC0E4TypeO10acr1255uj1yA2EmF">TerminalType.acr1255uj1</a></code>,
+<code><a href="../Classes/BluetoothTerminalManager/TerminalType.html#/s:14ACSSmartCardIO24BluetoothTerminalManagerC0E4TypeO7amr220cyA2EmF">TerminalType.amr220c</a></code> or <code><a href="../Classes/BluetoothTerminalManager/TerminalType.html#/s:14ACSSmartCardIO24BluetoothTerminalManagerC0E4TypeO8acr1555uyA2EmF">TerminalType.acr1555u</a></code>.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14ACSSmartCardIO24BluetoothTerminalManagerC8stopScanyyF"></a>
+                    <a name="//apple_ref/swift/Method/stopScan()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14ACSSmartCardIO24BluetoothTerminalManagerC8stopScanyyF">stopScan()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Stops the scanning for available card terminals.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">stopScan</span><span class="p">()</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14ACSSmartCardIO24BluetoothTerminalManagerC8timeouts8terminalAA0E8TimeoutsC05SmartbC00bE0_p_tKF"></a>
+                    <a name="//apple_ref/swift/Method/timeouts(terminal:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14ACSSmartCardIO24BluetoothTerminalManagerC8timeouts8terminalAA0E8TimeoutsC05SmartbC00bE0_p_tKF">timeouts(terminal:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Gets the timeouts from the card terminal.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">timeouts</span><span class="p">(</span><span class="nv">terminal</span><span class="p">:</span> <span class="kt"><a href="../Protocols/CardTerminal.html">CardTerminal</a></span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Classes/TerminalTimeouts.html">TerminalTimeouts</a></span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>terminal</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the card terminal</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>the timeouts</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14ACSSmartCardIO24BluetoothTerminalManagerC12setMasterKey8terminal06masterI0y05SmartbC00bE0_p_Says5UInt8VGSgtKF"></a>
+                    <a name="//apple_ref/swift/Method/setMasterKey(terminal:masterKey:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14ACSSmartCardIO24BluetoothTerminalManagerC12setMasterKey8terminal06masterI0y05SmartbC00bE0_p_Says5UInt8VGSgtKF">setMasterKey(terminal:<wbr>masterKey:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Sets the master key from the card terminal.</p>
+<div class="aside aside-since">
+    <p class="aside-title">Since</p>
+    0.3
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">setMasterKey</span><span class="p">(</span><span class="nv">terminal</span><span class="p">:</span> <span class="kt"><a href="../Protocols/CardTerminal.html">CardTerminal</a></span><span class="p">,</span>
+                         <span class="nv">masterKey</span><span class="p">:</span> <span class="p">[</span><span class="kt">UInt8</span><span class="p">]?)</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>terminal</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the card terminal</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>masterKey</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the master key</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14ACSSmartCardIO24BluetoothTerminalManagerC12terminalType0G0AC0eH0O05SmartbC00bE0_p_tKF"></a>
+                    <a name="//apple_ref/swift/Method/terminalType(terminal:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14ACSSmartCardIO24BluetoothTerminalManagerC12terminalType0G0AC0eH0O05SmartbC00bE0_p_tKF">terminalType(terminal:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Gets the terminal type from the card terminal.</p>
+<div class="aside aside-since">
+    <p class="aside-title">Since</p>
+    0.3
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">terminalType</span><span class="p">(</span><span class="nv">terminal</span><span class="p">:</span> <span class="kt"><a href="../Protocols/CardTerminal.html">CardTerminal</a></span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Classes/BluetoothTerminalManager/TerminalType.html">TerminalType</a></span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>terminal</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the card terminal</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>the terminal type</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14ACSSmartCardIO24BluetoothTerminalManagerC13batteryStatus8terminal7timeoutAC07BatteryH0O05SmartbC00bE0_p_SitKF"></a>
+                    <a name="//apple_ref/swift/Method/batteryStatus(terminal:timeout:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14ACSSmartCardIO24BluetoothTerminalManagerC13batteryStatus8terminal7timeoutAC07BatteryH0O05SmartbC00bE0_p_SitKF">batteryStatus(terminal:<wbr>timeout:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Gets the battery status from the card terminal.</p>
+<div class="aside aside-since">
+    <p class="aside-title">Since</p>
+    0.4
+
+</div><div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <code>CardError.operationFailed</code> if the card operation failed
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">batteryStatus</span><span class="p">(</span><span class="nv">terminal</span><span class="p">:</span> <span class="kt"><a href="../Protocols/CardTerminal.html">CardTerminal</a></span><span class="p">,</span>
+                          <span class="nv">timeout</span><span class="p">:</span> <span class="kt">Int</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Classes/BluetoothTerminalManager/BatteryStatus.html">BatteryStatus</a></span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>terminal</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the card terminal</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>timeout</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the maximum time to wait in milliseconds</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>the battery status</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14ACSSmartCardIO24BluetoothTerminalManagerC12batteryLevel8terminal7timeoutSi05SmartbC00bE0_p_SitKF"></a>
+                    <a name="//apple_ref/swift/Method/batteryLevel(terminal:timeout:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14ACSSmartCardIO24BluetoothTerminalManagerC12batteryLevel8terminal7timeoutSi05SmartbC00bE0_p_SitKF">batteryLevel(terminal:<wbr>timeout:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Gets the battery level from the card terminal.</p>
+<div class="aside aside-since">
+    <p class="aside-title">Since</p>
+    0.4
+
+</div><div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <code>CardError.operationFailed</code> if the card operation failed
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">batteryLevel</span><span class="p">(</span><span class="nv">terminal</span><span class="p">:</span> <span class="kt"><a href="../Protocols/CardTerminal.html">CardTerminal</a></span><span class="p">,</span>
+                         <span class="nv">timeout</span><span class="p">:</span> <span class="kt">Int</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">Int</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>terminal</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the card terminal</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>timeout</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the maximum time to wait in milliseconds</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>the battery level. -1 if the card terminal does not support
+it.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14ACSSmartCardIO24BluetoothTerminalManagerC10deviceInfo8terminal4type7timeoutSSSg05SmartbC00bE0_p_AC06DeviceH4TypeOSitKF"></a>
+                    <a name="//apple_ref/swift/Method/deviceInfo(terminal:type:timeout:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14ACSSmartCardIO24BluetoothTerminalManagerC10deviceInfo8terminal4type7timeoutSSSg05SmartbC00bE0_p_AC06DeviceH4TypeOSitKF">deviceInfo(terminal:<wbr>type:<wbr>timeout:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Gets the device information.</p>
+<div class="aside aside-since">
+    <p class="aside-title">Since</p>
+    0.5
+
+</div><div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <code>CardError.operationFailed</code> if the card operation failed
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">deviceInfo</span><span class="p">(</span><span class="nv">terminal</span><span class="p">:</span> <span class="kt"><a href="../Protocols/CardTerminal.html">CardTerminal</a></span><span class="p">,</span>
+                       <span class="nv">type</span><span class="p">:</span> <span class="kt">BluetoothTerminalManager</span><span class="o">.</span><span class="kt"><a href="../Classes/BluetoothTerminalManager/DeviceInfoType.html">DeviceInfoType</a></span><span class="p">,</span>
+                       <span class="nv">timeout</span><span class="p">:</span> <span class="kt">Int</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">String</span><span class="p">?</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>terminal</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the card terminal</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>type</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the device information type</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>timeout</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the maximum time to wait in milliseconds</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>the device information. nil if the card terminal does not
+support it.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14ACSSmartCardIO24BluetoothTerminalManagerC10disconnect8terminaly05SmartbC00bE0_p_tKF"></a>
+                    <a name="//apple_ref/swift/Method/disconnect(terminal:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14ACSSmartCardIO24BluetoothTerminalManagerC10disconnect8terminaly05SmartbC00bE0_p_tKF">disconnect(terminal:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Disconnects the card terminal.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">disconnect</span><span class="p">(</span><span class="nv">terminal</span><span class="p">:</span> <span class="kt"><a href="../Protocols/CardTerminal.html">CardTerminal</a></span><span class="p">)</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>terminal</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the card terminal</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/CBCentralManagerDelegate"></a>
+                <a name="//apple_ref/swift/Section/CBCentralManagerDelegate" class="dashAnchor"></a>
+                <div class="section-name-container">
+                  <a class="section-name-link" href="#/CBCentralManagerDelegate"></a>
+                  <h3 class="section-name"><span>CBCentralManagerDelegate</span>
+</h3>
+                </div>
+              </div>
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@CM@ACSSmartCardIO@objc(cs)BluetoothTerminalManager(im)centralManagerDidUpdateState:"></a>
+                    <a name="//apple_ref/swift/Method/centralManagerDidUpdateState(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@CM@ACSSmartCardIO@objc(cs)BluetoothTerminalManager(im)centralManagerDidUpdateState:">centralManagerDidUpdateState(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">centralManagerDidUpdateState</span><span class="p">(</span><span class="n">_</span> <span class="nv">central</span><span class="p">:</span> <span class="kt">CBCentralManager</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@CM@ACSSmartCardIO@objc(cs)BluetoothTerminalManager(im)centralManager:didDiscoverPeripheral:advertisementData:RSSI:"></a>
+                    <a name="//apple_ref/swift/Method/centralManager(_:didDiscover:advertisementData:rssi:)" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@CM@ACSSmartCardIO@objc(cs)BluetoothTerminalManager(im)centralManager:didDiscoverPeripheral:advertisementData:RSSI:">centralManager(_:<wbr>didDiscover:<wbr>advertisementData:<wbr>rssi:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">centralManager</span><span class="p">(</span><span class="n">_</span> <span class="nv">central</span><span class="p">:</span> <span class="kt">CBCentralManager</span><span class="p">,</span>
+                           <span class="n">didDiscover</span> <span class="nv">peripheral</span><span class="p">:</span> <span class="kt">CBPeripheral</span><span class="p">,</span>
+                           <span class="nv">advertisementData</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span> <span class="p">:</span> <span class="kt">Any</span><span class="p">],</span>
+                           <span class="n">rssi</span> <span class="kt">RSSI</span><span class="p">:</span> <span class="kt">NSNumber</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@CM@ACSSmartCardIO@objc(cs)BluetoothTerminalManager(im)centralManager:didConnectPeripheral:"></a>
+                    <a name="//apple_ref/swift/Method/centralManager(_:didConnect:)" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@CM@ACSSmartCardIO@objc(cs)BluetoothTerminalManager(im)centralManager:didConnectPeripheral:">centralManager(_:<wbr>didConnect:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">centralManager</span><span class="p">(</span><span class="n">_</span> <span class="nv">central</span><span class="p">:</span> <span class="kt">CBCentralManager</span><span class="p">,</span>
+                           <span class="n">didConnect</span> <span class="nv">peripheral</span><span class="p">:</span> <span class="kt">CBPeripheral</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@CM@ACSSmartCardIO@objc(cs)BluetoothTerminalManager(im)centralManager:didFailToConnectPeripheral:error:"></a>
+                    <a name="//apple_ref/swift/Method/centralManager(_:didFailToConnect:error:)" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@CM@ACSSmartCardIO@objc(cs)BluetoothTerminalManager(im)centralManager:didFailToConnectPeripheral:error:">centralManager(_:<wbr>didFailToConnect:<wbr>error:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">centralManager</span><span class="p">(</span><span class="n">_</span> <span class="nv">central</span><span class="p">:</span> <span class="kt">CBCentralManager</span><span class="p">,</span>
+                           <span class="n">didFailToConnect</span> <span class="nv">peripheral</span><span class="p">:</span> <span class="kt">CBPeripheral</span><span class="p">,</span>
+                           <span class="nv">error</span><span class="p">:</span> <span class="kt">Error</span><span class="p">?)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@CM@ACSSmartCardIO@objc(cs)BluetoothTerminalManager(im)centralManager:didDisconnectPeripheral:error:"></a>
+                    <a name="//apple_ref/swift/Method/centralManager(_:didDisconnectPeripheral:error:)" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@CM@ACSSmartCardIO@objc(cs)BluetoothTerminalManager(im)centralManager:didDisconnectPeripheral:error:">centralManager(_:<wbr>didDisconnectPeripheral:<wbr>error:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">centralManager</span><span class="p">(</span><span class="n">_</span> <span class="nv">central</span><span class="p">:</span> <span class="kt">CBCentralManager</span><span class="p">,</span>
+                           <span class="n">didDisconnectPeripheral</span> <span class="nv">peripheral</span><span class="p">:</span> <span class="kt">CBPeripheral</span><span class="p">,</span>
+                           <span class="nv">error</span><span class="p">:</span> <span class="kt">Error</span><span class="p">?)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </section>
+        </section>
+        <section id="footer">
+          <p>Copyright (c) 2017-2024, Advanced Card Systems Ltd. All rights reserved.<br> Copyright (c) 1996-2014, Oracle and/or its affiliates. All rights reserved.</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.4</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
+        </section>
+      </article>
+    </div>
+  </body>
+</html>

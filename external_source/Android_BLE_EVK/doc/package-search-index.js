@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"com.acs.smartcardio"},{"l":"javax.smartcardio"}];updateSearchResults();
