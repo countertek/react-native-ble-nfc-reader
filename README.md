@@ -28,3 +28,6 @@ ACS SDK binaries are bundled in the native package setup:
 - `android/libs/smartcardio-*.aar`
 - `ios/Frameworks/ACSSmartCardIO.xcframework`
 - `ios/Frameworks/SmartCardIO.xcframework`
+
+See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for bundled ACS and
+SmartCardIO/OpenJDK notices.
