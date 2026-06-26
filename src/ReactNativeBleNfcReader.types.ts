@@ -51,6 +51,8 @@ export type BleNfcReaderErrorCode =
   | 'INVALID_APDU_RESPONSE'
   | 'INVALID_MIFARE_BLOCK'
   | 'NATIVE_METHOD_UNAVAILABLE'
+  | 'READER_PERMISSION_DENIED'
+  | 'READER_PERMISSION_MISSING'
   | 'UNSUPPORTED_PLATFORM';
 
 export class BleNfcReaderError extends Error {
