@@ -1,13 +1,12 @@
 Pod::Spec.new do |s|
   s.name           = 'ReactNativeBleNfcReader'
   s.version        = '1.0.0'
-  s.summary        = 'A sample project summary'
-  s.description    = 'A sample project description'
-  s.author         = ''
-  s.homepage       = 'https://docs.expo.dev/modules/'
+  s.summary        = 'React Native BLE NFC reader'
+  s.description    = 'Expo native module for ACS BLE NFC readers'
+  s.author         = 'countertek'
+  s.homepage       = 'https://github.com/countertek/react-native-ble-nfc-reader'
   s.platforms      = {
-    :ios => '16.4',
-    :tvos => '16.4'
+    :ios => '15.0'
   }
   s.source         = { git: '' }
   s.static_framework = true
