@@ -27,6 +27,10 @@ class ReactNativeBleNfcReaderModule extends NativeModule {
     return this.rejectUnsupported();
   }
 
+  stopReaderScan(): Promise<Reader[]> {
+    return this.rejectUnsupported();
+  }
+
   connectReader(_readerId: ReaderId): Promise<void> {
     return this.rejectUnsupported();
   }

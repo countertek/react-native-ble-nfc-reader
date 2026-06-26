@@ -1,4 +1,5 @@
 import {
+  addReaderDiscoveredListener,
   getReaderPermissionStatus,
   mifare,
   normalizeHexString,
@@ -6,6 +7,7 @@ import {
   requestReaderPermissions,
   scanReaders,
   splitApduResponse,
+  stopReaderScan,
   transmit,
 } from './ReactNativeBleNfcReader';
 import { BleNfcReaderError } from './ReactNativeBleNfcReader.types';
@@ -116,6 +118,43 @@ describe('public native wrappers', () => {
       })
     );
     await expect(getReaderPermissionStatus()).rejects.toBeInstanceOf(BleNfcReaderError);
+  });
+
+  it('passes bounded scan options to native', async () => {
+    mockNativeModule.scanReaders = jest.fn(async () => [{ id: 'reader-1', name: 'Reader 1' }]);
+
+    await expect(scanReaders({ timeoutMs: 1000 })).resolves.toEqual([
+      { id: 'reader-1', name: 'Reader 1' },
+    ]);
+
+    expect(mockNativeModule.scanReaders).toHaveBeenCalledWith({ timeoutMs: 1000 });
+  });
+
+  it('rejects invalid scan timeouts before native calls', async () => {
+    mockNativeModule.scanReaders = jest.fn(async () => []);
+
+    await expect(scanReaders({ timeoutMs: 0 })).rejects.toEqual(
+      expect.objectContaining({
+        code: 'INVALID_SCAN_TIMEOUT',
+      })
+    );
+
+    expect(mockNativeModule.scanReaders).not.toHaveBeenCalled();
+  });
+
+  it('subscribes to Reader discovery events', () => {
+    const listener = jest.fn();
+    const subscription = { remove: jest.fn() };
+    mockNativeModule.addListener = jest.fn(() => subscription);
+
+    expect(addReaderDiscoveredListener(listener)).toBe(subscription);
+    expect(mockNativeModule.addListener).toHaveBeenCalledWith('onReaderDiscovered', listener);
+  });
+
+  it('stops an active Reader scan', async () => {
+    mockNativeModule.stopReaderScan = jest.fn(async () => [{ id: 'reader-1' }]);
+
+    await expect(stopReaderScan()).resolves.toEqual([{ id: 'reader-1' }]);
   });
 
   it('normalizes card UIDs returned from native', async () => {
