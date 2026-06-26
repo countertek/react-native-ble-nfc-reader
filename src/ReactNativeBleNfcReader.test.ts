@@ -1,7 +1,9 @@
 import {
+  getReaderPermissionStatus,
   mifare,
   normalizeHexString,
   readCardUid,
+  requestReaderPermissions,
   scanReaders,
   splitApduResponse,
   transmit,
@@ -76,6 +78,29 @@ describe('public native wrappers', () => {
         code: 'NATIVE_METHOD_UNAVAILABLE',
       })
     );
+  });
+
+  it('returns native Reader permission status values', async () => {
+    mockNativeModule.getReaderPermissionStatus = jest.fn(async () => 'denied');
+    mockNativeModule.requestReaderPermissions = jest.fn(async () => 'granted');
+
+    await expect(getReaderPermissionStatus()).resolves.toBe('denied');
+    await expect(requestReaderPermissions()).resolves.toBe('granted');
+  });
+
+  it('maps native permission failures to typed errors', async () => {
+    mockNativeModule.scanReaders = jest.fn(async () => {
+      const error = new Error('Reader Bluetooth permission is denied');
+      Object.assign(error, { code: 'READER_PERMISSION_DENIED' });
+      throw error;
+    });
+
+    await expect(scanReaders()).rejects.toEqual(
+      expect.objectContaining({
+        code: 'READER_PERMISSION_DENIED',
+      })
+    );
+    await expect(scanReaders()).rejects.toBeInstanceOf(BleNfcReaderError);
   });
 
   it('normalizes card UIDs returned from native', async () => {

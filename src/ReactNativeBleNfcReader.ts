@@ -66,6 +66,42 @@ function getNativeMethod<Name extends keyof NativeReaderModule>(
   return method;
 }
 
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return 'Reader permission failed';
+}
+
+function normalizeNativeError(error: unknown): unknown {
+  if (error instanceof BleNfcReaderError) {
+    return error;
+  }
+
+  if (typeof error !== 'object' || error === null || !('code' in error)) {
+    return error;
+  }
+
+  if (error.code === 'READER_PERMISSION_DENIED') {
+    return new BleNfcReaderError('READER_PERMISSION_DENIED', getErrorMessage(error));
+  }
+
+  if (error.code === 'READER_PERMISSION_MISSING') {
+    return new BleNfcReaderError('READER_PERMISSION_MISSING', getErrorMessage(error));
+  }
+
+  return error;
+}
+
+async function callNative<T>(call: () => Promise<T>): Promise<T> {
+  try {
+    return await call();
+  } catch (error) {
+    throw normalizeNativeError(error);
+  }
+}
+
 function normalizeSizedHexString(value: string, name: string, byteLength: number): HexString {
   const normalizedValue = normalizeHexString(value, name);
 
@@ -86,32 +122,34 @@ function assertBlock(block: number): void {
 }
 
 export async function getReaderPermissionStatus(): Promise<ReaderPermissionStatus> {
-  return getNativeMethod('getReaderPermissionStatus')();
+  return callNative(() => getNativeMethod('getReaderPermissionStatus')());
 }
 
 export async function requestReaderPermissions(): Promise<ReaderPermissionStatus> {
-  return getNativeMethod('requestReaderPermissions')();
+  return callNative(() => getNativeMethod('requestReaderPermissions')());
 }
 
 export async function scanReaders(options?: ScanReadersOptions): Promise<Reader[]> {
-  return getNativeMethod('scanReaders')(options);
+  return callNative(() => getNativeMethod('scanReaders')(options));
 }
 
 export async function connectReader(readerId: ReaderId): Promise<void> {
-  return getNativeMethod('connectReader')(readerId);
+  return callNative(() => getNativeMethod('connectReader')(readerId));
 }
 
 export async function disconnectReader(readerId: ReaderId): Promise<void> {
-  return getNativeMethod('disconnectReader')(readerId);
+  return callNative(() => getNativeMethod('disconnectReader')(readerId));
 }
 
 export async function readCardUid(readerId: ReaderId): Promise<HexString> {
-  const uid = await getNativeMethod('readCardUid')(readerId);
+  const uid = await callNative(() => getNativeMethod('readCardUid')(readerId));
   return normalizeHexString(uid, 'uid');
 }
 
 export async function transmit(readerId: ReaderId, apdu: HexString): Promise<ApduResponse> {
-  const response = await getNativeMethod('transmit')(readerId, normalizeHexString(apdu, 'apdu'));
+  const response = await callNative(() =>
+    getNativeMethod('transmit')(readerId, normalizeHexString(apdu, 'apdu'))
+  );
   return splitApduResponse(response);
 }
 
@@ -119,25 +157,29 @@ export const mifare = {
   async authenticateBlock(options: AuthenticateBlockOptions): Promise<void> {
     assertBlock(options.block);
 
-    return getNativeMethod('authenticateBlock')({
-      ...options,
-      key: normalizeSizedHexString(options.key, 'key', 6),
-    });
+    return callNative(() =>
+      getNativeMethod('authenticateBlock')({
+        ...options,
+        key: normalizeSizedHexString(options.key, 'key', 6),
+      })
+    );
   },
 
   async readBlock(options: ReadBlockOptions): Promise<HexString> {
     assertBlock(options.block);
 
-    const data = await getNativeMethod('readBlock')(options);
+    const data = await callNative(() => getNativeMethod('readBlock')(options));
     return normalizeHexString(data, 'data');
   },
 
   async writeBlock(options: WriteBlockOptions): Promise<void> {
     assertBlock(options.block);
 
-    return getNativeMethod('writeBlock')({
-      ...options,
-      data: normalizeSizedHexString(options.data, 'data', 16),
-    });
+    return callNative(() =>
+      getNativeMethod('writeBlock')({
+        ...options,
+        data: normalizeSizedHexString(options.data, 'data', 16),
+      })
+    );
   },
 };
