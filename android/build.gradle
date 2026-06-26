@@ -9,10 +9,15 @@ version = '0.1.0'
 android {
   namespace "expo.modules.blenfcreader"
   defaultConfig {
+    minSdkVersion 23
     versionCode 1
     versionName "0.1.0"
   }
   lintOptions {
     abortOnError false
   }
+}
+
+dependencies {
+  implementation fileTree(dir: 'libs', include: ['*.aar'])
 }

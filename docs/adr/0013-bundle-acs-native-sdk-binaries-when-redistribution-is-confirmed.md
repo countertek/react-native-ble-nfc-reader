@@ -1,4 +1,3 @@
-# Bundle ACS Native SDK Binaries When Redistribution Is Confirmed
+# Bundle ACS Native SDK Binaries
 
-The package should include the ACS Android AARs and iOS XCFrameworks so consumers do not manually copy vendor files. Publishing the package with those binaries is blocked until ACS redistribution rights are confirmed; if redistribution is not permitted, the package must fail loudly and document the required local SDK placement.
-
+The package includes the ACS Android AARs and iOS XCFrameworks so consumers do not manually copy vendor files. Redistribution rights are confirmed. The bundled SmartCardIO/OpenJDK-derived code is documented as GPLv2 with the Classpath exception.
