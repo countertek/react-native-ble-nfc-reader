@@ -1,0 +1,3979 @@
+{
+  "ABIRoot": {
+    "kind": "Root",
+    "name": "SmartCardIO",
+    "printedName": "SmartCardIO",
+    "children": [
+      {
+        "kind": "TypeDecl",
+        "name": "CardTerminal",
+        "printedName": "CardTerminal",
+        "children": [
+          {
+            "kind": "Var",
+            "name": "name",
+            "printedName": "name",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11SmartCardIO0B8TerminalP4nameSSvp",
+            "mangledName": "$s11SmartCardIO0B8TerminalP4nameSSvp",
+            "moduleName": "SmartCardIO",
+            "protocolReq": true,
+            "declAttributes": [
+              "RawDocComment"
+            ],
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11SmartCardIO0B8TerminalP4nameSSvg",
+                "mangledName": "$s11SmartCardIO0B8TerminalP4nameSSvg",
+                "moduleName": "SmartCardIO",
+                "genericSig": "<τ_0_0 where τ_0_0 : SmartCardIO.CardTerminal>",
+                "sugared_genericSig": "<Self where Self : SmartCardIO.CardTerminal>",
+                "protocolReq": true,
+                "reqNewWitnessTableEntry": true,
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Function",
+            "name": "connect",
+            "printedName": "connect(protocolString:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Card",
+                "printedName": "any SmartCardIO.Card",
+                "usr": "s:11SmartCardIO0B0P"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11SmartCardIO0B8TerminalP7connect14protocolStringAA0B0_pSS_tKF",
+            "mangledName": "$s11SmartCardIO0B8TerminalP7connect14protocolStringAA0B0_pSS_tKF",
+            "moduleName": "SmartCardIO",
+            "genericSig": "<τ_0_0 where τ_0_0 : SmartCardIO.CardTerminal>",
+            "sugared_genericSig": "<Self where Self : SmartCardIO.CardTerminal>",
+            "protocolReq": true,
+            "declAttributes": [
+              "RawDocComment"
+            ],
+            "throwing": true,
+            "reqNewWitnessTableEntry": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "isCardPresent",
+            "printedName": "isCardPresent()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Bool",
+                "printedName": "Swift.Bool",
+                "usr": "s:Sb"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11SmartCardIO0B8TerminalP02isB7PresentSbyKF",
+            "mangledName": "$s11SmartCardIO0B8TerminalP02isB7PresentSbyKF",
+            "moduleName": "SmartCardIO",
+            "genericSig": "<τ_0_0 where τ_0_0 : SmartCardIO.CardTerminal>",
+            "sugared_genericSig": "<Self where Self : SmartCardIO.CardTerminal>",
+            "protocolReq": true,
+            "declAttributes": [
+              "RawDocComment"
+            ],
+            "throwing": true,
+            "reqNewWitnessTableEntry": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "waitForCardPresent",
+            "printedName": "waitForCardPresent(timeout:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Bool",
+                "printedName": "Swift.Bool",
+                "usr": "s:Sb"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Int",
+                "printedName": "Swift.Int",
+                "usr": "s:Si"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11SmartCardIO0B8TerminalP07waitForB7Present7timeoutSbSi_tKF",
+            "mangledName": "$s11SmartCardIO0B8TerminalP07waitForB7Present7timeoutSbSi_tKF",
+            "moduleName": "SmartCardIO",
+            "genericSig": "<τ_0_0 where τ_0_0 : SmartCardIO.CardTerminal>",
+            "sugared_genericSig": "<Self where Self : SmartCardIO.CardTerminal>",
+            "protocolReq": true,
+            "declAttributes": [
+              "RawDocComment"
+            ],
+            "throwing": true,
+            "reqNewWitnessTableEntry": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "waitForCardAbsent",
+            "printedName": "waitForCardAbsent(timeout:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Bool",
+                "printedName": "Swift.Bool",
+                "usr": "s:Sb"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Int",
+                "printedName": "Swift.Int",
+                "usr": "s:Si"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11SmartCardIO0B8TerminalP07waitForB6Absent7timeoutSbSi_tKF",
+            "mangledName": "$s11SmartCardIO0B8TerminalP07waitForB6Absent7timeoutSbSi_tKF",
+            "moduleName": "SmartCardIO",
+            "genericSig": "<τ_0_0 where τ_0_0 : SmartCardIO.CardTerminal>",
+            "sugared_genericSig": "<Self where Self : SmartCardIO.CardTerminal>",
+            "protocolReq": true,
+            "declAttributes": [
+              "RawDocComment"
+            ],
+            "throwing": true,
+            "reqNewWitnessTableEntry": true,
+            "funcSelfKind": "NonMutating"
+          }
+        ],
+        "declKind": "Protocol",
+        "usr": "s:11SmartCardIO0B8TerminalP",
+        "mangledName": "$s11SmartCardIO0B8TerminalP",
+        "moduleName": "SmartCardIO",
+        "genericSig": "<τ_0_0 : AnyObject>",
+        "sugared_genericSig": "<Self : AnyObject>",
+        "declAttributes": [
+          "AccessControl",
+          "RawDocComment"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "CardTerminals",
+        "printedName": "CardTerminals",
+        "children": [
+          {
+            "kind": "Function",
+            "name": "list",
+            "printedName": "list()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Array",
+                "printedName": "[any SmartCardIO.CardTerminal]",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "CardTerminal",
+                    "printedName": "any SmartCardIO.CardTerminal",
+                    "usr": "s:11SmartCardIO0B8TerminalP"
+                  }
+                ],
+                "usr": "s:Sa"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11SmartCardIO0B9TerminalsP4listSayAA0B8Terminal_pGyKF",
+            "mangledName": "$s11SmartCardIO0B9TerminalsP4listSayAA0B8Terminal_pGyKF",
+            "moduleName": "SmartCardIO",
+            "genericSig": "<τ_0_0 where τ_0_0 : SmartCardIO.CardTerminals>",
+            "sugared_genericSig": "<Self where Self : SmartCardIO.CardTerminals>",
+            "protocolReq": true,
+            "declAttributes": [
+              "RawDocComment"
+            ],
+            "throwing": true,
+            "reqNewWitnessTableEntry": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "list",
+            "printedName": "list(state:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Array",
+                "printedName": "[any SmartCardIO.CardTerminal]",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "CardTerminal",
+                    "printedName": "any SmartCardIO.CardTerminal",
+                    "usr": "s:11SmartCardIO0B8TerminalP"
+                  }
+                ],
+                "usr": "s:Sa"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "CardState",
+                "printedName": "SmartCardIO.CardState",
+                "usr": "s:11SmartCardIO0B5StateO"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11SmartCardIO0B9TerminalsP4list5stateSayAA0B8Terminal_pGAA0B5StateO_tKF",
+            "mangledName": "$s11SmartCardIO0B9TerminalsP4list5stateSayAA0B8Terminal_pGAA0B5StateO_tKF",
+            "moduleName": "SmartCardIO",
+            "genericSig": "<τ_0_0 where τ_0_0 : SmartCardIO.CardTerminals>",
+            "sugared_genericSig": "<Self where Self : SmartCardIO.CardTerminals>",
+            "protocolReq": true,
+            "declAttributes": [
+              "RawDocComment"
+            ],
+            "throwing": true,
+            "reqNewWitnessTableEntry": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "terminal",
+            "printedName": "terminal(name:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "(any SmartCardIO.CardTerminal)?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "CardTerminal",
+                    "printedName": "any SmartCardIO.CardTerminal",
+                    "usr": "s:11SmartCardIO0B8TerminalP"
+                  }
+                ],
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11SmartCardIO0B9TerminalsP8terminal4nameAA0B8Terminal_pSgSS_tF",
+            "mangledName": "$s11SmartCardIO0B9TerminalsP8terminal4nameAA0B8Terminal_pSgSS_tF",
+            "moduleName": "SmartCardIO",
+            "genericSig": "<τ_0_0 where τ_0_0 : SmartCardIO.CardTerminals>",
+            "sugared_genericSig": "<Self where Self : SmartCardIO.CardTerminals>",
+            "protocolReq": true,
+            "declAttributes": [
+              "RawDocComment"
+            ],
+            "reqNewWitnessTableEntry": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "waitForChange",
+            "printedName": "waitForChange()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11SmartCardIO0B9TerminalsP13waitForChangeyyKF",
+            "mangledName": "$s11SmartCardIO0B9TerminalsP13waitForChangeyyKF",
+            "moduleName": "SmartCardIO",
+            "genericSig": "<τ_0_0 where τ_0_0 : SmartCardIO.CardTerminals>",
+            "sugared_genericSig": "<Self where Self : SmartCardIO.CardTerminals>",
+            "protocolReq": true,
+            "declAttributes": [
+              "RawDocComment"
+            ],
+            "throwing": true,
+            "reqNewWitnessTableEntry": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "waitForChange",
+            "printedName": "waitForChange(timeout:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Bool",
+                "printedName": "Swift.Bool",
+                "usr": "s:Sb"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Int",
+                "printedName": "Swift.Int",
+                "usr": "s:Si"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11SmartCardIO0B9TerminalsP13waitForChange7timeoutSbSi_tKF",
+            "mangledName": "$s11SmartCardIO0B9TerminalsP13waitForChange7timeoutSbSi_tKF",
+            "moduleName": "SmartCardIO",
+            "genericSig": "<τ_0_0 where τ_0_0 : SmartCardIO.CardTerminals>",
+            "sugared_genericSig": "<Self where Self : SmartCardIO.CardTerminals>",
+            "protocolReq": true,
+            "declAttributes": [
+              "RawDocComment"
+            ],
+            "throwing": true,
+            "reqNewWitnessTableEntry": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "list",
+            "printedName": "list()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Array",
+                "printedName": "[any SmartCardIO.CardTerminal]",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "CardTerminal",
+                    "printedName": "any SmartCardIO.CardTerminal",
+                    "usr": "s:11SmartCardIO0B8TerminalP"
+                  }
+                ],
+                "usr": "s:Sa"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11SmartCardIO0B9TerminalsPAAE4listSayAA0B8Terminal_pGyKF",
+            "mangledName": "$s11SmartCardIO0B9TerminalsPAAE4listSayAA0B8Terminal_pGyKF",
+            "moduleName": "SmartCardIO",
+            "genericSig": "<τ_0_0 where τ_0_0 : SmartCardIO.CardTerminals>",
+            "sugared_genericSig": "<Self where Self : SmartCardIO.CardTerminals>",
+            "declAttributes": [
+              "AccessControl"
+            ],
+            "isFromExtension": true,
+            "throwing": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "terminal",
+            "printedName": "terminal(name:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "(any SmartCardIO.CardTerminal)?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "CardTerminal",
+                    "printedName": "any SmartCardIO.CardTerminal",
+                    "usr": "s:11SmartCardIO0B8TerminalP"
+                  }
+                ],
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11SmartCardIO0B9TerminalsPAAE8terminal4nameAA0B8Terminal_pSgSS_tF",
+            "mangledName": "$s11SmartCardIO0B9TerminalsPAAE8terminal4nameAA0B8Terminal_pSgSS_tF",
+            "moduleName": "SmartCardIO",
+            "genericSig": "<τ_0_0 where τ_0_0 : SmartCardIO.CardTerminals>",
+            "sugared_genericSig": "<Self where Self : SmartCardIO.CardTerminals>",
+            "declAttributes": [
+              "AccessControl"
+            ],
+            "isFromExtension": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "waitForChange",
+            "printedName": "waitForChange()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11SmartCardIO0B9TerminalsPAAE13waitForChangeyyKF",
+            "mangledName": "$s11SmartCardIO0B9TerminalsPAAE13waitForChangeyyKF",
+            "moduleName": "SmartCardIO",
+            "genericSig": "<τ_0_0 where τ_0_0 : SmartCardIO.CardTerminals>",
+            "sugared_genericSig": "<Self where Self : SmartCardIO.CardTerminals>",
+            "declAttributes": [
+              "AccessControl"
+            ],
+            "isFromExtension": true,
+            "throwing": true,
+            "funcSelfKind": "NonMutating"
+          }
+        ],
+        "declKind": "Protocol",
+        "usr": "s:11SmartCardIO0B9TerminalsP",
+        "mangledName": "$s11SmartCardIO0B9TerminalsP",
+        "moduleName": "SmartCardIO",
+        "genericSig": "<τ_0_0 : AnyObject>",
+        "sugared_genericSig": "<Self : AnyObject>",
+        "declAttributes": [
+          "AccessControl",
+          "RawDocComment"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "CardState",
+        "printedName": "CardState",
+        "children": [
+          {
+            "kind": "Var",
+            "name": "all",
+            "printedName": "all",
+            "children": [
+              {
+                "kind": "TypeFunc",
+                "name": "Function",
+                "printedName": "(SmartCardIO.CardState.Type) -> SmartCardIO.CardState",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "CardState",
+                    "printedName": "SmartCardIO.CardState",
+                    "usr": "s:11SmartCardIO0B5StateO"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Metatype",
+                    "printedName": "SmartCardIO.CardState.Type",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "CardState",
+                        "printedName": "SmartCardIO.CardState",
+                        "usr": "s:11SmartCardIO0B5StateO"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "declKind": "EnumElement",
+            "usr": "s:11SmartCardIO0B5StateO3allyA2CmF",
+            "mangledName": "$s11SmartCardIO0B5StateO3allyA2CmF",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "RawDocComment"
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "cardPresent",
+            "printedName": "cardPresent",
+            "children": [
+              {
+                "kind": "TypeFunc",
+                "name": "Function",
+                "printedName": "(SmartCardIO.CardState.Type) -> SmartCardIO.CardState",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "CardState",
+                    "printedName": "SmartCardIO.CardState",
+                    "usr": "s:11SmartCardIO0B5StateO"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Metatype",
+                    "printedName": "SmartCardIO.CardState.Type",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "CardState",
+                        "printedName": "SmartCardIO.CardState",
+                        "usr": "s:11SmartCardIO0B5StateO"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "declKind": "EnumElement",
+            "usr": "s:11SmartCardIO0B5StateO11cardPresentyA2CmF",
+            "mangledName": "$s11SmartCardIO0B5StateO11cardPresentyA2CmF",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "RawDocComment"
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "cardAbsent",
+            "printedName": "cardAbsent",
+            "children": [
+              {
+                "kind": "TypeFunc",
+                "name": "Function",
+                "printedName": "(SmartCardIO.CardState.Type) -> SmartCardIO.CardState",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "CardState",
+                    "printedName": "SmartCardIO.CardState",
+                    "usr": "s:11SmartCardIO0B5StateO"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Metatype",
+                    "printedName": "SmartCardIO.CardState.Type",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "CardState",
+                        "printedName": "SmartCardIO.CardState",
+                        "usr": "s:11SmartCardIO0B5StateO"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "declKind": "EnumElement",
+            "usr": "s:11SmartCardIO0B5StateO10cardAbsentyA2CmF",
+            "mangledName": "$s11SmartCardIO0B5StateO10cardAbsentyA2CmF",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "RawDocComment"
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "cardInsertion",
+            "printedName": "cardInsertion",
+            "children": [
+              {
+                "kind": "TypeFunc",
+                "name": "Function",
+                "printedName": "(SmartCardIO.CardState.Type) -> SmartCardIO.CardState",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "CardState",
+                    "printedName": "SmartCardIO.CardState",
+                    "usr": "s:11SmartCardIO0B5StateO"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Metatype",
+                    "printedName": "SmartCardIO.CardState.Type",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "CardState",
+                        "printedName": "SmartCardIO.CardState",
+                        "usr": "s:11SmartCardIO0B5StateO"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "declKind": "EnumElement",
+            "usr": "s:11SmartCardIO0B5StateO13cardInsertionyA2CmF",
+            "mangledName": "$s11SmartCardIO0B5StateO13cardInsertionyA2CmF",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "RawDocComment"
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "cardRemoval",
+            "printedName": "cardRemoval",
+            "children": [
+              {
+                "kind": "TypeFunc",
+                "name": "Function",
+                "printedName": "(SmartCardIO.CardState.Type) -> SmartCardIO.CardState",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "CardState",
+                    "printedName": "SmartCardIO.CardState",
+                    "usr": "s:11SmartCardIO0B5StateO"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Metatype",
+                    "printedName": "SmartCardIO.CardState.Type",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "CardState",
+                        "printedName": "SmartCardIO.CardState",
+                        "usr": "s:11SmartCardIO0B5StateO"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "declKind": "EnumElement",
+            "usr": "s:11SmartCardIO0B5StateO11cardRemovalyA2CmF",
+            "mangledName": "$s11SmartCardIO0B5StateO11cardRemovalyA2CmF",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "RawDocComment"
+            ]
+          },
+          {
+            "kind": "Function",
+            "name": "==",
+            "printedName": "==(_:_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Bool",
+                "printedName": "Swift.Bool",
+                "usr": "s:Sb"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "CardState",
+                "printedName": "SmartCardIO.CardState",
+                "usr": "s:11SmartCardIO0B5StateO"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "CardState",
+                "printedName": "SmartCardIO.CardState",
+                "usr": "s:11SmartCardIO0B5StateO"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11SmartCardIO0B5StateO2eeoiySbAC_ACtFZ",
+            "mangledName": "$s11SmartCardIO0B5StateO2eeoiySbAC_ACtFZ",
+            "moduleName": "SmartCardIO",
+            "static": true,
+            "implicit": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Var",
+            "name": "hashValue",
+            "printedName": "hashValue",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Int",
+                "printedName": "Swift.Int",
+                "usr": "s:Si"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11SmartCardIO0B5StateO9hashValueSivp",
+            "mangledName": "$s11SmartCardIO0B5StateO9hashValueSivp",
+            "moduleName": "SmartCardIO",
+            "implicit": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Int",
+                    "printedName": "Swift.Int",
+                    "usr": "s:Si"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11SmartCardIO0B5StateO9hashValueSivg",
+                "mangledName": "$s11SmartCardIO0B5StateO9hashValueSivg",
+                "moduleName": "SmartCardIO",
+                "implicit": true,
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Function",
+            "name": "hash",
+            "printedName": "hash(into:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Hasher",
+                "printedName": "Swift.Hasher",
+                "paramValueOwnership": "InOut",
+                "usr": "s:s6HasherV"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11SmartCardIO0B5StateO4hash4intoys6HasherVz_tF",
+            "mangledName": "$s11SmartCardIO0B5StateO4hash4intoys6HasherVz_tF",
+            "moduleName": "SmartCardIO",
+            "implicit": true,
+            "funcSelfKind": "NonMutating"
+          }
+        ],
+        "declKind": "Enum",
+        "usr": "s:11SmartCardIO0B5StateO",
+        "mangledName": "$s11SmartCardIO0B5StateO",
+        "moduleName": "SmartCardIO",
+        "declAttributes": [
+          "AccessControl",
+          "RawDocComment"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Equatable",
+            "printedName": "Equatable",
+            "usr": "s:SQ",
+            "mangledName": "$sSQ"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Hashable",
+            "printedName": "Hashable",
+            "usr": "s:SH",
+            "mangledName": "$sSH"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "Card",
+        "printedName": "Card",
+        "children": [
+          {
+            "kind": "Var",
+            "name": "atr",
+            "printedName": "atr",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "ATR",
+                "printedName": "SmartCardIO.ATR",
+                "usr": "s:11SmartCardIO3ATRC"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11SmartCardIO0B0P3atrAA3ATRCvp",
+            "mangledName": "$s11SmartCardIO0B0P3atrAA3ATRCvp",
+            "moduleName": "SmartCardIO",
+            "protocolReq": true,
+            "declAttributes": [
+              "RawDocComment"
+            ],
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "ATR",
+                    "printedName": "SmartCardIO.ATR",
+                    "usr": "s:11SmartCardIO3ATRC"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11SmartCardIO0B0P3atrAA3ATRCvg",
+                "mangledName": "$s11SmartCardIO0B0P3atrAA3ATRCvg",
+                "moduleName": "SmartCardIO",
+                "genericSig": "<τ_0_0 where τ_0_0 : SmartCardIO.Card>",
+                "sugared_genericSig": "<Self where Self : SmartCardIO.Card>",
+                "protocolReq": true,
+                "reqNewWitnessTableEntry": true,
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "activeProtocol",
+            "printedName": "activeProtocol",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11SmartCardIO0B0P14activeProtocolSSvp",
+            "mangledName": "$s11SmartCardIO0B0P14activeProtocolSSvp",
+            "moduleName": "SmartCardIO",
+            "protocolReq": true,
+            "declAttributes": [
+              "RawDocComment"
+            ],
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11SmartCardIO0B0P14activeProtocolSSvg",
+                "mangledName": "$s11SmartCardIO0B0P14activeProtocolSSvg",
+                "moduleName": "SmartCardIO",
+                "genericSig": "<τ_0_0 where τ_0_0 : SmartCardIO.Card>",
+                "sugared_genericSig": "<Self where Self : SmartCardIO.Card>",
+                "protocolReq": true,
+                "reqNewWitnessTableEntry": true,
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Function",
+            "name": "basicChannel",
+            "printedName": "basicChannel()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "CardChannel",
+                "printedName": "any SmartCardIO.CardChannel",
+                "usr": "s:11SmartCardIO0B7ChannelP"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11SmartCardIO0B0P12basicChannelAA0bE0_pyKF",
+            "mangledName": "$s11SmartCardIO0B0P12basicChannelAA0bE0_pyKF",
+            "moduleName": "SmartCardIO",
+            "genericSig": "<τ_0_0 where τ_0_0 : SmartCardIO.Card>",
+            "sugared_genericSig": "<Self where Self : SmartCardIO.Card>",
+            "protocolReq": true,
+            "declAttributes": [
+              "RawDocComment"
+            ],
+            "throwing": true,
+            "reqNewWitnessTableEntry": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "openLogicalChannel",
+            "printedName": "openLogicalChannel()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "CardChannel",
+                "printedName": "any SmartCardIO.CardChannel",
+                "usr": "s:11SmartCardIO0B7ChannelP"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11SmartCardIO0B0P18openLogicalChannelAA0bF0_pyKF",
+            "mangledName": "$s11SmartCardIO0B0P18openLogicalChannelAA0bF0_pyKF",
+            "moduleName": "SmartCardIO",
+            "genericSig": "<τ_0_0 where τ_0_0 : SmartCardIO.Card>",
+            "sugared_genericSig": "<Self where Self : SmartCardIO.Card>",
+            "protocolReq": true,
+            "declAttributes": [
+              "RawDocComment"
+            ],
+            "throwing": true,
+            "reqNewWitnessTableEntry": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "beginExclusive",
+            "printedName": "beginExclusive()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11SmartCardIO0B0P14beginExclusiveyyKF",
+            "mangledName": "$s11SmartCardIO0B0P14beginExclusiveyyKF",
+            "moduleName": "SmartCardIO",
+            "genericSig": "<τ_0_0 where τ_0_0 : SmartCardIO.Card>",
+            "sugared_genericSig": "<Self where Self : SmartCardIO.Card>",
+            "protocolReq": true,
+            "declAttributes": [
+              "RawDocComment"
+            ],
+            "throwing": true,
+            "reqNewWitnessTableEntry": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "endExclusive",
+            "printedName": "endExclusive()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11SmartCardIO0B0P12endExclusiveyyKF",
+            "mangledName": "$s11SmartCardIO0B0P12endExclusiveyyKF",
+            "moduleName": "SmartCardIO",
+            "genericSig": "<τ_0_0 where τ_0_0 : SmartCardIO.Card>",
+            "sugared_genericSig": "<Self where Self : SmartCardIO.Card>",
+            "protocolReq": true,
+            "declAttributes": [
+              "RawDocComment"
+            ],
+            "throwing": true,
+            "reqNewWitnessTableEntry": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "transmitControlCommand",
+            "printedName": "transmitControlCommand(controlCode:command:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Array",
+                "printedName": "[Swift.UInt8]",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UInt8",
+                    "printedName": "Swift.UInt8",
+                    "usr": "s:s5UInt8V"
+                  }
+                ],
+                "usr": "s:Sa"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Int",
+                "printedName": "Swift.Int",
+                "usr": "s:Si"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Array",
+                "printedName": "[Swift.UInt8]",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UInt8",
+                    "printedName": "Swift.UInt8",
+                    "usr": "s:s5UInt8V"
+                  }
+                ],
+                "usr": "s:Sa"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11SmartCardIO0B0P22transmitControlCommand11controlCode7commandSays5UInt8VGSi_AItKF",
+            "mangledName": "$s11SmartCardIO0B0P22transmitControlCommand11controlCode7commandSays5UInt8VGSi_AItKF",
+            "moduleName": "SmartCardIO",
+            "genericSig": "<τ_0_0 where τ_0_0 : SmartCardIO.Card>",
+            "sugared_genericSig": "<Self where Self : SmartCardIO.Card>",
+            "protocolReq": true,
+            "declAttributes": [
+              "RawDocComment"
+            ],
+            "throwing": true,
+            "reqNewWitnessTableEntry": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "disconnect",
+            "printedName": "disconnect(reset:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Bool",
+                "printedName": "Swift.Bool",
+                "usr": "s:Sb"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11SmartCardIO0B0P10disconnect5resetySb_tKF",
+            "mangledName": "$s11SmartCardIO0B0P10disconnect5resetySb_tKF",
+            "moduleName": "SmartCardIO",
+            "genericSig": "<τ_0_0 where τ_0_0 : SmartCardIO.Card>",
+            "sugared_genericSig": "<Self where Self : SmartCardIO.Card>",
+            "protocolReq": true,
+            "declAttributes": [
+              "RawDocComment"
+            ],
+            "throwing": true,
+            "reqNewWitnessTableEntry": true,
+            "funcSelfKind": "NonMutating"
+          }
+        ],
+        "declKind": "Protocol",
+        "usr": "s:11SmartCardIO0B0P",
+        "mangledName": "$s11SmartCardIO0B0P",
+        "moduleName": "SmartCardIO",
+        "genericSig": "<τ_0_0 : AnyObject>",
+        "sugared_genericSig": "<Self : AnyObject>",
+        "declAttributes": [
+          "AccessControl",
+          "RawDocComment"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "CommandAPDU",
+        "printedName": "CommandAPDU",
+        "children": [
+          {
+            "kind": "Var",
+            "name": "cla",
+            "printedName": "cla",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "UInt8",
+                "printedName": "Swift.UInt8",
+                "usr": "s:s5UInt8V"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11SmartCardIO11CommandAPDUC3clas5UInt8Vvp",
+            "mangledName": "$s11SmartCardIO11CommandAPDUC3clas5UInt8Vvp",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "Final",
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UInt8",
+                    "printedName": "Swift.UInt8",
+                    "usr": "s:s5UInt8V"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11SmartCardIO11CommandAPDUC3clas5UInt8Vvg",
+                "mangledName": "$s11SmartCardIO11CommandAPDUC3clas5UInt8Vvg",
+                "moduleName": "SmartCardIO",
+                "declAttributes": [
+                  "Final"
+                ],
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "ins",
+            "printedName": "ins",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "UInt8",
+                "printedName": "Swift.UInt8",
+                "usr": "s:s5UInt8V"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11SmartCardIO11CommandAPDUC3inss5UInt8Vvp",
+            "mangledName": "$s11SmartCardIO11CommandAPDUC3inss5UInt8Vvp",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "Final",
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UInt8",
+                    "printedName": "Swift.UInt8",
+                    "usr": "s:s5UInt8V"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11SmartCardIO11CommandAPDUC3inss5UInt8Vvg",
+                "mangledName": "$s11SmartCardIO11CommandAPDUC3inss5UInt8Vvg",
+                "moduleName": "SmartCardIO",
+                "declAttributes": [
+                  "Final"
+                ],
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "p1",
+            "printedName": "p1",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "UInt8",
+                "printedName": "Swift.UInt8",
+                "usr": "s:s5UInt8V"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11SmartCardIO11CommandAPDUC2p1s5UInt8Vvp",
+            "mangledName": "$s11SmartCardIO11CommandAPDUC2p1s5UInt8Vvp",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "Final",
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UInt8",
+                    "printedName": "Swift.UInt8",
+                    "usr": "s:s5UInt8V"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11SmartCardIO11CommandAPDUC2p1s5UInt8Vvg",
+                "mangledName": "$s11SmartCardIO11CommandAPDUC2p1s5UInt8Vvg",
+                "moduleName": "SmartCardIO",
+                "declAttributes": [
+                  "Final"
+                ],
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "p2",
+            "printedName": "p2",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "UInt8",
+                "printedName": "Swift.UInt8",
+                "usr": "s:s5UInt8V"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11SmartCardIO11CommandAPDUC2p2s5UInt8Vvp",
+            "mangledName": "$s11SmartCardIO11CommandAPDUC2p2s5UInt8Vvp",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "Final",
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UInt8",
+                    "printedName": "Swift.UInt8",
+                    "usr": "s:s5UInt8V"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11SmartCardIO11CommandAPDUC2p2s5UInt8Vvg",
+                "mangledName": "$s11SmartCardIO11CommandAPDUC2p2s5UInt8Vvg",
+                "moduleName": "SmartCardIO",
+                "declAttributes": [
+                  "Final"
+                ],
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "nc",
+            "printedName": "nc",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Int",
+                "printedName": "Swift.Int",
+                "usr": "s:Si"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11SmartCardIO11CommandAPDUC2ncSivp",
+            "mangledName": "$s11SmartCardIO11CommandAPDUC2ncSivp",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "HasInitialValue",
+              "Final",
+              "HasStorage",
+              "SetterAccess",
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Int",
+                    "printedName": "Swift.Int",
+                    "usr": "s:Si"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11SmartCardIO11CommandAPDUC2ncSivg",
+                "mangledName": "$s11SmartCardIO11CommandAPDUC2ncSivg",
+                "moduleName": "SmartCardIO",
+                "implicit": true,
+                "declAttributes": [
+                  "Final"
+                ],
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "data",
+            "printedName": "data",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Array",
+                "printedName": "[Swift.UInt8]",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UInt8",
+                    "printedName": "Swift.UInt8",
+                    "usr": "s:s5UInt8V"
+                  }
+                ],
+                "usr": "s:Sa"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11SmartCardIO11CommandAPDUC4dataSays5UInt8VGvp",
+            "mangledName": "$s11SmartCardIO11CommandAPDUC4dataSays5UInt8VGvp",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "Final",
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Array",
+                    "printedName": "[Swift.UInt8]",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "UInt8",
+                        "printedName": "Swift.UInt8",
+                        "usr": "s:s5UInt8V"
+                      }
+                    ],
+                    "usr": "s:Sa"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11SmartCardIO11CommandAPDUC4dataSays5UInt8VGvg",
+                "mangledName": "$s11SmartCardIO11CommandAPDUC4dataSays5UInt8VGvg",
+                "moduleName": "SmartCardIO",
+                "declAttributes": [
+                  "Final"
+                ],
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "ne",
+            "printedName": "ne",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Int",
+                "printedName": "Swift.Int",
+                "usr": "s:Si"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11SmartCardIO11CommandAPDUC2neSivp",
+            "mangledName": "$s11SmartCardIO11CommandAPDUC2neSivp",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "HasInitialValue",
+              "Final",
+              "HasStorage",
+              "SetterAccess",
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Int",
+                    "printedName": "Swift.Int",
+                    "usr": "s:Si"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11SmartCardIO11CommandAPDUC2neSivg",
+                "mangledName": "$s11SmartCardIO11CommandAPDUC2neSivg",
+                "moduleName": "SmartCardIO",
+                "implicit": true,
+                "declAttributes": [
+                  "Final"
+                ],
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "bytes",
+            "printedName": "bytes",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Array",
+                "printedName": "[Swift.UInt8]",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UInt8",
+                    "printedName": "Swift.UInt8",
+                    "usr": "s:s5UInt8V"
+                  }
+                ],
+                "usr": "s:Sa"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11SmartCardIO11CommandAPDUC5bytesSays5UInt8VGvp",
+            "mangledName": "$s11SmartCardIO11CommandAPDUC5bytesSays5UInt8VGvp",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "Final",
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Array",
+                    "printedName": "[Swift.UInt8]",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "UInt8",
+                        "printedName": "Swift.UInt8",
+                        "usr": "s:s5UInt8V"
+                      }
+                    ],
+                    "usr": "s:Sa"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11SmartCardIO11CommandAPDUC5bytesSays5UInt8VGvg",
+                "mangledName": "$s11SmartCardIO11CommandAPDUC5bytesSays5UInt8VGvg",
+                "moduleName": "SmartCardIO",
+                "declAttributes": [
+                  "Final"
+                ],
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init(apdu:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "CommandAPDU",
+                "printedName": "SmartCardIO.CommandAPDU",
+                "usr": "s:11SmartCardIO11CommandAPDUC"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Array",
+                "printedName": "[Swift.UInt8]",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UInt8",
+                    "printedName": "Swift.UInt8",
+                    "usr": "s:s5UInt8V"
+                  }
+                ],
+                "usr": "s:Sa"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "s:11SmartCardIO11CommandAPDUC4apduACSays5UInt8VG_tKcfc",
+            "mangledName": "$s11SmartCardIO11CommandAPDUC4apduACSays5UInt8VG_tKcfc",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "throwing": true,
+            "init_kind": "Designated"
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init(apdu:apduOffset:apduLength:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "CommandAPDU",
+                "printedName": "SmartCardIO.CommandAPDU",
+                "usr": "s:11SmartCardIO11CommandAPDUC"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Array",
+                "printedName": "[Swift.UInt8]",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UInt8",
+                    "printedName": "Swift.UInt8",
+                    "usr": "s:s5UInt8V"
+                  }
+                ],
+                "usr": "s:Sa"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Int",
+                "printedName": "Swift.Int",
+                "usr": "s:Si"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Int",
+                "printedName": "Swift.Int",
+                "usr": "s:Si"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "s:11SmartCardIO11CommandAPDUC4apdu0F6Offset0F6LengthACSays5UInt8VG_S2itKcfc",
+            "mangledName": "$s11SmartCardIO11CommandAPDUC4apdu0F6Offset0F6LengthACSays5UInt8VG_S2itKcfc",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "throwing": true,
+            "init_kind": "Designated"
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init(apdu:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "CommandAPDU",
+                "printedName": "SmartCardIO.CommandAPDU",
+                "usr": "s:11SmartCardIO11CommandAPDUC"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Data",
+                "printedName": "Foundation.Data",
+                "usr": "s:10Foundation4DataV"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "s:11SmartCardIO11CommandAPDUC4apduAC10Foundation4DataV_tKcfc",
+            "mangledName": "$s11SmartCardIO11CommandAPDUC4apduAC10Foundation4DataV_tKcfc",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "throwing": true,
+            "init_kind": "Designated"
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init(cla:ins:p1:p2:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "CommandAPDU",
+                "printedName": "SmartCardIO.CommandAPDU",
+                "usr": "s:11SmartCardIO11CommandAPDUC"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "UInt8",
+                "printedName": "Swift.UInt8",
+                "usr": "s:s5UInt8V"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "UInt8",
+                "printedName": "Swift.UInt8",
+                "usr": "s:s5UInt8V"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "UInt8",
+                "printedName": "Swift.UInt8",
+                "usr": "s:s5UInt8V"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "UInt8",
+                "printedName": "Swift.UInt8",
+                "usr": "s:s5UInt8V"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "s:11SmartCardIO11CommandAPDUC3cla3ins2p12p2ACs5UInt8V_A3ItKcfc",
+            "mangledName": "$s11SmartCardIO11CommandAPDUC3cla3ins2p12p2ACs5UInt8V_A3ItKcfc",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "Convenience",
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "throwing": true,
+            "init_kind": "Convenience"
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init(cla:ins:p1:p2:ne:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "CommandAPDU",
+                "printedName": "SmartCardIO.CommandAPDU",
+                "usr": "s:11SmartCardIO11CommandAPDUC"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "UInt8",
+                "printedName": "Swift.UInt8",
+                "usr": "s:s5UInt8V"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "UInt8",
+                "printedName": "Swift.UInt8",
+                "usr": "s:s5UInt8V"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "UInt8",
+                "printedName": "Swift.UInt8",
+                "usr": "s:s5UInt8V"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "UInt8",
+                "printedName": "Swift.UInt8",
+                "usr": "s:s5UInt8V"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Int",
+                "printedName": "Swift.Int",
+                "usr": "s:Si"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "s:11SmartCardIO11CommandAPDUC3cla3ins2p12p22neACs5UInt8V_A3JSitKcfc",
+            "mangledName": "$s11SmartCardIO11CommandAPDUC3cla3ins2p12p22neACs5UInt8V_A3JSitKcfc",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "Convenience",
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "throwing": true,
+            "init_kind": "Convenience"
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init(cla:ins:p1:p2:data:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "CommandAPDU",
+                "printedName": "SmartCardIO.CommandAPDU",
+                "usr": "s:11SmartCardIO11CommandAPDUC"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "UInt8",
+                "printedName": "Swift.UInt8",
+                "usr": "s:s5UInt8V"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "UInt8",
+                "printedName": "Swift.UInt8",
+                "usr": "s:s5UInt8V"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "UInt8",
+                "printedName": "Swift.UInt8",
+                "usr": "s:s5UInt8V"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "UInt8",
+                "printedName": "Swift.UInt8",
+                "usr": "s:s5UInt8V"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Array",
+                "printedName": "[Swift.UInt8]",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UInt8",
+                    "printedName": "Swift.UInt8",
+                    "usr": "s:s5UInt8V"
+                  }
+                ],
+                "usr": "s:Sa"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "s:11SmartCardIO11CommandAPDUC3cla3ins2p12p24dataACs5UInt8V_A3JSayAJGtKcfc",
+            "mangledName": "$s11SmartCardIO11CommandAPDUC3cla3ins2p12p24dataACs5UInt8V_A3JSayAJGtKcfc",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "Convenience",
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "throwing": true,
+            "init_kind": "Convenience"
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init(cla:ins:p1:p2:data:dataOffset:dataLength:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "CommandAPDU",
+                "printedName": "SmartCardIO.CommandAPDU",
+                "usr": "s:11SmartCardIO11CommandAPDUC"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "UInt8",
+                "printedName": "Swift.UInt8",
+                "usr": "s:s5UInt8V"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "UInt8",
+                "printedName": "Swift.UInt8",
+                "usr": "s:s5UInt8V"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "UInt8",
+                "printedName": "Swift.UInt8",
+                "usr": "s:s5UInt8V"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "UInt8",
+                "printedName": "Swift.UInt8",
+                "usr": "s:s5UInt8V"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Array",
+                "printedName": "[Swift.UInt8]",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UInt8",
+                    "printedName": "Swift.UInt8",
+                    "usr": "s:s5UInt8V"
+                  }
+                ],
+                "usr": "s:Sa"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Int",
+                "printedName": "Swift.Int",
+                "usr": "s:Si"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Int",
+                "printedName": "Swift.Int",
+                "usr": "s:Si"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "s:11SmartCardIO11CommandAPDUC3cla3ins2p12p24data0J6Offset0J6LengthACs5UInt8V_A3LSayALGS2itKcfc",
+            "mangledName": "$s11SmartCardIO11CommandAPDUC3cla3ins2p12p24data0J6Offset0J6LengthACs5UInt8V_A3LSayALGS2itKcfc",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "Convenience",
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "throwing": true,
+            "init_kind": "Convenience"
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init(cla:ins:p1:p2:data:ne:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "CommandAPDU",
+                "printedName": "SmartCardIO.CommandAPDU",
+                "usr": "s:11SmartCardIO11CommandAPDUC"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "UInt8",
+                "printedName": "Swift.UInt8",
+                "usr": "s:s5UInt8V"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "UInt8",
+                "printedName": "Swift.UInt8",
+                "usr": "s:s5UInt8V"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "UInt8",
+                "printedName": "Swift.UInt8",
+                "usr": "s:s5UInt8V"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "UInt8",
+                "printedName": "Swift.UInt8",
+                "usr": "s:s5UInt8V"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Array",
+                "printedName": "[Swift.UInt8]",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UInt8",
+                    "printedName": "Swift.UInt8",
+                    "usr": "s:s5UInt8V"
+                  }
+                ],
+                "usr": "s:Sa"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Int",
+                "printedName": "Swift.Int",
+                "usr": "s:Si"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "s:11SmartCardIO11CommandAPDUC3cla3ins2p12p24data2neACs5UInt8V_A3KSayAKGSitKcfc",
+            "mangledName": "$s11SmartCardIO11CommandAPDUC3cla3ins2p12p24data2neACs5UInt8V_A3KSayAKGSitKcfc",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "Convenience",
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "throwing": true,
+            "init_kind": "Convenience"
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init(cla:ins:p1:p2:data:dataOffset:dataLength:ne:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "CommandAPDU",
+                "printedName": "SmartCardIO.CommandAPDU",
+                "usr": "s:11SmartCardIO11CommandAPDUC"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "UInt8",
+                "printedName": "Swift.UInt8",
+                "usr": "s:s5UInt8V"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "UInt8",
+                "printedName": "Swift.UInt8",
+                "usr": "s:s5UInt8V"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "UInt8",
+                "printedName": "Swift.UInt8",
+                "usr": "s:s5UInt8V"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "UInt8",
+                "printedName": "Swift.UInt8",
+                "usr": "s:s5UInt8V"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Array",
+                "printedName": "[Swift.UInt8]",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UInt8",
+                    "printedName": "Swift.UInt8",
+                    "usr": "s:s5UInt8V"
+                  }
+                ],
+                "usr": "s:Sa"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Int",
+                "printedName": "Swift.Int",
+                "usr": "s:Si"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Int",
+                "printedName": "Swift.Int",
+                "usr": "s:Si"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Int",
+                "printedName": "Swift.Int",
+                "usr": "s:Si"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "s:11SmartCardIO11CommandAPDUC3cla3ins2p12p24data0J6Offset0J6Length2neACs5UInt8V_A3MSayAMGS3itKcfc",
+            "mangledName": "$s11SmartCardIO11CommandAPDUC3cla3ins2p12p24data0J6Offset0J6Length2neACs5UInt8V_A3MSayAMGS3itKcfc",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "throwing": true,
+            "init_kind": "Designated"
+          }
+        ],
+        "declKind": "Class",
+        "usr": "s:11SmartCardIO11CommandAPDUC",
+        "mangledName": "$s11SmartCardIO11CommandAPDUC",
+        "moduleName": "SmartCardIO",
+        "declAttributes": [
+          "Final",
+          "AccessControl",
+          "RawDocComment"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          }
+        ]
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "SmartCardIO",
+        "declAttributes": [
+          "RawDocComment"
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "CardChannel",
+        "printedName": "CardChannel",
+        "children": [
+          {
+            "kind": "Var",
+            "name": "card",
+            "printedName": "card",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Card",
+                "printedName": "any SmartCardIO.Card",
+                "usr": "s:11SmartCardIO0B0P"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11SmartCardIO0B7ChannelP4cardAA0B0_pvp",
+            "mangledName": "$s11SmartCardIO0B7ChannelP4cardAA0B0_pvp",
+            "moduleName": "SmartCardIO",
+            "protocolReq": true,
+            "declAttributes": [
+              "RawDocComment"
+            ],
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Card",
+                    "printedName": "any SmartCardIO.Card",
+                    "usr": "s:11SmartCardIO0B0P"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11SmartCardIO0B7ChannelP4cardAA0B0_pvg",
+                "mangledName": "$s11SmartCardIO0B7ChannelP4cardAA0B0_pvg",
+                "moduleName": "SmartCardIO",
+                "genericSig": "<τ_0_0 where τ_0_0 : SmartCardIO.CardChannel>",
+                "sugared_genericSig": "<Self where Self : SmartCardIO.CardChannel>",
+                "protocolReq": true,
+                "reqNewWitnessTableEntry": true,
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Function",
+            "name": "channelNumber",
+            "printedName": "channelNumber()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "UInt8",
+                "printedName": "Swift.UInt8",
+                "usr": "s:s5UInt8V"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11SmartCardIO0B7ChannelP13channelNumbers5UInt8VyKF",
+            "mangledName": "$s11SmartCardIO0B7ChannelP13channelNumbers5UInt8VyKF",
+            "moduleName": "SmartCardIO",
+            "genericSig": "<τ_0_0 where τ_0_0 : SmartCardIO.CardChannel>",
+            "sugared_genericSig": "<Self where Self : SmartCardIO.CardChannel>",
+            "protocolReq": true,
+            "declAttributes": [
+              "RawDocComment"
+            ],
+            "throwing": true,
+            "reqNewWitnessTableEntry": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "transmit",
+            "printedName": "transmit(apdu:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "ResponseAPDU",
+                "printedName": "SmartCardIO.ResponseAPDU",
+                "usr": "s:11SmartCardIO12ResponseAPDUC"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "CommandAPDU",
+                "printedName": "SmartCardIO.CommandAPDU",
+                "usr": "s:11SmartCardIO11CommandAPDUC"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11SmartCardIO0B7ChannelP8transmit4apduAA12ResponseAPDUCAA07CommandH0C_tKF",
+            "mangledName": "$s11SmartCardIO0B7ChannelP8transmit4apduAA12ResponseAPDUCAA07CommandH0C_tKF",
+            "moduleName": "SmartCardIO",
+            "genericSig": "<τ_0_0 where τ_0_0 : SmartCardIO.CardChannel>",
+            "sugared_genericSig": "<Self where Self : SmartCardIO.CardChannel>",
+            "protocolReq": true,
+            "declAttributes": [
+              "RawDocComment"
+            ],
+            "throwing": true,
+            "reqNewWitnessTableEntry": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "transmit",
+            "printedName": "transmit(buffer:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Array",
+                "printedName": "[Swift.UInt8]",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UInt8",
+                    "printedName": "Swift.UInt8",
+                    "usr": "s:s5UInt8V"
+                  }
+                ],
+                "usr": "s:Sa"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Array",
+                "printedName": "[Swift.UInt8]",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UInt8",
+                    "printedName": "Swift.UInt8",
+                    "usr": "s:s5UInt8V"
+                  }
+                ],
+                "usr": "s:Sa"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11SmartCardIO0B7ChannelP8transmit6bufferSays5UInt8VGAH_tKF",
+            "mangledName": "$s11SmartCardIO0B7ChannelP8transmit6bufferSays5UInt8VGAH_tKF",
+            "moduleName": "SmartCardIO",
+            "genericSig": "<τ_0_0 where τ_0_0 : SmartCardIO.CardChannel>",
+            "sugared_genericSig": "<Self where Self : SmartCardIO.CardChannel>",
+            "protocolReq": true,
+            "declAttributes": [
+              "RawDocComment"
+            ],
+            "throwing": true,
+            "reqNewWitnessTableEntry": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "transmit",
+            "printedName": "transmit(data:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Data",
+                "printedName": "Foundation.Data",
+                "usr": "s:10Foundation4DataV"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Data",
+                "printedName": "Foundation.Data",
+                "usr": "s:10Foundation4DataV"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11SmartCardIO0B7ChannelP8transmit4data10Foundation4DataVAH_tKF",
+            "mangledName": "$s11SmartCardIO0B7ChannelP8transmit4data10Foundation4DataVAH_tKF",
+            "moduleName": "SmartCardIO",
+            "genericSig": "<τ_0_0 where τ_0_0 : SmartCardIO.CardChannel>",
+            "sugared_genericSig": "<Self where Self : SmartCardIO.CardChannel>",
+            "protocolReq": true,
+            "declAttributes": [
+              "RawDocComment"
+            ],
+            "throwing": true,
+            "reqNewWitnessTableEntry": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "close",
+            "printedName": "close()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11SmartCardIO0B7ChannelP5closeyyKF",
+            "mangledName": "$s11SmartCardIO0B7ChannelP5closeyyKF",
+            "moduleName": "SmartCardIO",
+            "genericSig": "<τ_0_0 where τ_0_0 : SmartCardIO.CardChannel>",
+            "sugared_genericSig": "<Self where Self : SmartCardIO.CardChannel>",
+            "protocolReq": true,
+            "declAttributes": [
+              "RawDocComment"
+            ],
+            "throwing": true,
+            "reqNewWitnessTableEntry": true,
+            "funcSelfKind": "NonMutating"
+          }
+        ],
+        "declKind": "Protocol",
+        "usr": "s:11SmartCardIO0B7ChannelP",
+        "mangledName": "$s11SmartCardIO0B7ChannelP",
+        "moduleName": "SmartCardIO",
+        "genericSig": "<τ_0_0 : AnyObject>",
+        "sugared_genericSig": "<Self : AnyObject>",
+        "declAttributes": [
+          "AccessControl",
+          "RawDocComment"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "ResponseAPDU",
+        "printedName": "ResponseAPDU",
+        "children": [
+          {
+            "kind": "Var",
+            "name": "nr",
+            "printedName": "nr",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Int",
+                "printedName": "Swift.Int",
+                "usr": "s:Si"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11SmartCardIO12ResponseAPDUC2nrSivp",
+            "mangledName": "$s11SmartCardIO12ResponseAPDUC2nrSivp",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "Final",
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Int",
+                    "printedName": "Swift.Int",
+                    "usr": "s:Si"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11SmartCardIO12ResponseAPDUC2nrSivg",
+                "mangledName": "$s11SmartCardIO12ResponseAPDUC2nrSivg",
+                "moduleName": "SmartCardIO",
+                "declAttributes": [
+                  "Final"
+                ],
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "data",
+            "printedName": "data",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Array",
+                "printedName": "[Swift.UInt8]",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UInt8",
+                    "printedName": "Swift.UInt8",
+                    "usr": "s:s5UInt8V"
+                  }
+                ],
+                "usr": "s:Sa"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11SmartCardIO12ResponseAPDUC4dataSays5UInt8VGvp",
+            "mangledName": "$s11SmartCardIO12ResponseAPDUC4dataSays5UInt8VGvp",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "Final",
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Array",
+                    "printedName": "[Swift.UInt8]",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "UInt8",
+                        "printedName": "Swift.UInt8",
+                        "usr": "s:s5UInt8V"
+                      }
+                    ],
+                    "usr": "s:Sa"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11SmartCardIO12ResponseAPDUC4dataSays5UInt8VGvg",
+                "mangledName": "$s11SmartCardIO12ResponseAPDUC4dataSays5UInt8VGvg",
+                "moduleName": "SmartCardIO",
+                "declAttributes": [
+                  "Final"
+                ],
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "sw1",
+            "printedName": "sw1",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "UInt8",
+                "printedName": "Swift.UInt8",
+                "usr": "s:s5UInt8V"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11SmartCardIO12ResponseAPDUC3sw1s5UInt8Vvp",
+            "mangledName": "$s11SmartCardIO12ResponseAPDUC3sw1s5UInt8Vvp",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "Final",
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UInt8",
+                    "printedName": "Swift.UInt8",
+                    "usr": "s:s5UInt8V"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11SmartCardIO12ResponseAPDUC3sw1s5UInt8Vvg",
+                "mangledName": "$s11SmartCardIO12ResponseAPDUC3sw1s5UInt8Vvg",
+                "moduleName": "SmartCardIO",
+                "declAttributes": [
+                  "Final"
+                ],
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "sw2",
+            "printedName": "sw2",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "UInt8",
+                "printedName": "Swift.UInt8",
+                "usr": "s:s5UInt8V"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11SmartCardIO12ResponseAPDUC3sw2s5UInt8Vvp",
+            "mangledName": "$s11SmartCardIO12ResponseAPDUC3sw2s5UInt8Vvp",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "Final",
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UInt8",
+                    "printedName": "Swift.UInt8",
+                    "usr": "s:s5UInt8V"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11SmartCardIO12ResponseAPDUC3sw2s5UInt8Vvg",
+                "mangledName": "$s11SmartCardIO12ResponseAPDUC3sw2s5UInt8Vvg",
+                "moduleName": "SmartCardIO",
+                "declAttributes": [
+                  "Final"
+                ],
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "sw",
+            "printedName": "sw",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "UInt16",
+                "printedName": "Swift.UInt16",
+                "usr": "s:s6UInt16V"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11SmartCardIO12ResponseAPDUC2sws6UInt16Vvp",
+            "mangledName": "$s11SmartCardIO12ResponseAPDUC2sws6UInt16Vvp",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "Final",
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UInt16",
+                    "printedName": "Swift.UInt16",
+                    "usr": "s:s6UInt16V"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11SmartCardIO12ResponseAPDUC2sws6UInt16Vvg",
+                "mangledName": "$s11SmartCardIO12ResponseAPDUC2sws6UInt16Vvg",
+                "moduleName": "SmartCardIO",
+                "declAttributes": [
+                  "Final"
+                ],
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "bytes",
+            "printedName": "bytes",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Array",
+                "printedName": "[Swift.UInt8]",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UInt8",
+                    "printedName": "Swift.UInt8",
+                    "usr": "s:s5UInt8V"
+                  }
+                ],
+                "usr": "s:Sa"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11SmartCardIO12ResponseAPDUC5bytesSays5UInt8VGvp",
+            "mangledName": "$s11SmartCardIO12ResponseAPDUC5bytesSays5UInt8VGvp",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "Final",
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Array",
+                    "printedName": "[Swift.UInt8]",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "UInt8",
+                        "printedName": "Swift.UInt8",
+                        "usr": "s:s5UInt8V"
+                      }
+                    ],
+                    "usr": "s:Sa"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11SmartCardIO12ResponseAPDUC5bytesSays5UInt8VGvg",
+                "mangledName": "$s11SmartCardIO12ResponseAPDUC5bytesSays5UInt8VGvg",
+                "moduleName": "SmartCardIO",
+                "declAttributes": [
+                  "Final"
+                ],
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init(apdu:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "ResponseAPDU",
+                "printedName": "SmartCardIO.ResponseAPDU",
+                "usr": "s:11SmartCardIO12ResponseAPDUC"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Array",
+                "printedName": "[Swift.UInt8]",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UInt8",
+                    "printedName": "Swift.UInt8",
+                    "usr": "s:s5UInt8V"
+                  }
+                ],
+                "usr": "s:Sa"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "s:11SmartCardIO12ResponseAPDUC4apduACSays5UInt8VG_tKcfc",
+            "mangledName": "$s11SmartCardIO12ResponseAPDUC4apduACSays5UInt8VG_tKcfc",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "throwing": true,
+            "init_kind": "Designated"
+          }
+        ],
+        "declKind": "Class",
+        "usr": "s:11SmartCardIO12ResponseAPDUC",
+        "mangledName": "$s11SmartCardIO12ResponseAPDUC",
+        "moduleName": "SmartCardIO",
+        "declAttributes": [
+          "Final",
+          "AccessControl",
+          "RawDocComment"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          }
+        ]
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "SmartCardIO",
+        "declAttributes": [
+          "RawDocComment"
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "TerminalFactory",
+        "printedName": "TerminalFactory",
+        "children": [
+          {
+            "kind": "Var",
+            "name": "provider",
+            "printedName": "provider",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Provider",
+                "printedName": "SmartCardIO.Provider",
+                "usr": "s:11SmartCardIO8ProviderC"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11SmartCardIO15TerminalFactoryC8providerAA8ProviderCvp",
+            "mangledName": "$s11SmartCardIO15TerminalFactoryC8providerAA8ProviderCvp",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "Final",
+              "HasStorage",
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "isLet": true,
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Provider",
+                    "printedName": "SmartCardIO.Provider",
+                    "usr": "s:11SmartCardIO8ProviderC"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11SmartCardIO15TerminalFactoryC8providerAA8ProviderCvg",
+                "mangledName": "$s11SmartCardIO15TerminalFactoryC8providerAA8ProviderCvg",
+                "moduleName": "SmartCardIO",
+                "implicit": true,
+                "declAttributes": [
+                  "Final"
+                ],
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "type",
+            "printedName": "type",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11SmartCardIO15TerminalFactoryC4typeSSvp",
+            "mangledName": "$s11SmartCardIO15TerminalFactoryC4typeSSvp",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "Final",
+              "HasStorage",
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "isLet": true,
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11SmartCardIO15TerminalFactoryC4typeSSvg",
+                "mangledName": "$s11SmartCardIO15TerminalFactoryC4typeSSvg",
+                "moduleName": "SmartCardIO",
+                "implicit": true,
+                "declAttributes": [
+                  "Final"
+                ],
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Function",
+            "name": "shared",
+            "printedName": "shared(type:params:provider:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "TerminalFactory",
+                "printedName": "SmartCardIO.TerminalFactory",
+                "usr": "s:11SmartCardIO15TerminalFactoryC"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "ProtocolComposition",
+                "printedName": "Any"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Provider",
+                "printedName": "SmartCardIO.Provider",
+                "usr": "s:11SmartCardIO8ProviderC"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11SmartCardIO15TerminalFactoryC6shared4type6params8providerACSS_ypAA8ProviderCtKFZ",
+            "mangledName": "$s11SmartCardIO15TerminalFactoryC6shared4type6params8providerACSS_ypAA8ProviderCtKFZ",
+            "moduleName": "SmartCardIO",
+            "static": true,
+            "declAttributes": [
+              "Final",
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "throwing": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "terminals",
+            "printedName": "terminals()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "CardTerminals",
+                "printedName": "any SmartCardIO.CardTerminals",
+                "usr": "s:11SmartCardIO0B9TerminalsP"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11SmartCardIO15TerminalFactoryC9terminalsAA0B9Terminals_pyF",
+            "mangledName": "$s11SmartCardIO15TerminalFactoryC9terminalsAA0B9Terminals_pyF",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "Final",
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "funcSelfKind": "NonMutating"
+          }
+        ],
+        "declKind": "Class",
+        "usr": "s:11SmartCardIO15TerminalFactoryC",
+        "mangledName": "$s11SmartCardIO15TerminalFactoryC",
+        "moduleName": "SmartCardIO",
+        "declAttributes": [
+          "Final",
+          "AccessControl",
+          "RawDocComment"
+        ],
+        "hasMissingDesignatedInitializers": true,
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "Provider",
+        "printedName": "Provider",
+        "children": [
+          {
+            "kind": "Var",
+            "name": "name",
+            "printedName": "name",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11SmartCardIO8ProviderC4nameSSvp",
+            "mangledName": "$s11SmartCardIO8ProviderC4nameSSvp",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "Final",
+              "HasStorage",
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "isLet": true,
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11SmartCardIO8ProviderC4nameSSvg",
+                "mangledName": "$s11SmartCardIO8ProviderC4nameSSvg",
+                "moduleName": "SmartCardIO",
+                "implicit": true,
+                "declAttributes": [
+                  "Final"
+                ],
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "version",
+            "printedName": "version",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Double",
+                "printedName": "Swift.Double",
+                "usr": "s:Sd"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11SmartCardIO8ProviderC7versionSdvp",
+            "mangledName": "$s11SmartCardIO8ProviderC7versionSdvp",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "Final",
+              "HasStorage",
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "isLet": true,
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Double",
+                    "printedName": "Swift.Double",
+                    "usr": "s:Sd"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11SmartCardIO8ProviderC7versionSdvg",
+                "mangledName": "$s11SmartCardIO8ProviderC7versionSdvg",
+                "moduleName": "SmartCardIO",
+                "implicit": true,
+                "declAttributes": [
+                  "Final"
+                ],
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "info",
+            "printedName": "info",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11SmartCardIO8ProviderC4infoSSvp",
+            "mangledName": "$s11SmartCardIO8ProviderC4infoSSvp",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "Final",
+              "HasStorage",
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "isLet": true,
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11SmartCardIO8ProviderC4infoSSvg",
+                "mangledName": "$s11SmartCardIO8ProviderC4infoSSvg",
+                "moduleName": "SmartCardIO",
+                "implicit": true,
+                "declAttributes": [
+                  "Final"
+                ],
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init(name:version:info:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Provider",
+                "printedName": "SmartCardIO.Provider",
+                "usr": "s:11SmartCardIO8ProviderC"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Double",
+                "printedName": "Swift.Double",
+                "usr": "s:Sd"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "s:11SmartCardIO8ProviderC4name7version4infoACSS_SdSStcfc",
+            "mangledName": "$s11SmartCardIO8ProviderC4name7version4infoACSS_SdSStcfc",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "init_kind": "Designated"
+          },
+          {
+            "kind": "Function",
+            "name": "put",
+            "printedName": "put(key:value:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11SmartCardIO8ProviderC3put3key5valueySS_SStF",
+            "mangledName": "$s11SmartCardIO8ProviderC3put3key5valueySS_SStF",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Var",
+            "name": "description",
+            "printedName": "description",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11SmartCardIO8ProviderC11descriptionSSvp",
+            "mangledName": "$s11SmartCardIO8ProviderC11descriptionSSvp",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "AccessControl"
+            ],
+            "isFromExtension": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11SmartCardIO8ProviderC11descriptionSSvg",
+                "mangledName": "$s11SmartCardIO8ProviderC11descriptionSSvg",
+                "moduleName": "SmartCardIO",
+                "isFromExtension": true,
+                "accessorKind": "get"
+              }
+            ]
+          }
+        ],
+        "declKind": "Class",
+        "usr": "s:11SmartCardIO8ProviderC",
+        "mangledName": "$s11SmartCardIO8ProviderC",
+        "moduleName": "SmartCardIO",
+        "isOpen": true,
+        "declAttributes": [
+          "AccessControl",
+          "RawDocComment"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CustomStringConvertible",
+            "printedName": "CustomStringConvertible",
+            "usr": "s:s23CustomStringConvertibleP",
+            "mangledName": "$ss23CustomStringConvertibleP"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "CardError",
+        "printedName": "CardError",
+        "children": [
+          {
+            "kind": "Var",
+            "name": "illegalArgument",
+            "printedName": "illegalArgument",
+            "children": [
+              {
+                "kind": "TypeFunc",
+                "name": "Function",
+                "printedName": "(SmartCardIO.CardError.Type) -> (Swift.String) -> SmartCardIO.CardError",
+                "children": [
+                  {
+                    "kind": "TypeFunc",
+                    "name": "Function",
+                    "printedName": "(Swift.String) -> SmartCardIO.CardError",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "CardError",
+                        "printedName": "SmartCardIO.CardError",
+                        "usr": "s:11SmartCardIO0B5ErrorO"
+                      },
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      }
+                    ]
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Metatype",
+                    "printedName": "SmartCardIO.CardError.Type",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "CardError",
+                        "printedName": "SmartCardIO.CardError",
+                        "usr": "s:11SmartCardIO0B5ErrorO"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "declKind": "EnumElement",
+            "usr": "s:11SmartCardIO0B5ErrorO15illegalArgumentyACSScACmF",
+            "mangledName": "$s11SmartCardIO0B5ErrorO15illegalArgumentyACSScACmF",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "RawDocComment"
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "illegalState",
+            "printedName": "illegalState",
+            "children": [
+              {
+                "kind": "TypeFunc",
+                "name": "Function",
+                "printedName": "(SmartCardIO.CardError.Type) -> (Swift.String) -> SmartCardIO.CardError",
+                "children": [
+                  {
+                    "kind": "TypeFunc",
+                    "name": "Function",
+                    "printedName": "(Swift.String) -> SmartCardIO.CardError",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "CardError",
+                        "printedName": "SmartCardIO.CardError",
+                        "usr": "s:11SmartCardIO0B5ErrorO"
+                      },
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      }
+                    ]
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Metatype",
+                    "printedName": "SmartCardIO.CardError.Type",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "CardError",
+                        "printedName": "SmartCardIO.CardError",
+                        "usr": "s:11SmartCardIO0B5ErrorO"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "declKind": "EnumElement",
+            "usr": "s:11SmartCardIO0B5ErrorO12illegalStateyACSScACmF",
+            "mangledName": "$s11SmartCardIO0B5ErrorO12illegalStateyACSScACmF",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "RawDocComment"
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "noSuchAlgorithm",
+            "printedName": "noSuchAlgorithm",
+            "children": [
+              {
+                "kind": "TypeFunc",
+                "name": "Function",
+                "printedName": "(SmartCardIO.CardError.Type) -> (Swift.String) -> SmartCardIO.CardError",
+                "children": [
+                  {
+                    "kind": "TypeFunc",
+                    "name": "Function",
+                    "printedName": "(Swift.String) -> SmartCardIO.CardError",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "CardError",
+                        "printedName": "SmartCardIO.CardError",
+                        "usr": "s:11SmartCardIO0B5ErrorO"
+                      },
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      }
+                    ]
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Metatype",
+                    "printedName": "SmartCardIO.CardError.Type",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "CardError",
+                        "printedName": "SmartCardIO.CardError",
+                        "usr": "s:11SmartCardIO0B5ErrorO"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "declKind": "EnumElement",
+            "usr": "s:11SmartCardIO0B5ErrorO15noSuchAlgorithmyACSScACmF",
+            "mangledName": "$s11SmartCardIO0B5ErrorO15noSuchAlgorithmyACSScACmF",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "RawDocComment"
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "runTimeError",
+            "printedName": "runTimeError",
+            "children": [
+              {
+                "kind": "TypeFunc",
+                "name": "Function",
+                "printedName": "(SmartCardIO.CardError.Type) -> (Swift.String) -> SmartCardIO.CardError",
+                "children": [
+                  {
+                    "kind": "TypeFunc",
+                    "name": "Function",
+                    "printedName": "(Swift.String) -> SmartCardIO.CardError",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "CardError",
+                        "printedName": "SmartCardIO.CardError",
+                        "usr": "s:11SmartCardIO0B5ErrorO"
+                      },
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      }
+                    ]
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Metatype",
+                    "printedName": "SmartCardIO.CardError.Type",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "CardError",
+                        "printedName": "SmartCardIO.CardError",
+                        "usr": "s:11SmartCardIO0B5ErrorO"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "declKind": "EnumElement",
+            "usr": "s:11SmartCardIO0B5ErrorO07runTimeD0yACSScACmF",
+            "mangledName": "$s11SmartCardIO0B5ErrorO07runTimeD0yACSScACmF",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "RawDocComment"
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "operationFailed",
+            "printedName": "operationFailed",
+            "children": [
+              {
+                "kind": "TypeFunc",
+                "name": "Function",
+                "printedName": "(SmartCardIO.CardError.Type) -> (Swift.String) -> SmartCardIO.CardError",
+                "children": [
+                  {
+                    "kind": "TypeFunc",
+                    "name": "Function",
+                    "printedName": "(Swift.String) -> SmartCardIO.CardError",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "CardError",
+                        "printedName": "SmartCardIO.CardError",
+                        "usr": "s:11SmartCardIO0B5ErrorO"
+                      },
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      }
+                    ]
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Metatype",
+                    "printedName": "SmartCardIO.CardError.Type",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "CardError",
+                        "printedName": "SmartCardIO.CardError",
+                        "usr": "s:11SmartCardIO0B5ErrorO"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "declKind": "EnumElement",
+            "usr": "s:11SmartCardIO0B5ErrorO15operationFailedyACSScACmF",
+            "mangledName": "$s11SmartCardIO0B5ErrorO15operationFailedyACSScACmF",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "RawDocComment"
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "cardNotPresent",
+            "printedName": "cardNotPresent",
+            "children": [
+              {
+                "kind": "TypeFunc",
+                "name": "Function",
+                "printedName": "(SmartCardIO.CardError.Type) -> (Swift.String) -> SmartCardIO.CardError",
+                "children": [
+                  {
+                    "kind": "TypeFunc",
+                    "name": "Function",
+                    "printedName": "(Swift.String) -> SmartCardIO.CardError",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "CardError",
+                        "printedName": "SmartCardIO.CardError",
+                        "usr": "s:11SmartCardIO0B5ErrorO"
+                      },
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      }
+                    ]
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Metatype",
+                    "printedName": "SmartCardIO.CardError.Type",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "CardError",
+                        "printedName": "SmartCardIO.CardError",
+                        "usr": "s:11SmartCardIO0B5ErrorO"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "declKind": "EnumElement",
+            "usr": "s:11SmartCardIO0B5ErrorO14cardNotPresentyACSScACmF",
+            "mangledName": "$s11SmartCardIO0B5ErrorO14cardNotPresentyACSScACmF",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "RawDocComment"
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "errorDescription",
+            "printedName": "errorDescription",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Swift.String?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11SmartCardIO0B5ErrorO16errorDescriptionSSSgvp",
+            "mangledName": "$s11SmartCardIO0B5ErrorO16errorDescriptionSSSgvp",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "AccessControl"
+            ],
+            "isFromExtension": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "Swift.String?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11SmartCardIO0B5ErrorO16errorDescriptionSSSgvg",
+                "mangledName": "$s11SmartCardIO0B5ErrorO16errorDescriptionSSSgvg",
+                "moduleName": "SmartCardIO",
+                "isFromExtension": true,
+                "accessorKind": "get"
+              }
+            ]
+          }
+        ],
+        "declKind": "Enum",
+        "usr": "s:11SmartCardIO0B5ErrorO",
+        "mangledName": "$s11SmartCardIO0B5ErrorO",
+        "moduleName": "SmartCardIO",
+        "declAttributes": [
+          "AccessControl",
+          "RawDocComment"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Error",
+            "printedName": "Error",
+            "usr": "s:s5ErrorP",
+            "mangledName": "$ss5ErrorP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Sendable",
+            "printedName": "Sendable",
+            "usr": "s:s8SendableP",
+            "mangledName": "$ss8SendableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "SendableMetatype",
+            "printedName": "SendableMetatype",
+            "usr": "s:s16SendableMetatypeP",
+            "mangledName": "$ss16SendableMetatypeP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "LocalizedError",
+            "printedName": "LocalizedError",
+            "usr": "s:10Foundation14LocalizedErrorP",
+            "mangledName": "$s10Foundation14LocalizedErrorP"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "ATR",
+        "printedName": "ATR",
+        "children": [
+          {
+            "kind": "Var",
+            "name": "bytes",
+            "printedName": "bytes",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Array",
+                "printedName": "[Swift.UInt8]",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UInt8",
+                    "printedName": "Swift.UInt8",
+                    "usr": "s:s5UInt8V"
+                  }
+                ],
+                "usr": "s:Sa"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11SmartCardIO3ATRC5bytesSays5UInt8VGvp",
+            "mangledName": "$s11SmartCardIO3ATRC5bytesSays5UInt8VGvp",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "Final",
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Array",
+                    "printedName": "[Swift.UInt8]",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "UInt8",
+                        "printedName": "Swift.UInt8",
+                        "usr": "s:s5UInt8V"
+                      }
+                    ],
+                    "usr": "s:Sa"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11SmartCardIO3ATRC5bytesSays5UInt8VGvg",
+                "mangledName": "$s11SmartCardIO3ATRC5bytesSays5UInt8VGvg",
+                "moduleName": "SmartCardIO",
+                "declAttributes": [
+                  "Final"
+                ],
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "historicalBytes",
+            "printedName": "historicalBytes",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Array",
+                "printedName": "[Swift.UInt8]",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UInt8",
+                    "printedName": "Swift.UInt8",
+                    "usr": "s:s5UInt8V"
+                  }
+                ],
+                "usr": "s:Sa"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11SmartCardIO3ATRC15historicalBytesSays5UInt8VGvp",
+            "mangledName": "$s11SmartCardIO3ATRC15historicalBytesSays5UInt8VGvp",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "Final",
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Array",
+                    "printedName": "[Swift.UInt8]",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "UInt8",
+                        "printedName": "Swift.UInt8",
+                        "usr": "s:s5UInt8V"
+                      }
+                    ],
+                    "usr": "s:Sa"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11SmartCardIO3ATRC15historicalBytesSays5UInt8VGvg",
+                "mangledName": "$s11SmartCardIO3ATRC15historicalBytesSays5UInt8VGvg",
+                "moduleName": "SmartCardIO",
+                "declAttributes": [
+                  "Final"
+                ],
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init(atr:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "ATR",
+                "printedName": "SmartCardIO.ATR",
+                "usr": "s:11SmartCardIO3ATRC"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Array",
+                "printedName": "[Swift.UInt8]",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UInt8",
+                    "printedName": "Swift.UInt8",
+                    "usr": "s:s5UInt8V"
+                  }
+                ],
+                "usr": "s:Sa"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "s:11SmartCardIO3ATRC3atrACSays5UInt8VG_tcfc",
+            "mangledName": "$s11SmartCardIO3ATRC3atrACSays5UInt8VG_tcfc",
+            "moduleName": "SmartCardIO",
+            "declAttributes": [
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "init_kind": "Designated"
+          }
+        ],
+        "declKind": "Class",
+        "usr": "s:11SmartCardIO3ATRC",
+        "mangledName": "$s11SmartCardIO3ATRC",
+        "moduleName": "SmartCardIO",
+        "declAttributes": [
+          "Final",
+          "AccessControl",
+          "RawDocComment"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "TerminalFactorySpi",
+        "printedName": "TerminalFactorySpi",
+        "children": [
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init(parameter:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "GenericTypeParam",
+                "printedName": "τ_0_0"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "ProtocolComposition",
+                "printedName": "Any"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "s:11SmartCardIO18TerminalFactorySpiP9parameterxyp_tKcfc",
+            "mangledName": "$s11SmartCardIO18TerminalFactorySpiP9parameterxyp_tKcfc",
+            "moduleName": "SmartCardIO",
+            "genericSig": "<τ_0_0 where τ_0_0 : SmartCardIO.TerminalFactorySpi>",
+            "sugared_genericSig": "<Self where Self : SmartCardIO.TerminalFactorySpi>",
+            "protocolReq": true,
+            "declAttributes": [
+              "RawDocComment"
+            ],
+            "throwing": true,
+            "reqNewWitnessTableEntry": true,
+            "init_kind": "Designated"
+          },
+          {
+            "kind": "Function",
+            "name": "engineTerminals",
+            "printedName": "engineTerminals()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "CardTerminals",
+                "printedName": "any SmartCardIO.CardTerminals",
+                "usr": "s:11SmartCardIO0B9TerminalsP"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11SmartCardIO18TerminalFactorySpiP15engineTerminalsAA0bH0_pyF",
+            "mangledName": "$s11SmartCardIO18TerminalFactorySpiP15engineTerminalsAA0bH0_pyF",
+            "moduleName": "SmartCardIO",
+            "genericSig": "<τ_0_0 where τ_0_0 : SmartCardIO.TerminalFactorySpi>",
+            "sugared_genericSig": "<Self where Self : SmartCardIO.TerminalFactorySpi>",
+            "protocolReq": true,
+            "declAttributes": [
+              "RawDocComment"
+            ],
+            "reqNewWitnessTableEntry": true,
+            "funcSelfKind": "NonMutating"
+          }
+        ],
+        "declKind": "Protocol",
+        "usr": "s:11SmartCardIO18TerminalFactorySpiP",
+        "mangledName": "$s11SmartCardIO18TerminalFactorySpiP",
+        "moduleName": "SmartCardIO",
+        "genericSig": "<τ_0_0 : AnyObject>",
+        "sugared_genericSig": "<Self : AnyObject>",
+        "declAttributes": [
+          "AccessControl",
+          "RawDocComment"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          }
+        ]
+      }
+    ],
+    "json_format_version": 8
+  },
+  "ConstValues": [
+    {
+      "filePath": "\/Users\/godfrey\/SmartCardIO\/SmartCardIO\/SmartCardIO\/CommandAPDU.swift",
+      "kind": "IntegerLiteral",
+      "offset": 2500,
+      "length": 5,
+      "value": "65544"
+    },
+    {
+      "filePath": "\/Users\/godfrey\/SmartCardIO\/SmartCardIO\/SmartCardIO\/CommandAPDU.swift",
+      "kind": "IntegerLiteral",
+      "offset": 2568,
+      "length": 1,
+      "value": "0"
+    },
+    {
+      "filePath": "\/Users\/godfrey\/SmartCardIO\/SmartCardIO\/SmartCardIO\/CommandAPDU.swift",
+      "kind": "IntegerLiteral",
+      "offset": 3188,
+      "length": 1,
+      "value": "0"
+    },
+    {
+      "filePath": "\/Users\/godfrey\/SmartCardIO\/SmartCardIO\/SmartCardIO\/CommandAPDU.swift",
+      "kind": "IntegerLiteral",
+      "offset": 3558,
+      "length": 1,
+      "value": "0"
+    },
+    {
+      "filePath": "\/Users\/godfrey\/SmartCardIO\/SmartCardIO\/SmartCardIO\/ATR.swift",
+      "kind": "IntegerLiteral",
+      "offset": 1880,
+      "length": 1,
+      "value": "0"
+    },
+    {
+      "filePath": "\/Users\/godfrey\/SmartCardIO\/SmartCardIO\/SmartCardIO\/ATR.swift",
+      "kind": "IntegerLiteral",
+      "offset": 1912,
+      "length": 1,
+      "value": "0"
+    }
+  ]
+}

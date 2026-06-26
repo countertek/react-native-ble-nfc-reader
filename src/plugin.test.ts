@@ -46,15 +46,7 @@ describe('config plugin helpers', () => {
     expect(infoPlist.NSBluetoothPeripheralUsageDescription).toContain('connect ACS readers');
   });
 
-  it('fails loudly when ACS SDK binaries are absent', () => {
-    expect(plugin.getMissingAcsSdkBinaries('/missing-package-root')).toEqual([
-      'android/libs/acssmcio-*.aar',
-      'android/libs/smartcardio-*.aar',
-      'ios/Frameworks/ACSSmartCardIO.xcframework',
-      'ios/Frameworks/SmartCardIO.xcframework',
-    ]);
-    expect(() => plugin.assertAcsSdkBinariesPresent('/missing-package-root')).toThrow(
-      /ACS SDK binaries/
-    );
+  it('exports the config plugin without requiring app-specific options', () => {
+    expect(typeof plugin).toBe('function');
   });
 });

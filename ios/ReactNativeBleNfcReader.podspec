@@ -19,4 +19,5 @@ Pod::Spec.new do |s|
   }
 
   s.source_files = "**/*.{h,m,mm,swift,hpp,cpp}"
+  s.vendored_frameworks = 'Frameworks/ACSSmartCardIO.xcframework', 'Frameworks/SmartCardIO.xcframework'
 end

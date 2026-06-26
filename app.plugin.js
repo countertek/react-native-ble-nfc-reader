@@ -1,5 +1,3 @@
-const fs = require('fs');
-const path = require('path');
 const {
   createRunOncePlugin,
   withAndroidManifest,
@@ -107,58 +105,7 @@ function setIosBluetoothUsageDescriptions(infoPlist) {
   return infoPlist;
 }
 
-function hasMatchingFile(dir, pattern) {
-  if (!fs.existsSync(dir)) {
-    return false;
-  }
-
-  return fs.readdirSync(dir).some((file) => pattern.test(file));
-}
-
-function getMissingAcsSdkBinaries(packageRoot = __dirname) {
-  const missing = [];
-  const androidLibs = path.join(packageRoot, 'android', 'libs');
-  const iosFrameworks = path.join(packageRoot, 'ios', 'Frameworks');
-
-  if (!hasMatchingFile(androidLibs, /^acssmcio-.+\.aar$/)) {
-    missing.push('android/libs/acssmcio-*.aar');
-  }
-
-  if (!hasMatchingFile(androidLibs, /^smartcardio-.+\.aar$/)) {
-    missing.push('android/libs/smartcardio-*.aar');
-  }
-
-  if (!fs.existsSync(path.join(iosFrameworks, 'ACSSmartCardIO.xcframework'))) {
-    missing.push('ios/Frameworks/ACSSmartCardIO.xcframework');
-  }
-
-  if (!fs.existsSync(path.join(iosFrameworks, 'SmartCardIO.xcframework'))) {
-    missing.push('ios/Frameworks/SmartCardIO.xcframework');
-  }
-
-  return missing;
-}
-
-function assertAcsSdkBinariesPresent(packageRoot = __dirname) {
-  const missing = getMissingAcsSdkBinaries(packageRoot);
-
-  if (missing.length === 0) {
-    return;
-  }
-
-  throw new Error(
-    [
-      'react-native-ble-nfc-reader requires ACS SDK binaries for native builds.',
-      'ACS redistribution rights are not confirmed, so this package does not bundle them yet.',
-      `Missing: ${missing.join(', ')}`,
-      'See README.md#acs-sdk-placement.',
-    ].join('\n')
-  );
-}
-
 function withBleNfcReader(config) {
-  assertAcsSdkBinariesPresent();
-
   config = withInfoPlist(config, (nextConfig) => {
     setIosBluetoothUsageDescriptions(nextConfig.modResults);
     return nextConfig;
@@ -174,7 +121,5 @@ function withBleNfcReader(config) {
 
 module.exports = createRunOncePlugin(withBleNfcReader, pkg.name, pkg.version);
 module.exports.addAndroidBleRequirements = addAndroidBleRequirements;
-module.exports.assertAcsSdkBinariesPresent = assertAcsSdkBinariesPresent;
-module.exports.getMissingAcsSdkBinaries = getMissingAcsSdkBinaries;
 module.exports.setIosBluetoothUsageDescriptions = setIosBluetoothUsageDescriptions;
 module.exports.withBleNfcReader = withBleNfcReader;
