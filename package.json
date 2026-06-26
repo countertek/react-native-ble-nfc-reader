@@ -42,7 +42,10 @@
     "typescript": "^5.9.2"
   },
   "jest": {
-    "preset": "jest-expo",
+    "testEnvironment": "node",
+    "transform": {
+      "^.+\\.[jt]sx?$": "babel-jest"
+    },
     "roots": [
       "<rootDir>/src"
     ]

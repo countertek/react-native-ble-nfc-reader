@@ -1,4 +1,13 @@
-// Reexport the native module. On web, it will be resolved to ReactNativeBleNfcReaderModule.web.ts
-// and on native platforms to ReactNativeBleNfcReaderModule.ts
-export { default } from './ReactNativeBleNfcReaderModule';
+export {
+  connectReader,
+  disconnectReader,
+  getReaderPermissionStatus,
+  mifare,
+  normalizeHexString,
+  readCardUid,
+  requestReaderPermissions,
+  scanReaders,
+  splitApduResponse,
+  transmit,
+} from './ReactNativeBleNfcReader';
 export * from './ReactNativeBleNfcReader.types';
