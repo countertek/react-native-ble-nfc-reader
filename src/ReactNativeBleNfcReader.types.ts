@@ -49,6 +49,7 @@ export type WriteBlockOptions = {
 export type BleNfcReaderErrorCode =
   | 'INVALID_HEX_STRING'
   | 'INVALID_APDU_RESPONSE'
+  | 'INVALID_MIFARE_BLOCK'
   | 'NATIVE_METHOD_UNAVAILABLE'
   | 'UNSUPPORTED_PLATFORM';
 
@@ -61,7 +62,7 @@ export class BleNfcReaderError extends Error {
     this.name = 'BleNfcReaderError';
     this.code = code;
 
-    if (apduStatus) {
+    if (apduStatus !== undefined) {
       this.apduStatus = apduStatus;
     }
   }

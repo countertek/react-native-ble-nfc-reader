@@ -10,22 +10,11 @@ import {
   ScanReadersOptions,
   WriteBlockOptions,
 } from './ReactNativeBleNfcReader.types';
-import ReactNativeBleNfcReaderModule from './ReactNativeBleNfcReaderModule';
+import ReactNativeBleNfcReaderModule, {
+  ReactNativeBleNfcReaderModule as NativeReaderModule,
+} from './ReactNativeBleNfcReaderModule';
 
-type NativeReaderModule = {
-  getReaderPermissionStatus?: () => Promise<ReaderPermissionStatus>;
-  requestReaderPermissions?: () => Promise<ReaderPermissionStatus>;
-  scanReaders?: (options?: ScanReadersOptions) => Promise<Reader[]>;
-  connectReader?: (readerId: ReaderId) => Promise<void>;
-  disconnectReader?: (readerId: ReaderId) => Promise<void>;
-  readCardUid?: (readerId: ReaderId) => Promise<HexString>;
-  transmit?: (readerId: ReaderId, apdu: HexString) => Promise<HexString>;
-  authenticateBlock?: (options: AuthenticateBlockOptions) => Promise<void>;
-  readBlock?: (options: ReadBlockOptions) => Promise<HexString>;
-  writeBlock?: (options: WriteBlockOptions) => Promise<void>;
-};
-
-const nativeModule = ReactNativeBleNfcReaderModule as NativeReaderModule;
+const nativeModule: NativeReaderModule = ReactNativeBleNfcReaderModule;
 
 export function normalizeHexString(value: string, name = 'value'): HexString {
   if (typeof value !== 'string') {
@@ -77,28 +66,48 @@ function getNativeMethod<Name extends keyof NativeReaderModule>(
   return method;
 }
 
-export function getReaderPermissionStatus(): Promise<ReaderPermissionStatus> {
+function normalizeSizedHexString(value: string, name: string, byteLength: number): HexString {
+  const normalizedValue = normalizeHexString(value, name);
+
+  if (normalizedValue.length !== byteLength * 2) {
+    throw new BleNfcReaderError(
+      'INVALID_HEX_STRING',
+      `${name} must be ${byteLength} bytes (${byteLength * 2} hex characters)`
+    );
+  }
+
+  return normalizedValue;
+}
+
+function assertBlock(block: number): void {
+  if (!Number.isInteger(block) || block < 0) {
+    throw new BleNfcReaderError('INVALID_MIFARE_BLOCK', 'block must be a non-negative integer');
+  }
+}
+
+export async function getReaderPermissionStatus(): Promise<ReaderPermissionStatus> {
   return getNativeMethod('getReaderPermissionStatus')();
 }
 
-export function requestReaderPermissions(): Promise<ReaderPermissionStatus> {
+export async function requestReaderPermissions(): Promise<ReaderPermissionStatus> {
   return getNativeMethod('requestReaderPermissions')();
 }
 
-export function scanReaders(options?: ScanReadersOptions): Promise<Reader[]> {
+export async function scanReaders(options?: ScanReadersOptions): Promise<Reader[]> {
   return getNativeMethod('scanReaders')(options);
 }
 
-export function connectReader(readerId: ReaderId): Promise<void> {
+export async function connectReader(readerId: ReaderId): Promise<void> {
   return getNativeMethod('connectReader')(readerId);
 }
 
-export function disconnectReader(readerId: ReaderId): Promise<void> {
+export async function disconnectReader(readerId: ReaderId): Promise<void> {
   return getNativeMethod('disconnectReader')(readerId);
 }
 
-export function readCardUid(readerId: ReaderId): Promise<HexString> {
-  return getNativeMethod('readCardUid')(readerId);
+export async function readCardUid(readerId: ReaderId): Promise<HexString> {
+  const uid = await getNativeMethod('readCardUid')(readerId);
+  return normalizeHexString(uid, 'uid');
 }
 
 export async function transmit(readerId: ReaderId, apdu: HexString): Promise<ApduResponse> {
@@ -107,22 +116,28 @@ export async function transmit(readerId: ReaderId, apdu: HexString): Promise<Apd
 }
 
 export const mifare = {
-  authenticateBlock(options: AuthenticateBlockOptions): Promise<void> {
+  async authenticateBlock(options: AuthenticateBlockOptions): Promise<void> {
+    assertBlock(options.block);
+
     return getNativeMethod('authenticateBlock')({
       ...options,
-      key: normalizeHexString(options.key, 'key'),
+      key: normalizeSizedHexString(options.key, 'key', 6),
     });
   },
 
   async readBlock(options: ReadBlockOptions): Promise<HexString> {
+    assertBlock(options.block);
+
     const data = await getNativeMethod('readBlock')(options);
     return normalizeHexString(data, 'data');
   },
 
-  writeBlock(options: WriteBlockOptions): Promise<void> {
+  async writeBlock(options: WriteBlockOptions): Promise<void> {
+    assertBlock(options.block);
+
     return getNativeMethod('writeBlock')({
       ...options,
-      data: normalizeHexString(options.data, 'data'),
+      data: normalizeSizedHexString(options.data, 'data', 16),
     });
   },
 };

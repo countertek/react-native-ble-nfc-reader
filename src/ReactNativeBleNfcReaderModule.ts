@@ -11,7 +11,7 @@ import {
   WriteBlockOptions,
 } from './ReactNativeBleNfcReader.types';
 
-declare class ReactNativeBleNfcReaderModule extends NativeModule {
+export declare class ReactNativeBleNfcReaderModule extends NativeModule {
   getReaderPermissionStatus?: () => Promise<ReaderPermissionStatus>;
   requestReaderPermissions?: () => Promise<ReaderPermissionStatus>;
   scanReaders?: (options?: ScanReadersOptions) => Promise<Reader[]>;

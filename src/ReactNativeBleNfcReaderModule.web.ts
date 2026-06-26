@@ -1,47 +1,58 @@
 import { registerWebModule, NativeModule } from 'expo';
 
-import { createUnsupportedPlatformError } from './ReactNativeBleNfcReader.types';
+import {
+  createUnsupportedPlatformError,
+  HexString,
+  Reader,
+  ReaderId,
+  ReaderPermissionStatus,
+  ScanReadersOptions,
+} from './ReactNativeBleNfcReader.types';
 
 // ReactNativeBleNfcReaderModule is not available on the web platform.
 class ReactNativeBleNfcReaderModule extends NativeModule {
-  getReaderPermissionStatus(): never {
-    throw createUnsupportedPlatformError();
+  private rejectUnsupported<T>(): Promise<T> {
+    return Promise.reject(createUnsupportedPlatformError());
   }
 
-  requestReaderPermissions(): never {
-    throw createUnsupportedPlatformError();
+  getReaderPermissionStatus(): Promise<ReaderPermissionStatus> {
+    return this.rejectUnsupported();
   }
 
-  scanReaders(): never {
-    throw createUnsupportedPlatformError();
+  requestReaderPermissions(): Promise<ReaderPermissionStatus> {
+    return this.rejectUnsupported();
   }
 
-  connectReader(): never {
-    throw createUnsupportedPlatformError();
+  scanReaders(_options?: ScanReadersOptions): Promise<Reader[]> {
+    return this.rejectUnsupported();
   }
 
-  disconnectReader(): never {
-    throw createUnsupportedPlatformError();
+  connectReader(_readerId: ReaderId): Promise<void> {
+    return this.rejectUnsupported();
   }
 
-  readCardUid(): never {
-    throw createUnsupportedPlatformError();
+  disconnectReader(_readerId: ReaderId): Promise<void> {
+    return this.rejectUnsupported();
   }
 
-  transmit(): never {
-    throw createUnsupportedPlatformError();
+  readCardUid(_readerId: ReaderId): Promise<HexString> {
+    return this.rejectUnsupported();
   }
 
-  authenticateBlock(): never {
-    throw createUnsupportedPlatformError();
+  transmit(_readerId: ReaderId, _apdu: HexString): Promise<HexString> {
+    return this.rejectUnsupported();
   }
 
-  readBlock(): never {
-    throw createUnsupportedPlatformError();
+  authenticateBlock(): Promise<void> {
+    return this.rejectUnsupported();
   }
 
-  writeBlock(): never {
-    throw createUnsupportedPlatformError();
+  readBlock(): Promise<HexString> {
+    return this.rejectUnsupported();
+  }
+
+  writeBlock(): Promise<void> {
+    return this.rejectUnsupported();
   }
 }
 
