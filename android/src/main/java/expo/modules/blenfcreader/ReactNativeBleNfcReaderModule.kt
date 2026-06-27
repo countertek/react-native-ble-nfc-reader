@@ -75,12 +75,29 @@ class ReactNativeBleNfcReaderModule : Module() {
       }
     }
 
-    AsyncFunction("connectReader") { readerId: String ->
-      connectReader(readerId)
+    AsyncFunction("connectReader") { readerId: String, promise: Promise ->
+      scanHandler.post {
+        try {
+          promise.resolve(connectReader(readerId))
+        } catch (error: CodedException) {
+          promise.reject(error)
+        } catch (_: Exception) {
+          promise.reject(ReaderConnectionUnavailableException())
+        }
+      }
     }
 
-    AsyncFunction("disconnectReader") { readerId: String ->
-      disconnectReader(readerId)
+    AsyncFunction("disconnectReader") { readerId: String, promise: Promise ->
+      scanHandler.post {
+        try {
+          disconnectReader(readerId)
+          promise.resolve(null)
+        } catch (error: CodedException) {
+          promise.reject(error)
+        } catch (_: Exception) {
+          promise.reject(ReaderConnectionUnavailableException())
+        }
+      }
     }
   }
 
@@ -242,7 +259,9 @@ class ReactNativeBleNfcReaderModule : Module() {
 
   private fun connectReader(readerId: String): Map<String, Any> {
     val manager = readerManager()
-    return synchronized(readerLock) {
+    finishScan()
+
+    val terminal = synchronized(readerLock) {
       val activeId = activeReaderId
 
       if (activeId != null && activeId != readerId) {
@@ -253,19 +272,26 @@ class ReactNativeBleNfcReaderModule : Module() {
       activeReaderId = readerId
       activeReaderTerminal = knownTerminal
       activeReaderManager = manager
-      readerForTerminal(knownTerminal, manager)
+      knownTerminal
     }
+
+    return readerForTerminal(terminal, manager)
   }
 
   private fun disconnectReader(readerId: String) {
-    synchronized(readerLock) {
+    val activeConnection = synchronized(readerLock) {
       if (activeReaderId != readerId) {
         throw ReaderNotConnectedException(readerId)
       }
 
       val terminal = activeReaderTerminal ?: throw ReaderNotConnectedException(readerId)
       val manager = activeReaderManager ?: throw ReaderConnectionUnavailableException()
-      manager.disconnect(terminal)
+      Pair(manager, terminal)
+    }
+
+    activeConnection.first.disconnect(activeConnection.second)
+
+    synchronized(readerLock) {
       activeReaderId = null
       activeReaderTerminal = null
       activeReaderManager = null
