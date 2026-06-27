@@ -120,6 +120,36 @@ describe('public native wrappers', () => {
     await expect(getReaderPermissionStatus()).rejects.toBeInstanceOf(BleNfcReaderError);
   });
 
+  it('maps undetermined native permission failures to typed errors', async () => {
+    mockNativeModule.scanReaders = jest.fn(async () => {
+      const error = new Error('Reader Bluetooth permission has not been requested');
+      Object.assign(error, { code: 'READER_PERMISSION_UNDETERMINED' });
+      throw error;
+    });
+
+    await expect(scanReaders()).rejects.toEqual(
+      expect.objectContaining({
+        code: 'READER_PERMISSION_UNDETERMINED',
+      })
+    );
+    await expect(scanReaders()).rejects.toBeInstanceOf(BleNfcReaderError);
+  });
+
+  it('maps native scan availability failures to typed errors', async () => {
+    mockNativeModule.scanReaders = jest.fn(async () => {
+      const error = new Error('Reader scanning is not available');
+      Object.assign(error, { code: 'READER_SCAN_UNAVAILABLE' });
+      throw error;
+    });
+
+    await expect(scanReaders()).rejects.toEqual(
+      expect.objectContaining({
+        code: 'READER_SCAN_UNAVAILABLE',
+      })
+    );
+    await expect(scanReaders()).rejects.toBeInstanceOf(BleNfcReaderError);
+  });
+
   it('passes bounded scan options to native', async () => {
     mockNativeModule.scanReaders = jest.fn(async () => [{ id: 'reader-1', name: 'Reader 1' }]);
 
@@ -134,6 +164,18 @@ describe('public native wrappers', () => {
     mockNativeModule.scanReaders = jest.fn(async () => []);
 
     await expect(scanReaders({ timeoutMs: 0 })).rejects.toEqual(
+      expect.objectContaining({
+        code: 'INVALID_SCAN_TIMEOUT',
+      })
+    );
+
+    expect(mockNativeModule.scanReaders).not.toHaveBeenCalled();
+  });
+
+  it('rejects non-finite scan timeouts before native calls', async () => {
+    mockNativeModule.scanReaders = jest.fn(async () => []);
+
+    await expect(scanReaders({ timeoutMs: Number.POSITIVE_INFINITY })).rejects.toEqual(
       expect.objectContaining({
         code: 'INVALID_SCAN_TIMEOUT',
       })

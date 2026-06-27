@@ -57,6 +57,8 @@ class ReactNativeBleNfcReaderModule : Module() {
           scanReaders(options, promise)
         } catch (error: CodedException) {
           promise.reject(error)
+        } catch (_: Exception) {
+          promise.reject(ReaderScanUnavailableException())
         }
       }
     }
@@ -197,6 +199,10 @@ class ReactNativeBleNfcReaderModule : Module() {
   }
 
   private fun addDiscoveredReader(terminal: CardTerminal) {
+    if (activeScanManager == null || scanPromise == null) {
+      return
+    }
+
     val reader = mapOf(
       "id" to terminal.name,
       "name" to terminal.name

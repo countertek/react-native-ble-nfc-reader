@@ -96,7 +96,14 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
   }
 
   private func scanReaders(options: ScanReadersOptions?, promise: Promise) {
-    if readerPermissionStatus() != "granted" {
+    let permissionStatus = readerPermissionStatus()
+
+    if permissionStatus == "undetermined" {
+      promise.reject(readerPermissionUndeterminedException())
+      return
+    }
+
+    if permissionStatus != "granted" {
       promise.reject(readerPermissionDeniedException())
       return
     }
@@ -125,6 +132,10 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
   }
 
   private func startCurrentScanType() {
+    if scanPromise == nil {
+      return
+    }
+
     scanManager.stopScan()
     scanManager.startScan(terminalType: scanTerminalTypes[scanTypeIndex])
 
@@ -141,6 +152,7 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
     scanTypeTimer = nil
 
     scanManager.stopScan()
+    scanManager.delegate = nil
 
     let readers = discoveredReaders
     discoveredReaderIds = []
@@ -158,6 +170,10 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
     _ manager: BluetoothTerminalManager,
     didDiscover terminal: any CardTerminal
   ) {
+    if scanPromise == nil {
+      return
+    }
+
     let reader = [
       "id": terminal.name,
       "name": terminal.name
@@ -176,6 +192,14 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
 private struct ScanReadersOptions: Record {
   @Field
   var timeoutMs: Double?
+}
+
+private func readerPermissionUndeterminedException() -> Exception {
+  return Exception(
+    name: "ReaderPermissionUndeterminedException",
+    description: "Reader Bluetooth permission has not been requested",
+    code: "READER_PERMISSION_UNDETERMINED"
+  )
 }
 
 private func readerPermissionDeniedException() -> Exception {

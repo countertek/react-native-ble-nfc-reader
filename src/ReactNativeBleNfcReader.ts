@@ -89,6 +89,10 @@ function normalizeNativeError(error: unknown): unknown {
     return new BleNfcReaderError('READER_PERMISSION_DENIED', getErrorMessage(error));
   }
 
+  if (error.code === 'READER_PERMISSION_UNDETERMINED') {
+    return new BleNfcReaderError('READER_PERMISSION_UNDETERMINED', getErrorMessage(error));
+  }
+
   if (error.code === 'READER_PERMISSION_MISSING') {
     return new BleNfcReaderError('READER_PERMISSION_MISSING', getErrorMessage(error));
   }
