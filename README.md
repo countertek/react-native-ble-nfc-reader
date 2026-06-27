@@ -39,7 +39,9 @@ Use `connectReader(readerId)` with a discovered Reader ID to connect one Reader
 per app process. It returns the connected `Reader`; `metadata` may include model,
 firmware version, serial number, or battery level when the ACS Reader provides
 those fields. Call `disconnectReader(readerId)` to release the native Reader
-connection before connecting another Reader.
+connection before connecting another Reader. If `disconnectReader()` rejects,
+treat the Reader as still active and retry disconnect before connecting another
+Reader.
 
 ## Manual hardware checklist
 

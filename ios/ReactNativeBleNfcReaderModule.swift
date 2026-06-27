@@ -217,6 +217,8 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
   }
 
   private func connectReader(readerId: String) throws -> [String: Any] {
+    _ = finishScan()
+
     if let activeReader {
       if activeReader.id != readerId {
         throw readerAlreadyConnectedException(readerId: activeReader.id)
