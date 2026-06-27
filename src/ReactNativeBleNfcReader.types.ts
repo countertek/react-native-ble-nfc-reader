@@ -24,6 +24,10 @@ export type ReaderDiscoveredEvent = {
   reader: Reader;
 };
 
+export type ReaderCardEvent = {
+  readerId: ReaderId;
+};
+
 export type ReaderDiscoverySubscription = {
   remove(): void;
 };
@@ -68,6 +72,7 @@ export type BleNfcReaderErrorCode =
   | 'READER_ALREADY_CONNECTED'
   | 'READER_NOT_CONNECTED'
   | 'READER_CONNECTION_UNAVAILABLE'
+  | 'CARD_COMMAND_FAILED'
   | 'UNSUPPORTED_PLATFORM';
 
 export class BleNfcReaderError extends Error {

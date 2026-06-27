@@ -16,11 +16,17 @@ import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 import expo.modules.kotlin.records.Field
 import expo.modules.kotlin.records.Record
+import javax.smartcardio.Card
+import javax.smartcardio.CardException
 import javax.smartcardio.CardTerminal
+import javax.smartcardio.CommandAPDU
 
 private const val READER_DISCOVERED_EVENT = "onReaderDiscovered"
+private const val CARD_PRESENT_EVENT = "onCardPresent"
+private const val CARD_REMOVED_EVENT = "onCardRemoved"
 private const val DEFAULT_SCAN_TIMEOUT_MS = 5000.0
 private const val METADATA_TIMEOUT_MS = 1000L
+private const val READ_UID_APDU = "FFCA000000"
 
 class ReactNativeBleNfcReaderModule : Module() {
   private val scanHandler = Handler(Looper.getMainLooper())
@@ -38,6 +44,7 @@ class ReactNativeBleNfcReaderModule : Module() {
   private var activeReaderId: String? = null
   private var activeReaderTerminal: CardTerminal? = null
   private var activeReaderManager: BluetoothTerminalManager? = null
+  private var cardMonitorThread: Thread? = null
   private var scanPromise: Promise? = null
   private var scanStopRunnable: Runnable? = null
   private var scanTypeRunnable: Runnable? = null
@@ -47,7 +54,7 @@ class ReactNativeBleNfcReaderModule : Module() {
   override fun definition() = ModuleDefinition {
     Name("ReactNativeBleNfcReader")
 
-    Events(READER_DISCOVERED_EVENT)
+    Events(READER_DISCOVERED_EVENT, CARD_PRESENT_EVENT, CARD_REMOVED_EVENT)
 
     AsyncFunction("getReaderPermissionStatus") {
       getReaderPermissionStatus()
@@ -97,6 +104,26 @@ class ReactNativeBleNfcReaderModule : Module() {
         } catch (_: Exception) {
           promise.reject(ReaderConnectionUnavailableException())
         }
+      }
+    }
+
+    AsyncFunction("readCardUid") { readerId: String, promise: Promise ->
+      try {
+        promise.resolve(readCardUid(readerId))
+      } catch (error: CodedException) {
+        promise.reject(error)
+      } catch (_: Exception) {
+        promise.reject(ReaderConnectionUnavailableException())
+      }
+    }
+
+    AsyncFunction("transmit") { readerId: String, apdu: String, promise: Promise ->
+      try {
+        promise.resolve(transmit(readerId, apdu))
+      } catch (error: CodedException) {
+        promise.reject(error)
+      } catch (_: Exception) {
+        promise.reject(ReaderConnectionUnavailableException())
       }
     }
   }
@@ -275,6 +302,7 @@ class ReactNativeBleNfcReaderModule : Module() {
       knownTerminal
     }
 
+    startCardMonitor(readerId, terminal)
     return readerForTerminal(terminal, manager)
   }
 
@@ -290,11 +318,146 @@ class ReactNativeBleNfcReaderModule : Module() {
     }
 
     activeConnection.first.disconnect(activeConnection.second)
+    stopCardMonitor()
 
     synchronized(readerLock) {
       activeReaderId = null
       activeReaderTerminal = null
       activeReaderManager = null
+    }
+  }
+
+  private fun readCardUid(readerId: String): String {
+    val response = transmit(readerId, READ_UID_APDU)
+
+    if (response.length < 4) {
+      throw CardCommandFailedException("unknown")
+    }
+
+    val status = response.takeLast(4)
+    if (status != "9000") {
+      throw CardCommandFailedException(status)
+    }
+
+    return response.dropLast(4)
+  }
+
+  private fun transmit(readerId: String, apdu: String): String {
+    return withConnectedCard(readerId) { card ->
+      val response = card.basicChannel.transmit(CommandAPDU(hexToBytes(apdu)))
+      bytesToHex(response.bytes)
+    }
+  }
+
+  private fun <T> withConnectedCard(readerId: String, block: (Card) -> T): T {
+    val terminal = activeTerminal(readerId)
+    val card = terminal.connect("*")
+
+    try {
+      return block(card)
+    } finally {
+      card.disconnect(false)
+    }
+  }
+
+  private fun activeTerminal(readerId: String): CardTerminal {
+    return synchronized(readerLock) {
+      if (activeReaderId != readerId) {
+        throw ReaderNotConnectedException(readerId)
+      }
+
+      activeReaderTerminal ?: throw ReaderNotConnectedException(readerId)
+    }
+  }
+
+  private fun startCardMonitor(readerId: String, terminal: CardTerminal) {
+    stopCardMonitor()
+
+    val thread = Thread {
+      var wasPresent: Boolean? = null
+
+      while (!Thread.currentThread().isInterrupted) {
+        val present = try {
+          terminal.isCardPresent
+        } catch (_: CardException) {
+          null
+        }
+
+        if (present == null) {
+          sleepCardMonitor()
+          continue
+        }
+
+        if (present && wasPresent != true) {
+          sendCardEvent(CARD_PRESENT_EVENT, readerId)
+        }
+
+        if (!present && wasPresent == true) {
+          sendCardEvent(CARD_REMOVED_EVENT, readerId)
+        }
+
+        wasPresent = present
+
+        try {
+          if (present) {
+            terminal.waitForCardAbsent(1000)
+          } else {
+            terminal.waitForCardPresent(1000)
+          }
+        } catch (error: CardException) {
+          if (error.cause is InterruptedException) {
+            break
+          }
+        }
+      }
+    }
+
+    cardMonitorThread = thread
+    thread.start()
+  }
+
+  private fun stopCardMonitor() {
+    cardMonitorThread?.interrupt()
+    cardMonitorThread = null
+  }
+
+  private fun sleepCardMonitor() {
+    try {
+      Thread.sleep(500)
+    } catch (_: InterruptedException) {
+      Thread.currentThread().interrupt()
+    }
+  }
+
+  private fun sendCardEvent(eventName: String, readerId: String) {
+    scanHandler.post {
+      val connected = synchronized(readerLock) {
+        activeReaderId == readerId
+      }
+
+      if (!connected) {
+        return@post
+      }
+
+      sendEvent(eventName, Bundle().apply {
+        putString("readerId", readerId)
+      })
+    }
+  }
+
+  private fun hexToBytes(value: String): ByteArray {
+    if (value.length % 2 != 0 || !value.all { it in '0'..'9' || it in 'a'..'f' || it in 'A'..'F' }) {
+      throw InvalidHexStringException()
+    }
+
+    return value.chunked(2).map { byte ->
+      byte.toInt(16).toByte()
+    }.toByteArray()
+  }
+
+  private fun bytesToHex(value: ByteArray): String {
+    return value.joinToString("") { byte ->
+      "%02X".format(byte.toInt() and 0xFF)
     }
   }
 
@@ -417,6 +580,12 @@ private class InvalidScanTimeoutException : CodedException(
   null
 )
 
+private class InvalidHexStringException : CodedException(
+  "INVALID_HEX_STRING",
+  "apdu must contain only hex characters and have an even number of characters",
+  null
+)
+
 private class ReaderScanUnavailableException : CodedException(
   "READER_SCAN_UNAVAILABLE",
   "Reader scanning is not available on this Android device",
@@ -444,5 +613,11 @@ private class ReaderNotConnectedException(readerId: String) : CodedException(
 private class ReaderConnectionUnavailableException : CodedException(
   "READER_CONNECTION_UNAVAILABLE",
   "Reader connection is not available on this Android device",
+  null
+)
+
+private class CardCommandFailedException(status: String) : CodedException(
+  "CARD_COMMAND_FAILED",
+  "Card command failed with APDU Status $status",
   null
 )

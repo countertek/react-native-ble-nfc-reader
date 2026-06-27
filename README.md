@@ -43,18 +43,29 @@ connection before connecting another Reader. If `disconnectReader()` rejects,
 treat the Reader as still active and retry disconnect before connecting another
 Reader.
 
+## Card and APDU
+
+Use `addCardPresentListener()` and `addCardRemovedListener()` after connecting a
+Reader. `readCardUid(readerId)` returns the presented card UID as a Hex String.
+`transmit(readerId, apdu)` sends a raw APDU Hex String and resolves with
+`responseData` and `status`; non-`9000` APDU statuses are returned, not thrown.
+
 ## Manual hardware checklist
 
 - Android: grant Reader permission, start a 5 second scan, confirm an ACS BLE
   Reader appears during the scan, then confirm scanning stops at timeout and
   after `stopReaderScan()`. Connect the discovered Reader, confirm optional
-  metadata appears when available, disconnect it, then confirm a second connect
-  works only after disconnect.
+  metadata appears when available, present and remove a card, confirm the card
+  presence events update, read the card UID, transmit `FFCA000000`, confirm APDU
+  Response Data and APDU Status are shown separately, disconnect it, then confirm
+  a second connect works only after disconnect.
 - iOS: grant Bluetooth permission, start a 5 second scan, confirm an ACS BLE
   Reader appears during the scan, then confirm scanning stops at timeout and
   after `stopReaderScan()`. Connect the discovered Reader, confirm optional
-  metadata appears when available, disconnect it, then confirm a second connect
-  works only after disconnect.
+  metadata appears when available, present and remove a card, confirm the card
+  presence events update, read the card UID, transmit `FFCA000000`, confirm APDU
+  Response Data and APDU Status are shown separately, disconnect it, then confirm
+  a second connect works only after disconnect.
 
 ## ACS SDK
 

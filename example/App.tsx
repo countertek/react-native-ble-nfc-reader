@@ -1,16 +1,20 @@
 import { useEffect, useState } from 'react';
 import { Button, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import {
+  addCardPresentListener,
+  addCardRemovedListener,
   addReaderDiscoveredListener,
   BleNfcReaderError,
   connectReader,
   disconnectReader,
   getReaderPermissionStatus,
   Reader,
+  readCardUid,
   requestReaderPermissions,
   ReaderPermissionStatus,
   scanReaders,
   stopReaderScan,
+  transmit,
 } from 'react-native-ble-nfc-reader';
 
 type PermissionState = ReaderPermissionStatus | 'loading';
@@ -20,6 +24,9 @@ export default function App() {
   const [message, setMessage] = useState('');
   const [readers, setReaders] = useState<Reader[]>([]);
   const [connectedReader, setConnectedReader] = useState<Reader | null>(null);
+  const [cardPresent, setCardPresent] = useState(false);
+  const [cardUid, setCardUid] = useState('');
+  const [apduResponse, setApduResponse] = useState('');
   const [scanning, setScanning] = useState(false);
 
   async function refreshPermissionStatus() {
@@ -57,6 +64,9 @@ export default function App() {
   async function connectToReader(readerId: string) {
     try {
       setConnectedReader(await connectReader(readerId));
+      setCardPresent(false);
+      setCardUid('');
+      setApduResponse('');
       setMessage('');
     } catch (error) {
       setMessage(formatError(error));
@@ -71,6 +81,36 @@ export default function App() {
     try {
       await disconnectReader(connectedReader.id);
       setConnectedReader(null);
+      setCardPresent(false);
+      setCardUid('');
+      setApduResponse('');
+      setMessage('');
+    } catch (error) {
+      setMessage(formatError(error));
+    }
+  }
+
+  async function readUid() {
+    if (connectedReader === null) {
+      return;
+    }
+
+    try {
+      setCardUid(await readCardUid(connectedReader.id));
+      setMessage('');
+    } catch (error) {
+      setMessage(formatError(error));
+    }
+  }
+
+  async function transmitUidApdu() {
+    if (connectedReader === null) {
+      return;
+    }
+
+    try {
+      const response = await transmit(connectedReader.id, 'FFCA000000');
+      setApduResponse(`Data: ${response.responseData || '(empty)'} Status: ${response.status}`);
       setMessage('');
     } catch (error) {
       setMessage(formatError(error));
@@ -101,6 +141,30 @@ export default function App() {
       subscription.remove();
     };
   }, []);
+
+  useEffect(() => {
+    const presentSubscription = addCardPresentListener((event) => {
+      if (event.readerId !== connectedReader?.id) {
+        return;
+      }
+
+      setCardPresent(true);
+    });
+    const removedSubscription = addCardRemovedListener((event) => {
+      if (event.readerId !== connectedReader?.id) {
+        return;
+      }
+
+      setCardPresent(false);
+      setCardUid('');
+      setApduResponse('');
+    });
+
+    return () => {
+      presentSubscription.remove();
+      removedSubscription.remove();
+    };
+  }, [connectedReader?.id]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -136,6 +200,11 @@ export default function App() {
           <View style={styles.connectedReader}>
             <Text style={styles.status}>Connected: {connectedReader.name ?? connectedReader.id}</Text>
             <Text style={styles.reader}>{formatMetadata(connectedReader)}</Text>
+            <Text style={styles.status}>Card: {cardPresent ? 'present' : 'removed'}</Text>
+            <Button title="Read Card UID" onPress={readUid} />
+            <Button title="Transmit UID APDU" onPress={transmitUidApdu} />
+            {cardUid ? <Text style={styles.reader}>UID: {cardUid}</Text> : null}
+            {apduResponse ? <Text style={styles.reader}>{apduResponse}</Text> : null}
             <Button title="Disconnect Reader" onPress={disconnectCurrentReader} />
           </View>
         ) : null}

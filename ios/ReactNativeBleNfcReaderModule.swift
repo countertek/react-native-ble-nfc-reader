@@ -1,11 +1,15 @@
 import ACSSmartCardIO
 import CoreBluetooth
 import ExpoModulesCore
+import Foundation
 import SmartCardIO
 
 private let readerDiscoveredEvent = "onReaderDiscovered"
+private let cardPresentEvent = "onCardPresent"
+private let cardRemovedEvent = "onCardRemoved"
 private let defaultScanTimeoutMs = 5000.0
 private let metadataTimeoutMs = 1000
+private let readUidApdu = "FFCA000000"
 
 public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDelegate {
   private var bluetoothManager: CBCentralManager?
@@ -28,11 +32,12 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
   private var discoveredReaders: [[String: Any]] = []
   private var knownTerminals: [String: any CardTerminal] = [:]
   private var activeReader: (id: String, terminal: any CardTerminal)?
+  private var cardMonitorThread: Thread?
 
   public func definition() -> ModuleDefinition {
     Name("ReactNativeBleNfcReader")
 
-    Events(readerDiscoveredEvent)
+    Events(readerDiscoveredEvent, cardPresentEvent, cardRemovedEvent)
 
     AsyncFunction("getReaderPermissionStatus") { () -> String in
       return self.readerPermissionStatus()
@@ -82,6 +87,28 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
       do {
         try self.disconnectReader(readerId: readerId)
         promise.resolve(nil)
+      } catch let error as Exception {
+        promise.reject(error)
+      } catch {
+        promise.reject(readerConnectionUnavailableException())
+      }
+    }
+    .runOnQueue(.main)
+
+    AsyncFunction("readCardUid") { (readerId: String, promise: Promise) in
+      do {
+        promise.resolve(try self.readCardUid(readerId: readerId))
+      } catch let error as Exception {
+        promise.reject(error)
+      } catch {
+        promise.reject(readerConnectionUnavailableException())
+      }
+    }
+    .runOnQueue(.main)
+
+    AsyncFunction("transmit") { (readerId: String, apdu: String, promise: Promise) in
+      do {
+        promise.resolve(try self.transmit(readerId: readerId, apdu: apdu))
       } catch let error as Exception {
         promise.reject(error)
       } catch {
@@ -232,6 +259,7 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
     }
 
     activeReader = (readerId, terminal)
+    startCardMonitor(readerId: readerId, terminal: terminal)
     return readerForTerminal(terminal, includeMetadata: true)
   }
 
@@ -242,6 +270,134 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
 
     try scanManager.disconnect(terminal: activeReader.terminal)
     self.activeReader = nil
+    stopCardMonitor()
+  }
+
+  private func readCardUid(readerId: String) throws -> String {
+    let response = try transmit(readerId: readerId, apdu: readUidApdu)
+
+    if response.count < 4 {
+      throw cardCommandFailedException(status: "unknown")
+    }
+
+    let status = String(response.suffix(4))
+    if status != "9000" {
+      throw cardCommandFailedException(status: status)
+    }
+
+    return String(response.dropLast(4))
+  }
+
+  private func transmit(readerId: String, apdu: String) throws -> String {
+    let terminal = try activeTerminal(readerId: readerId)
+    let card = try terminal.connect(protocolString: "*")
+    defer {
+      try? card.disconnect(reset: false)
+    }
+
+    let channel = try card.basicChannel()
+    let commandApdu = try CommandAPDU(apdu: hexBytes(apdu))
+    let responseApdu = try channel.transmit(apdu: commandApdu)
+
+    return hexString(responseApdu.bytes)
+  }
+
+  private func activeTerminal(readerId: String) throws -> any CardTerminal {
+    guard let activeReader, activeReader.id == readerId else {
+      throw readerNotConnectedException(readerId: readerId)
+    }
+
+    return activeReader.terminal
+  }
+
+  private func startCardMonitor(readerId: String, terminal: any CardTerminal) {
+    stopCardMonitor()
+
+    let thread = Thread { [weak self] in
+      self?.monitorCardState(readerId: readerId, terminal: terminal)
+    }
+
+    cardMonitorThread = thread
+    thread.start()
+  }
+
+  private func stopCardMonitor() {
+    cardMonitorThread?.cancel()
+    cardMonitorThread = nil
+  }
+
+  private func monitorCardState(readerId: String, terminal: any CardTerminal) {
+    var wasPresent: Bool?
+
+    while !Thread.current.isCancelled {
+      let present: Bool?
+
+      do {
+        present = try terminal.isCardPresent()
+      } catch {
+        present = nil
+      }
+
+      guard let present else {
+        Thread.sleep(forTimeInterval: 0.5)
+        continue
+      }
+
+      if present && wasPresent != true {
+        sendCardEvent(cardPresentEvent, readerId: readerId)
+      }
+
+      if !present && wasPresent == true {
+        sendCardEvent(cardRemovedEvent, readerId: readerId)
+      }
+
+      wasPresent = present
+
+      do {
+        if present {
+          _ = try terminal.waitForCardAbsent(timeout: 1000)
+        } else {
+          _ = try terminal.waitForCardPresent(timeout: 1000)
+        }
+      } catch {
+        Thread.sleep(forTimeInterval: 0.5)
+      }
+    }
+  }
+
+  private func sendCardEvent(_ eventName: String, readerId: String) {
+    DispatchQueue.main.async { [weak self] in
+      guard self?.activeReader?.id == readerId else {
+        return
+      }
+
+      self?.sendEvent(eventName, ["readerId": readerId])
+    }
+  }
+
+  private func hexBytes(_ value: String) throws -> [UInt8] {
+    if value.count % 2 != 0 {
+      throw invalidHexStringException()
+    }
+
+    var bytes: [UInt8] = []
+    var index = value.startIndex
+
+    while index < value.endIndex {
+      let nextIndex = value.index(index, offsetBy: 2)
+      guard let byte = UInt8(value[index..<nextIndex], radix: 16) else {
+        throw invalidHexStringException()
+      }
+
+      bytes.append(byte)
+      index = nextIndex
+    }
+
+    return bytes
+  }
+
+  private func hexString(_ bytes: [UInt8]) -> String {
+    return bytes.map { String(format: "%02X", $0) }.joined()
   }
 
   private func readerForTerminal(
@@ -365,6 +521,22 @@ private func readerConnectionUnavailableException() -> Exception {
     name: "ReaderConnectionUnavailableException",
     description: "Reader connection is not available",
     code: "READER_CONNECTION_UNAVAILABLE"
+  )
+}
+
+private func invalidHexStringException() -> Exception {
+  return Exception(
+    name: "InvalidHexStringException",
+    description: "apdu must contain only hex characters",
+    code: "INVALID_HEX_STRING"
+  )
+}
+
+private func cardCommandFailedException(status: String) -> Exception {
+  return Exception(
+    name: "CardCommandFailedException",
+    description: "Card command failed with APDU Status \(status)",
+    code: "CARD_COMMAND_FAILED"
   )
 }
 
