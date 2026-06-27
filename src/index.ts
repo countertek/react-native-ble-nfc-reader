@@ -1,4 +1,5 @@
 export {
+  addReaderDiscoveredListener,
   connectReader,
   disconnectReader,
   getReaderPermissionStatus,
@@ -8,6 +9,7 @@ export {
   requestReaderPermissions,
   scanReaders,
   splitApduResponse,
+  stopReaderScan,
   transmit,
 } from './ReactNativeBleNfcReader';
 export * from './ReactNativeBleNfcReader.types';

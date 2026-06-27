@@ -20,6 +20,14 @@ export type ScanReadersOptions = {
   timeoutMs?: number;
 };
 
+export type ReaderDiscoveredEvent = {
+  reader: Reader;
+};
+
+export type ReaderDiscoverySubscription = {
+  remove(): void;
+};
+
 export type ApduResponse = {
   responseData: HexString;
   status: HexString;
@@ -49,9 +57,12 @@ export type WriteBlockOptions = {
 export type BleNfcReaderErrorCode =
   | 'INVALID_HEX_STRING'
   | 'INVALID_APDU_RESPONSE'
+  | 'INVALID_SCAN_TIMEOUT'
   | 'INVALID_MIFARE_BLOCK'
   | 'NATIVE_METHOD_UNAVAILABLE'
+  | 'READER_SCAN_UNAVAILABLE'
   | 'READER_PERMISSION_DENIED'
+  | 'READER_PERMISSION_UNDETERMINED'
   | 'READER_PERMISSION_MISSING'
   | 'UNSUPPORTED_PLATFORM';
 

@@ -4,6 +4,8 @@ import {
   BleNfcReaderError,
   HexString,
   Reader,
+  ReaderDiscoveredEvent,
+  ReaderDiscoverySubscription,
   ReaderId,
   ReaderPermissionStatus,
   ReadBlockOptions,
@@ -87,8 +89,20 @@ function normalizeNativeError(error: unknown): unknown {
     return new BleNfcReaderError('READER_PERMISSION_DENIED', getErrorMessage(error));
   }
 
+  if (error.code === 'READER_PERMISSION_UNDETERMINED') {
+    return new BleNfcReaderError('READER_PERMISSION_UNDETERMINED', getErrorMessage(error));
+  }
+
   if (error.code === 'READER_PERMISSION_MISSING') {
     return new BleNfcReaderError('READER_PERMISSION_MISSING', getErrorMessage(error));
+  }
+
+  if (error.code === 'INVALID_SCAN_TIMEOUT') {
+    return new BleNfcReaderError('INVALID_SCAN_TIMEOUT', getErrorMessage(error));
+  }
+
+  if (error.code === 'READER_SCAN_UNAVAILABLE') {
+    return new BleNfcReaderError('READER_SCAN_UNAVAILABLE', getErrorMessage(error));
   }
 
   return error;
@@ -121,6 +135,18 @@ function assertBlock(block: number): void {
   }
 }
 
+function normalizeScanOptions(options?: ScanReadersOptions): ScanReadersOptions | undefined {
+  if (options?.timeoutMs === undefined) {
+    return options;
+  }
+
+  if (!Number.isFinite(options.timeoutMs) || options.timeoutMs <= 0) {
+    throw new BleNfcReaderError('INVALID_SCAN_TIMEOUT', 'timeoutMs must be greater than 0');
+  }
+
+  return options;
+}
+
 export async function getReaderPermissionStatus(): Promise<ReaderPermissionStatus> {
   return callNative(() => getNativeMethod('getReaderPermissionStatus')());
 }
@@ -130,7 +156,24 @@ export async function requestReaderPermissions(): Promise<ReaderPermissionStatus
 }
 
 export async function scanReaders(options?: ScanReadersOptions): Promise<Reader[]> {
-  return callNative(() => getNativeMethod('scanReaders')(options));
+  return callNative(() => getNativeMethod('scanReaders')(normalizeScanOptions(options)));
+}
+
+export async function stopReaderScan(): Promise<Reader[]> {
+  return callNative(() => getNativeMethod('stopReaderScan')());
+}
+
+export function addReaderDiscoveredListener(
+  listener: (event: ReaderDiscoveredEvent) => void
+): ReaderDiscoverySubscription {
+  if (typeof nativeModule.addListener !== 'function') {
+    throw new BleNfcReaderError(
+      'NATIVE_METHOD_UNAVAILABLE',
+      'addListener is not available in this native build'
+    );
+  }
+
+  return nativeModule.addListener('onReaderDiscovered', listener);
 }
 
 export async function connectReader(readerId: ReaderId): Promise<void> {

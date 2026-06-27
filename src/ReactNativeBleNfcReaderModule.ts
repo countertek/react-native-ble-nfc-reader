@@ -4,6 +4,7 @@ import {
   AuthenticateBlockOptions,
   HexString,
   Reader,
+  ReaderDiscoveredEvent,
   ReaderId,
   ReaderPermissionStatus,
   ReadBlockOptions,
@@ -11,10 +12,15 @@ import {
   WriteBlockOptions,
 } from './ReactNativeBleNfcReader.types';
 
-export declare class ReactNativeBleNfcReaderModule extends NativeModule {
+type ReactNativeBleNfcReaderModuleEvents = {
+  onReaderDiscovered(event: ReaderDiscoveredEvent): void;
+};
+
+export declare class ReactNativeBleNfcReaderModule extends NativeModule<ReactNativeBleNfcReaderModuleEvents> {
   getReaderPermissionStatus?: () => Promise<ReaderPermissionStatus>;
   requestReaderPermissions?: () => Promise<ReaderPermissionStatus>;
   scanReaders?: (options?: ScanReadersOptions) => Promise<Reader[]>;
+  stopReaderScan?: () => Promise<Reader[]>;
   connectReader?: (readerId: ReaderId) => Promise<void>;
   disconnectReader?: (readerId: ReaderId) => Promise<void>;
   readCardUid?: (readerId: ReaderId) => Promise<HexString>;
