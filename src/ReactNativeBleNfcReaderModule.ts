@@ -21,7 +21,7 @@ export declare class ReactNativeBleNfcReaderModule extends NativeModule<ReactNat
   requestReaderPermissions?: () => Promise<ReaderPermissionStatus>;
   scanReaders?: (options?: ScanReadersOptions) => Promise<Reader[]>;
   stopReaderScan?: () => Promise<Reader[]>;
-  connectReader?: (readerId: ReaderId) => Promise<void>;
+  connectReader?: (readerId: ReaderId) => Promise<Reader>;
   disconnectReader?: (readerId: ReaderId) => Promise<void>;
   readCardUid?: (readerId: ReaderId) => Promise<HexString>;
   transmit?: (readerId: ReaderId, apdu: HexString) => Promise<HexString>;

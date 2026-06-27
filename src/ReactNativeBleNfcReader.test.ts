@@ -1,5 +1,7 @@
 import {
   addReaderDiscoveredListener,
+  connectReader,
+  disconnectReader,
   getReaderPermissionStatus,
   mifare,
   normalizeHexString,
@@ -197,6 +199,43 @@ describe('public native wrappers', () => {
     mockNativeModule.stopReaderScan = jest.fn(async () => [{ id: 'reader-1' }]);
 
     await expect(stopReaderScan()).resolves.toEqual([{ id: 'reader-1' }]);
+  });
+
+  it('connects and disconnects Readers by Reader ID', async () => {
+    mockNativeModule.connectReader = jest.fn(async () => ({
+      id: 'reader-1',
+      name: 'Reader 1',
+      metadata: {
+        model: 'ACR1555U',
+      },
+    }));
+    mockNativeModule.disconnectReader = jest.fn(async () => undefined);
+
+    await expect(connectReader('reader-1')).resolves.toEqual({
+      id: 'reader-1',
+      name: 'Reader 1',
+      metadata: {
+        model: 'ACR1555U',
+      },
+    });
+    await expect(disconnectReader('reader-1')).resolves.toBeUndefined();
+    expect(mockNativeModule.connectReader).toHaveBeenCalledWith('reader-1');
+    expect(mockNativeModule.disconnectReader).toHaveBeenCalledWith('reader-1');
+  });
+
+  it('maps native Reader connection failures to typed errors', async () => {
+    mockNativeModule.connectReader = jest.fn(async () => {
+      const error = new Error('Another Reader is already connected');
+      Object.assign(error, { code: 'READER_ALREADY_CONNECTED' });
+      throw error;
+    });
+
+    await expect(connectReader('reader-2')).rejects.toEqual(
+      expect.objectContaining({
+        code: 'READER_ALREADY_CONNECTED',
+      })
+    );
+    await expect(connectReader('reader-2')).rejects.toBeInstanceOf(BleNfcReaderError);
   });
 
   it('normalizes card UIDs returned from native', async () => {

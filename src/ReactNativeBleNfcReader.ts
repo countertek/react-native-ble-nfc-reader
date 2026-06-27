@@ -105,6 +105,22 @@ function normalizeNativeError(error: unknown): unknown {
     return new BleNfcReaderError('READER_SCAN_UNAVAILABLE', getErrorMessage(error));
   }
 
+  if (error.code === 'READER_NOT_FOUND') {
+    return new BleNfcReaderError('READER_NOT_FOUND', getErrorMessage(error));
+  }
+
+  if (error.code === 'READER_ALREADY_CONNECTED') {
+    return new BleNfcReaderError('READER_ALREADY_CONNECTED', getErrorMessage(error));
+  }
+
+  if (error.code === 'READER_NOT_CONNECTED') {
+    return new BleNfcReaderError('READER_NOT_CONNECTED', getErrorMessage(error));
+  }
+
+  if (error.code === 'READER_CONNECTION_UNAVAILABLE') {
+    return new BleNfcReaderError('READER_CONNECTION_UNAVAILABLE', getErrorMessage(error));
+  }
+
   return error;
 }
 
@@ -176,7 +192,7 @@ export function addReaderDiscoveredListener(
   return nativeModule.addListener('onReaderDiscovered', listener);
 }
 
-export async function connectReader(readerId: ReaderId): Promise<void> {
+export async function connectReader(readerId: ReaderId): Promise<Reader> {
   return callNative(() => getNativeMethod('connectReader')(readerId));
 }
 

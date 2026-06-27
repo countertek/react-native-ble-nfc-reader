@@ -3,6 +3,8 @@ import { Button, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import {
   addReaderDiscoveredListener,
   BleNfcReaderError,
+  connectReader,
+  disconnectReader,
   getReaderPermissionStatus,
   Reader,
   requestReaderPermissions,
@@ -17,6 +19,7 @@ export default function App() {
   const [permissionStatus, setPermissionStatus] = useState<PermissionState>('loading');
   const [message, setMessage] = useState('');
   const [readers, setReaders] = useState<Reader[]>([]);
+  const [connectedReader, setConnectedReader] = useState<Reader | null>(null);
   const [scanning, setScanning] = useState(false);
 
   async function refreshPermissionStatus() {
@@ -41,12 +44,36 @@ export default function App() {
     try {
       setScanning(true);
       setReaders([]);
+      setConnectedReader(null);
       setReaders(await scanReaders({ timeoutMs: 5000 }));
       setMessage('');
     } catch (error) {
       setMessage(formatError(error));
     } finally {
       setScanning(false);
+    }
+  }
+
+  async function connectToReader(readerId: string) {
+    try {
+      setConnectedReader(await connectReader(readerId));
+      setMessage('');
+    } catch (error) {
+      setMessage(formatError(error));
+    }
+  }
+
+  async function disconnectCurrentReader() {
+    if (connectedReader === null) {
+      return;
+    }
+
+    try {
+      await disconnectReader(connectedReader.id);
+      setConnectedReader(null);
+      setMessage('');
+    } catch (error) {
+      setMessage(formatError(error));
     }
   }
 
@@ -88,18 +115,55 @@ export default function App() {
         <Button
           title="Scan For Readers"
           onPress={scanForReaders}
-          disabled={permissionStatus !== 'granted' || scanning}
+          disabled={permissionStatus !== 'granted' || scanning || connectedReader !== null}
         />
         <Button title="Stop Scan" onPress={stopScan} disabled={!scanning} />
-        {readers.map((reader) => (
-          <Text key={reader.id} style={styles.reader}>
-            {reader.name ?? reader.id}
-          </Text>
-        ))}
+        {readers.map((reader) => {
+          const connected = connectedReader?.id === reader.id;
+
+          return (
+            <View key={reader.id} style={styles.readerRow}>
+              <Text style={styles.reader}>{reader.name ?? reader.id}</Text>
+              <Button
+                title={connected ? 'Connected' : 'Connect'}
+                onPress={() => connectToReader(reader.id)}
+                disabled={connectedReader !== null || scanning}
+              />
+            </View>
+          );
+        })}
+        {connectedReader ? (
+          <View style={styles.connectedReader}>
+            <Text style={styles.status}>Connected: {connectedReader.name ?? connectedReader.id}</Text>
+            <Text style={styles.reader}>{formatMetadata(connectedReader)}</Text>
+            <Button title="Disconnect Reader" onPress={disconnectCurrentReader} />
+          </View>
+        ) : null}
         {message ? <Text style={styles.error}>{message}</Text> : null}
       </View>
     </SafeAreaView>
   );
+}
+
+function formatMetadata(reader: Reader): string {
+  const metadata = reader.metadata;
+
+  if (metadata === undefined) {
+    return 'Metadata unavailable';
+  }
+
+  const fields = [
+    metadata.model ? `Model: ${metadata.model}` : undefined,
+    metadata.firmwareVersion ? `Firmware: ${metadata.firmwareVersion}` : undefined,
+    metadata.serialNumber ? `Serial: ${metadata.serialNumber}` : undefined,
+    metadata.batteryLevel !== undefined ? `Battery: ${metadata.batteryLevel}%` : undefined,
+  ].filter((field): field is string => field !== undefined);
+
+  if (fields.length === 0) {
+    return 'Metadata unavailable';
+  }
+
+  return fields.join('\n');
 }
 
 function addReader(readers: Reader[], reader: Reader): Reader[] {
@@ -143,6 +207,12 @@ const styles = StyleSheet.create({
   },
   reader: {
     fontSize: 14,
+  },
+  readerRow: {
+    gap: 8,
+  },
+  connectedReader: {
+    gap: 8,
   },
   error: {
     color: '#b91c1c',

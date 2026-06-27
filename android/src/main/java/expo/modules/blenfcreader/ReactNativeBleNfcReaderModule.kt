@@ -20,9 +20,11 @@ import javax.smartcardio.CardTerminal
 
 private const val READER_DISCOVERED_EVENT = "onReaderDiscovered"
 private const val DEFAULT_SCAN_TIMEOUT_MS = 5000.0
+private const val METADATA_TIMEOUT_MS = 1000L
 
 class ReactNativeBleNfcReaderModule : Module() {
   private val scanHandler = Handler(Looper.getMainLooper())
+  private val readerLock = Any()
   private val scanTerminalTypes = intArrayOf(
     BluetoothTerminalManager.TERMINAL_TYPE_ACR3901U_S1,
     BluetoothTerminalManager.TERMINAL_TYPE_ACR1255U_J1,
@@ -30,8 +32,12 @@ class ReactNativeBleNfcReaderModule : Module() {
     BluetoothTerminalManager.TERMINAL_TYPE_ACR1255U_J1_V2,
     BluetoothTerminalManager.TERMINAL_TYPE_ACR1555U
   )
-  private val discoveredReaders = LinkedHashMap<String, Map<String, String>>()
+  private val discoveredReaders = LinkedHashMap<String, Map<String, Any>>()
+  private val knownTerminals = LinkedHashMap<String, CardTerminal>()
   private var activeScanManager: BluetoothTerminalManager? = null
+  private var activeReaderId: String? = null
+  private var activeReaderTerminal: CardTerminal? = null
+  private var activeReaderManager: BluetoothTerminalManager? = null
   private var scanPromise: Promise? = null
   private var scanStopRunnable: Runnable? = null
   private var scanTypeRunnable: Runnable? = null
@@ -66,6 +72,31 @@ class ReactNativeBleNfcReaderModule : Module() {
     AsyncFunction("stopReaderScan") { promise: Promise ->
       scanHandler.post {
         promise.resolve(finishScan())
+      }
+    }
+
+    AsyncFunction("connectReader") { readerId: String, promise: Promise ->
+      scanHandler.post {
+        try {
+          promise.resolve(connectReader(readerId))
+        } catch (error: CodedException) {
+          promise.reject(error)
+        } catch (_: Exception) {
+          promise.reject(ReaderConnectionUnavailableException())
+        }
+      }
+    }
+
+    AsyncFunction("disconnectReader") { readerId: String, promise: Promise ->
+      scanHandler.post {
+        try {
+          disconnectReader(readerId)
+          promise.resolve(null)
+        } catch (error: CodedException) {
+          promise.reject(error)
+        } catch (_: Exception) {
+          promise.reject(ReaderConnectionUnavailableException())
+        }
       }
     }
   }
@@ -162,6 +193,14 @@ class ReactNativeBleNfcReaderModule : Module() {
     scanTypeIndex = 0
     scanTypeDelayMs = maxOf(250L, timeoutMs / scanTerminalTypes.size)
     discoveredReaders.clear()
+    synchronized(readerLock) {
+      val activeId = activeReaderId
+      val activeTerminal = activeReaderTerminal
+      knownTerminals.clear()
+      if (activeId != null && activeTerminal != null) {
+        knownTerminals[activeId] = activeTerminal
+      }
+    }
 
     startCurrentScanType()
 
@@ -203,13 +242,14 @@ class ReactNativeBleNfcReaderModule : Module() {
       return
     }
 
-    val reader = mapOf(
-      "id" to terminal.name,
-      "name" to terminal.name
-    )
+    val reader = readerForTerminal(terminal)
 
     if (discoveredReaders.putIfAbsent(terminal.name, reader) != null) {
       return
+    }
+
+    synchronized(readerLock) {
+      knownTerminals[terminal.name] = terminal
     }
 
     sendEvent(READER_DISCOVERED_EVENT, Bundle().apply {
@@ -217,7 +257,118 @@ class ReactNativeBleNfcReaderModule : Module() {
     })
   }
 
-  private fun finishScan(): ArrayList<Map<String, String>> {
+  private fun connectReader(readerId: String): Map<String, Any> {
+    val manager = readerManager()
+    finishScan()
+
+    val terminal = synchronized(readerLock) {
+      val activeId = activeReaderId
+
+      if (activeId != null && activeId != readerId) {
+        throw ReaderAlreadyConnectedException(activeId)
+      }
+
+      val knownTerminal = knownTerminals[readerId] ?: throw ReaderNotFoundException(readerId)
+      activeReaderId = readerId
+      activeReaderTerminal = knownTerminal
+      activeReaderManager = manager
+      knownTerminal
+    }
+
+    return readerForTerminal(terminal, manager)
+  }
+
+  private fun disconnectReader(readerId: String) {
+    val activeConnection = synchronized(readerLock) {
+      if (activeReaderId != readerId) {
+        throw ReaderNotConnectedException(readerId)
+      }
+
+      val terminal = activeReaderTerminal ?: throw ReaderNotConnectedException(readerId)
+      val manager = activeReaderManager ?: throw ReaderConnectionUnavailableException()
+      Pair(manager, terminal)
+    }
+
+    activeConnection.first.disconnect(activeConnection.second)
+
+    synchronized(readerLock) {
+      activeReaderId = null
+      activeReaderTerminal = null
+      activeReaderManager = null
+    }
+  }
+
+  private fun readerManager(): BluetoothTerminalManager {
+    return BluetoothSmartCard.getInstance(context()).manager ?: throw ReaderConnectionUnavailableException()
+  }
+
+  private fun readerForTerminal(
+    terminal: CardTerminal,
+    manager: BluetoothTerminalManager? = null
+  ): MutableMap<String, Any> {
+    val reader = mutableMapOf<String, Any>(
+      "id" to terminal.name,
+      "name" to terminal.name
+    )
+    val metadata = readerMetadata(terminal, manager)
+
+    if (metadata.isNotEmpty()) {
+      reader["metadata"] = metadata
+    }
+
+    return reader
+  }
+
+  private fun readerMetadata(
+    terminal: CardTerminal,
+    manager: BluetoothTerminalManager?
+  ): MutableMap<String, Any> {
+    val metadata = mutableMapOf<String, Any>()
+
+    if (manager == null) {
+      return metadata
+    }
+
+    addDeviceInfo(metadata, "model", manager, terminal, BluetoothTerminalManager.DEVICE_INFO_MODEL_NUMBER_STRING)
+    addDeviceInfo(
+      metadata,
+      "firmwareVersion",
+      manager,
+      terminal,
+      BluetoothTerminalManager.DEVICE_INFO_FIRMWARE_REVISION_STRING
+    )
+    addDeviceInfo(metadata, "serialNumber", manager, terminal, BluetoothTerminalManager.DEVICE_INFO_SERIAL_NUMBER_STRING)
+
+    try {
+      val batteryLevel = manager.getBatteryLevel(terminal, METADATA_TIMEOUT_MS)
+      if (batteryLevel in 0..100) {
+        metadata["batteryLevel"] = batteryLevel
+      }
+    } catch (_: Exception) {
+      // Metadata support varies by Reader model.
+    }
+
+    return metadata
+  }
+
+  private fun addDeviceInfo(
+    metadata: MutableMap<String, Any>,
+    key: String,
+    manager: BluetoothTerminalManager,
+    terminal: CardTerminal,
+    type: Int
+  ) {
+    try {
+      val value = manager.getDeviceInfo(terminal, type, METADATA_TIMEOUT_MS)?.trim()
+      if (!value.isNullOrEmpty()) {
+        metadata[key] = value
+      }
+    } catch (_: Exception) {
+      // Metadata support varies by Reader model.
+    }
+  }
+
+  private fun finishScan(): ArrayList<Map<String, Any>> {
     scanStopRunnable?.let(scanHandler::removeCallbacks)
     scanTypeRunnable?.let(scanHandler::removeCallbacks)
     scanStopRunnable = null
@@ -235,10 +386,10 @@ class ReactNativeBleNfcReaderModule : Module() {
     return readers
   }
 
-  private fun readerBundle(reader: Map<String, String>): Bundle {
+  private fun readerBundle(reader: Map<String, Any>): Bundle {
     return Bundle().apply {
-      putString("id", reader["id"])
-      putString("name", reader["name"])
+      putString("id", reader["id"] as? String)
+      putString("name", reader["name"] as? String)
     }
   }
 }
@@ -269,5 +420,29 @@ private class InvalidScanTimeoutException : CodedException(
 private class ReaderScanUnavailableException : CodedException(
   "READER_SCAN_UNAVAILABLE",
   "Reader scanning is not available on this Android device",
+  null
+)
+
+private class ReaderNotFoundException(readerId: String) : CodedException(
+  "READER_NOT_FOUND",
+  "Reader $readerId has not been discovered",
+  null
+)
+
+private class ReaderAlreadyConnectedException(readerId: String) : CodedException(
+  "READER_ALREADY_CONNECTED",
+  "Reader $readerId is already connected; disconnect it before connecting another Reader",
+  null
+)
+
+private class ReaderNotConnectedException(readerId: String) : CodedException(
+  "READER_NOT_CONNECTED",
+  "Reader $readerId is not connected",
+  null
+)
+
+private class ReaderConnectionUnavailableException : CodedException(
+  "READER_CONNECTION_UNAVAILABLE",
+  "Reader connection is not available on this Android device",
   null
 )
