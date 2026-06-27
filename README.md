@@ -33,14 +33,26 @@ Use `scanReaders({ timeoutMs })` for bounded scans and
 `addReaderDiscoveredListener()` to receive Readers during the scan window. Call
 `stopReaderScan()` to end the active scan early.
 
+## Reader connection
+
+Use `connectReader(readerId)` with a discovered Reader ID to connect one Reader
+per app process. It returns the connected `Reader`; `metadata` may include model,
+firmware version, serial number, or battery level when the ACS Reader provides
+those fields. Call `disconnectReader(readerId)` to release the native Reader
+connection before connecting another Reader.
+
 ## Manual hardware checklist
 
 - Android: grant Reader permission, start a 5 second scan, confirm an ACS BLE
   Reader appears during the scan, then confirm scanning stops at timeout and
-  after `stopReaderScan()`.
+  after `stopReaderScan()`. Connect the discovered Reader, confirm optional
+  metadata appears when available, disconnect it, then confirm a second connect
+  works only after disconnect.
 - iOS: grant Bluetooth permission, start a 5 second scan, confirm an ACS BLE
   Reader appears during the scan, then confirm scanning stops at timeout and
-  after `stopReaderScan()`.
+  after `stopReaderScan()`. Connect the discovered Reader, confirm optional
+  metadata appears when available, disconnect it, then confirm a second connect
+  works only after disconnect.
 
 ## ACS SDK
 
