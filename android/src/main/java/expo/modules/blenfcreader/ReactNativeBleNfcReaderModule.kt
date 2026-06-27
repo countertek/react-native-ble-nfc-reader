@@ -177,7 +177,12 @@ class ReactNativeBleNfcReaderModule : Module() {
     scanTypeDelayMs = maxOf(250L, timeoutMs / scanTerminalTypes.size)
     discoveredReaders.clear()
     synchronized(readerLock) {
+      val activeId = activeReaderId
+      val activeTerminal = activeReaderTerminal
       knownTerminals.clear()
+      if (activeId != null && activeTerminal != null) {
+        knownTerminals[activeId] = activeTerminal
+      }
     }
 
     startCurrentScanType()
@@ -237,7 +242,7 @@ class ReactNativeBleNfcReaderModule : Module() {
 
   private fun connectReader(readerId: String): Map<String, Any> {
     val manager = readerManager()
-    val terminal = synchronized(readerLock) {
+    return synchronized(readerLock) {
       val activeId = activeReaderId
 
       if (activeId != null && activeId != readerId) {
@@ -248,29 +253,22 @@ class ReactNativeBleNfcReaderModule : Module() {
       activeReaderId = readerId
       activeReaderTerminal = knownTerminal
       activeReaderManager = manager
-      knownTerminal
+      readerForTerminal(knownTerminal, manager)
     }
-
-    return readerForTerminal(terminal, manager)
   }
 
   private fun disconnectReader(readerId: String) {
-    val terminal = synchronized(readerLock) {
+    synchronized(readerLock) {
       if (activeReaderId != readerId) {
         throw ReaderNotConnectedException(readerId)
       }
 
-      activeReaderTerminal
-    }
-
-    try {
-      terminal?.let { activeReaderManager?.disconnect(it) }
-    } finally {
-      synchronized(readerLock) {
-        activeReaderId = null
-        activeReaderTerminal = null
-        activeReaderManager = null
-      }
+      val terminal = activeReaderTerminal ?: throw ReaderNotConnectedException(readerId)
+      val manager = activeReaderManager ?: throw ReaderConnectionUnavailableException()
+      manager.disconnect(terminal)
+      activeReaderId = null
+      activeReaderTerminal = null
+      activeReaderManager = null
     }
   }
 

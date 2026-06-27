@@ -150,6 +150,9 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
     discoveredReaderIds = []
     discoveredReaders = []
     knownTerminals = [:]
+    if let activeReader {
+      knownTerminals[activeReader.id] = activeReader.terminal
+    }
 
     startCurrentScanType()
 
@@ -235,11 +238,8 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
       throw readerNotConnectedException(readerId: readerId)
     }
 
-    defer {
-      self.activeReader = nil
-    }
-
     try scanManager.disconnect(terminal: activeReader.terminal)
+    self.activeReader = nil
   }
 
   private func readerForTerminal(
