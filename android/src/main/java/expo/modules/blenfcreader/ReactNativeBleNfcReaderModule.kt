@@ -331,11 +331,11 @@ class ReactNativeBleNfcReaderModule : Module() {
       Pair(manager, terminal)
     }
 
-    stopCardMonitor()
     synchronized(terminalIoLock) {
       activeConnection.first.disconnect(activeConnection.second)
     }
 
+    stopCardMonitor()
     synchronized(readerLock) {
       activeReaderId = null
       activeReaderTerminal = null

@@ -276,10 +276,10 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
       return activeReader.terminal
     }
 
-    stopCardMonitor()
     try withTerminalLock {
       try scanManager.disconnect(terminal: terminal)
     }
+    stopCardMonitor()
     withReaderStateLock {
       if activeReader?.id == readerId {
         activeReader = nil
