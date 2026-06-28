@@ -11,6 +11,8 @@ import {
   splitApduResponse,
   stopReaderScan,
   transmit,
+  addCardPresentListener,
+  addCardRemovedListener,
 } from './ReactNativeBleNfcReader';
 import { BleNfcReaderError } from './ReactNativeBleNfcReader.types';
 import webModule from './ReactNativeBleNfcReaderModule.web';
@@ -193,6 +195,32 @@ describe('public native wrappers', () => {
 
     expect(addReaderDiscoveredListener(listener)).toBe(subscription);
     expect(mockNativeModule.addListener).toHaveBeenCalledWith('onReaderDiscovered', listener);
+  });
+
+  it('subscribes to card presence events', () => {
+    const listener = jest.fn();
+    const subscription = { remove: jest.fn() };
+    mockNativeModule.addListener = jest.fn(() => subscription);
+
+    expect(addCardPresentListener(listener)).toBe(subscription);
+    expect(addCardRemovedListener(listener)).toBe(subscription);
+    expect(mockNativeModule.addListener).toHaveBeenCalledWith('onCardPresent', listener);
+    expect(mockNativeModule.addListener).toHaveBeenCalledWith('onCardRemoved', listener);
+  });
+
+  it('maps native card command failures to typed errors', async () => {
+    mockNativeModule.readCardUid = jest.fn(async () => {
+      const error = new Error('Card command failed with APDU Status 6A82');
+      Object.assign(error, { code: 'CARD_COMMAND_FAILED' });
+      throw error;
+    });
+
+    await expect(readCardUid('reader-1')).rejects.toEqual(
+      expect.objectContaining({
+        code: 'CARD_COMMAND_FAILED',
+      })
+    );
+    await expect(readCardUid('reader-1')).rejects.toBeInstanceOf(BleNfcReaderError);
   });
 
   it('stops an active Reader scan', async () => {

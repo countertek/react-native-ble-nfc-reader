@@ -16,15 +16,22 @@ import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 import expo.modules.kotlin.records.Field
 import expo.modules.kotlin.records.Record
+import javax.smartcardio.Card
+import javax.smartcardio.CardException
 import javax.smartcardio.CardTerminal
+import javax.smartcardio.CommandAPDU
 
 private const val READER_DISCOVERED_EVENT = "onReaderDiscovered"
+private const val CARD_PRESENT_EVENT = "onCardPresent"
+private const val CARD_REMOVED_EVENT = "onCardRemoved"
 private const val DEFAULT_SCAN_TIMEOUT_MS = 5000.0
 private const val METADATA_TIMEOUT_MS = 1000L
+private const val READ_UID_APDU = "FFCA000000"
 
 class ReactNativeBleNfcReaderModule : Module() {
   private val scanHandler = Handler(Looper.getMainLooper())
   private val readerLock = Any()
+  private val terminalIoLock = Any()
   private val scanTerminalTypes = intArrayOf(
     BluetoothTerminalManager.TERMINAL_TYPE_ACR3901U_S1,
     BluetoothTerminalManager.TERMINAL_TYPE_ACR1255U_J1,
@@ -38,6 +45,8 @@ class ReactNativeBleNfcReaderModule : Module() {
   private var activeReaderId: String? = null
   private var activeReaderTerminal: CardTerminal? = null
   private var activeReaderManager: BluetoothTerminalManager? = null
+  private var cardMonitorThread: Thread? = null
+  private var cardMonitorGeneration = 0
   private var scanPromise: Promise? = null
   private var scanStopRunnable: Runnable? = null
   private var scanTypeRunnable: Runnable? = null
@@ -47,7 +56,7 @@ class ReactNativeBleNfcReaderModule : Module() {
   override fun definition() = ModuleDefinition {
     Name("ReactNativeBleNfcReader")
 
-    Events(READER_DISCOVERED_EVENT)
+    Events(READER_DISCOVERED_EVENT, CARD_PRESENT_EVENT, CARD_REMOVED_EVENT)
 
     AsyncFunction("getReaderPermissionStatus") {
       getReaderPermissionStatus()
@@ -97,6 +106,30 @@ class ReactNativeBleNfcReaderModule : Module() {
         } catch (_: Exception) {
           promise.reject(ReaderConnectionUnavailableException())
         }
+      }
+    }
+
+    AsyncFunction("readCardUid") { readerId: String, promise: Promise ->
+      try {
+        promise.resolve(readCardUid(readerId))
+      } catch (error: CodedException) {
+        promise.reject(error)
+      } catch (_: CardException) {
+        promise.reject(CardCommandFailedException("unknown"))
+      } catch (_: Exception) {
+        promise.reject(ReaderConnectionUnavailableException())
+      }
+    }
+
+    AsyncFunction("transmit") { readerId: String, apdu: String, promise: Promise ->
+      try {
+        promise.resolve(transmit(readerId, apdu))
+      } catch (error: CodedException) {
+        promise.reject(error)
+      } catch (_: CardException) {
+        promise.reject(CardCommandFailedException("unknown"))
+      } catch (_: Exception) {
+        promise.reject(ReaderConnectionUnavailableException())
       }
     }
   }
@@ -261,21 +294,30 @@ class ReactNativeBleNfcReaderModule : Module() {
     val manager = readerManager()
     finishScan()
 
-    val terminal = synchronized(readerLock) {
+    val (terminal, shouldStartCardMonitor) = synchronized(readerLock) {
       val activeId = activeReaderId
 
       if (activeId != null && activeId != readerId) {
         throw ReaderAlreadyConnectedException(activeId)
       }
 
+      if (activeId == readerId) {
+        val activeTerminal = activeReaderTerminal ?: throw ReaderNotConnectedException(readerId)
+        return@synchronized Pair(activeTerminal, false)
+      }
+
       val knownTerminal = knownTerminals[readerId] ?: throw ReaderNotFoundException(readerId)
       activeReaderId = readerId
       activeReaderTerminal = knownTerminal
       activeReaderManager = manager
-      knownTerminal
+      Pair(knownTerminal, true)
     }
 
-    return readerForTerminal(terminal, manager)
+    val reader = readerForTerminal(terminal, manager)
+    if (shouldStartCardMonitor) {
+      startCardMonitor(readerId, terminal)
+    }
+    return reader
   }
 
   private fun disconnectReader(readerId: String) {
@@ -289,12 +331,204 @@ class ReactNativeBleNfcReaderModule : Module() {
       Pair(manager, terminal)
     }
 
-    activeConnection.first.disconnect(activeConnection.second)
+    synchronized(terminalIoLock) {
+      activeConnection.first.disconnect(activeConnection.second)
+    }
 
+    stopCardMonitor()
     synchronized(readerLock) {
       activeReaderId = null
       activeReaderTerminal = null
       activeReaderManager = null
+    }
+  }
+
+  private fun readCardUid(readerId: String): String {
+    val response = transmit(readerId, READ_UID_APDU)
+
+    if (response.length < 4) {
+      throw CardCommandFailedException("unknown")
+    }
+
+    val status = response.takeLast(4)
+    if (status != "9000") {
+      throw CardCommandFailedException(status)
+    }
+
+    return response.dropLast(4)
+  }
+
+  private fun transmit(readerId: String, apdu: String): String {
+    return withConnectedCard(readerId) { card ->
+      val response = card.basicChannel.transmit(CommandAPDU(hexToBytes(apdu)))
+      bytesToHex(response.bytes)
+    }
+  }
+
+  private fun <T> withConnectedCard(readerId: String, block: (Card) -> T): T {
+    val terminal = activeTerminal(readerId)
+
+    synchronized(terminalIoLock) {
+      val card = terminal.connect("*")
+
+      try {
+        return block(card)
+      } finally {
+        try {
+          card.disconnect(false)
+        } catch (_: CardException) {
+        }
+      }
+    }
+  }
+
+  private fun activeTerminal(readerId: String): CardTerminal {
+    return synchronized(readerLock) {
+      if (activeReaderId != readerId) {
+        throw ReaderNotConnectedException(readerId)
+      }
+
+      activeReaderTerminal ?: throw ReaderNotConnectedException(readerId)
+    }
+  }
+
+  private fun startCardMonitor(readerId: String, terminal: CardTerminal) {
+    stopCardMonitor()
+
+    val generation = synchronized(readerLock) {
+      cardMonitorGeneration += 1
+      cardMonitorGeneration
+    }
+    val thread = Thread {
+      var wasPresent: Boolean? = null
+
+      while (!Thread.currentThread().isInterrupted && isCurrentCardMonitor(generation)) {
+        val present = cardPresent(terminal)
+
+        if (present == null) {
+          sleepCardMonitor()
+          continue
+        }
+
+        if (present && wasPresent != true) {
+          sendCardEvent(CARD_PRESENT_EVENT, readerId, generation)
+        }
+
+        if (!present && wasPresent == true) {
+          if (!cardStillAbsent(terminal)) {
+            continue
+          }
+
+          sendCardEvent(CARD_REMOVED_EVENT, readerId, generation)
+        }
+
+        wasPresent = present
+
+        if (!waitForCardChange(terminal, present)) {
+          break
+        }
+      }
+    }
+
+    synchronized(readerLock) {
+      cardMonitorThread = thread
+    }
+    thread.start()
+  }
+
+  private fun stopCardMonitor() {
+    val thread = synchronized(readerLock) {
+      cardMonitorGeneration += 1
+      val currentThread = cardMonitorThread
+      cardMonitorThread = null
+      currentThread
+    }
+    thread?.interrupt()
+
+    if (thread == null || thread == Thread.currentThread()) {
+      return
+    }
+
+    try {
+      thread.join(1500)
+    } catch (_: InterruptedException) {
+      Thread.currentThread().interrupt()
+    }
+  }
+
+  private fun isCurrentCardMonitor(generation: Int): Boolean {
+    return synchronized(readerLock) {
+      cardMonitorGeneration == generation && cardMonitorThread == Thread.currentThread()
+    }
+  }
+
+  private fun cardPresent(terminal: CardTerminal): Boolean? {
+    return synchronized(terminalIoLock) {
+      try {
+        terminal.isCardPresent
+      } catch (_: CardException) {
+        null
+      }
+    }
+  }
+
+  private fun cardStillAbsent(terminal: CardTerminal): Boolean {
+    sleepCardMonitor(250)
+    return cardPresent(terminal) != true
+  }
+
+  private fun waitForCardChange(terminal: CardTerminal, present: Boolean): Boolean {
+    return synchronized(terminalIoLock) {
+      try {
+        if (present) {
+          terminal.waitForCardAbsent(1000)
+        } else {
+          terminal.waitForCardPresent(1000)
+        }
+        true
+      } catch (error: CardException) {
+        error.cause !is InterruptedException
+      }
+    }
+  }
+
+  private fun sleepCardMonitor(delayMs: Long = 500) {
+    try {
+      Thread.sleep(delayMs)
+    } catch (_: InterruptedException) {
+      Thread.currentThread().interrupt()
+    }
+  }
+
+  private fun sendCardEvent(eventName: String, readerId: String, generation: Int) {
+    scanHandler.post {
+      val connected = synchronized(readerLock) {
+        activeReaderId == readerId && cardMonitorGeneration == generation
+      }
+
+      if (!connected) {
+        return@post
+      }
+
+      sendEvent(eventName, Bundle().apply {
+        putString("readerId", readerId)
+      })
+    }
+  }
+
+  private fun hexToBytes(value: String): ByteArray {
+    if (value.length % 2 != 0 || !value.all { it in '0'..'9' || it in 'a'..'f' || it in 'A'..'F' }) {
+      throw InvalidHexStringException()
+    }
+
+    return value.chunked(2).map { byte ->
+      byte.toInt(16).toByte()
+    }.toByteArray()
+  }
+
+  private fun bytesToHex(value: ByteArray): String {
+    return value.joinToString("") { byte ->
+      "%02X".format(byte.toInt() and 0xFF)
     }
   }
 
@@ -417,6 +651,12 @@ private class InvalidScanTimeoutException : CodedException(
   null
 )
 
+private class InvalidHexStringException : CodedException(
+  "INVALID_HEX_STRING",
+  "apdu must contain only hex characters and have an even number of characters",
+  null
+)
+
 private class ReaderScanUnavailableException : CodedException(
   "READER_SCAN_UNAVAILABLE",
   "Reader scanning is not available on this Android device",
@@ -444,5 +684,11 @@ private class ReaderNotConnectedException(readerId: String) : CodedException(
 private class ReaderConnectionUnavailableException : CodedException(
   "READER_CONNECTION_UNAVAILABLE",
   "Reader connection is not available on this Android device",
+  null
+)
+
+private class CardCommandFailedException(status: String) : CodedException(
+  "CARD_COMMAND_FAILED",
+  "Card command failed with APDU Status $status",
   null
 )

@@ -4,6 +4,7 @@ import {
   AuthenticateBlockOptions,
   HexString,
   Reader,
+  ReaderCardEvent,
   ReaderDiscoveredEvent,
   ReaderId,
   ReaderPermissionStatus,
@@ -14,6 +15,8 @@ import {
 
 type ReactNativeBleNfcReaderModuleEvents = {
   onReaderDiscovered(event: ReaderDiscoveredEvent): void;
+  onCardPresent(event: ReaderCardEvent): void;
+  onCardRemoved(event: ReaderCardEvent): void;
 };
 
 export declare class ReactNativeBleNfcReaderModule extends NativeModule<ReactNativeBleNfcReaderModuleEvents> {

@@ -1,4 +1,6 @@
 export {
+  addCardPresentListener,
+  addCardRemovedListener,
   addReaderDiscoveredListener,
   connectReader,
   disconnectReader,

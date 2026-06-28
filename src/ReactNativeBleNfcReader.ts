@@ -4,6 +4,7 @@ import {
   BleNfcReaderError,
   HexString,
   Reader,
+  ReaderCardEvent,
   ReaderDiscoveredEvent,
   ReaderDiscoverySubscription,
   ReaderId,
@@ -121,6 +122,10 @@ function normalizeNativeError(error: unknown): unknown {
     return new BleNfcReaderError('READER_CONNECTION_UNAVAILABLE', getErrorMessage(error));
   }
 
+  if (error.code === 'CARD_COMMAND_FAILED') {
+    return new BleNfcReaderError('CARD_COMMAND_FAILED', getErrorMessage(error));
+  }
+
   return error;
 }
 
@@ -182,14 +187,31 @@ export async function stopReaderScan(): Promise<Reader[]> {
 export function addReaderDiscoveredListener(
   listener: (event: ReaderDiscoveredEvent) => void
 ): ReaderDiscoverySubscription {
+  assertNativeListenerAvailable();
+  return nativeModule.addListener('onReaderDiscovered', listener);
+}
+
+export function addCardPresentListener(
+  listener: (event: ReaderCardEvent) => void
+): ReaderDiscoverySubscription {
+  assertNativeListenerAvailable();
+  return nativeModule.addListener('onCardPresent', listener);
+}
+
+export function addCardRemovedListener(
+  listener: (event: ReaderCardEvent) => void
+): ReaderDiscoverySubscription {
+  assertNativeListenerAvailable();
+  return nativeModule.addListener('onCardRemoved', listener);
+}
+
+function assertNativeListenerAvailable(): void {
   if (typeof nativeModule.addListener !== 'function') {
     throw new BleNfcReaderError(
       'NATIVE_METHOD_UNAVAILABLE',
       'addListener is not available in this native build'
     );
   }
-
-  return nativeModule.addListener('onReaderDiscovered', listener);
 }
 
 export async function connectReader(readerId: ReaderId): Promise<Reader> {
