@@ -46,6 +46,7 @@ class ReactNativeBleNfcReaderModule : Module() {
   private var activeReaderTerminal: CardTerminal? = null
   private var activeReaderManager: BluetoothTerminalManager? = null
   private var cardMonitorThread: Thread? = null
+  private var cardMonitorGeneration = 0
   private var scanPromise: Promise? = null
   private var scanStopRunnable: Runnable? = null
   private var scanTypeRunnable: Runnable? = null
@@ -394,10 +395,14 @@ class ReactNativeBleNfcReaderModule : Module() {
   private fun startCardMonitor(readerId: String, terminal: CardTerminal) {
     stopCardMonitor()
 
+    val generation = synchronized(readerLock) {
+      cardMonitorGeneration += 1
+      cardMonitorGeneration
+    }
     val thread = Thread {
       var wasPresent: Boolean? = null
 
-      while (!Thread.currentThread().isInterrupted) {
+      while (!Thread.currentThread().isInterrupted && isCurrentCardMonitor(generation)) {
         val present = cardPresent(terminal)
 
         if (present == null) {
@@ -406,7 +411,7 @@ class ReactNativeBleNfcReaderModule : Module() {
         }
 
         if (present && wasPresent != true) {
-          sendCardEvent(CARD_PRESENT_EVENT, readerId)
+          sendCardEvent(CARD_PRESENT_EVENT, readerId, generation)
         }
 
         if (!present && wasPresent == true) {
@@ -414,7 +419,7 @@ class ReactNativeBleNfcReaderModule : Module() {
             continue
           }
 
-          sendCardEvent(CARD_REMOVED_EVENT, readerId)
+          sendCardEvent(CARD_REMOVED_EVENT, readerId, generation)
         }
 
         wasPresent = present
@@ -425,14 +430,20 @@ class ReactNativeBleNfcReaderModule : Module() {
       }
     }
 
-    cardMonitorThread = thread
+    synchronized(readerLock) {
+      cardMonitorThread = thread
+    }
     thread.start()
   }
 
   private fun stopCardMonitor() {
-    val thread = cardMonitorThread
+    val thread = synchronized(readerLock) {
+      cardMonitorGeneration += 1
+      val currentThread = cardMonitorThread
+      cardMonitorThread = null
+      currentThread
+    }
     thread?.interrupt()
-    cardMonitorThread = null
 
     if (thread == null || thread == Thread.currentThread()) {
       return
@@ -442,6 +453,12 @@ class ReactNativeBleNfcReaderModule : Module() {
       thread.join(1500)
     } catch (_: InterruptedException) {
       Thread.currentThread().interrupt()
+    }
+  }
+
+  private fun isCurrentCardMonitor(generation: Int): Boolean {
+    return synchronized(readerLock) {
+      cardMonitorGeneration == generation && cardMonitorThread == Thread.currentThread()
     }
   }
 
@@ -483,10 +500,10 @@ class ReactNativeBleNfcReaderModule : Module() {
     }
   }
 
-  private fun sendCardEvent(eventName: String, readerId: String) {
+  private fun sendCardEvent(eventName: String, readerId: String, generation: Int) {
     scanHandler.post {
       val connected = synchronized(readerLock) {
-        activeReaderId == readerId
+        activeReaderId == readerId && cardMonitorGeneration == generation
       }
 
       if (!connected) {

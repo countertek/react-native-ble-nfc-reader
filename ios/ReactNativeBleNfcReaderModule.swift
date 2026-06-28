@@ -33,6 +33,8 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
   private var knownTerminals: [String: any CardTerminal] = [:]
   private var activeReader: (id: String, terminal: any CardTerminal)?
   private var cardMonitorThread: Thread?
+  private var cardMonitorGeneration = 0
+  private let readerStateLock = NSLock()
   private let terminalIoLock = NSLock()
 
   public func definition() -> ModuleDefinition {
@@ -176,7 +178,7 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
     discoveredReaderIds = []
     discoveredReaders = []
     knownTerminals = [:]
-    if let activeReader {
+    if let activeReader = withReaderStateLock({ activeReader }) {
       knownTerminals[activeReader.id] = activeReader.terminal
     }
 
@@ -245,7 +247,7 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
   private func connectReader(readerId: String) throws -> [String: Any] {
     _ = finishScan()
 
-    if let activeReader {
+    if let activeReader = withReaderStateLock({ activeReader }) {
       if activeReader.id != readerId {
         throw readerAlreadyConnectedException(readerId: activeReader.id)
       }
@@ -257,22 +259,32 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
       throw readerNotFoundException(readerId: readerId)
     }
 
-    activeReader = (readerId, terminal)
+    withReaderStateLock {
+      activeReader = (readerId, terminal)
+    }
     let reader = readerForTerminal(terminal, includeMetadata: true)
     startCardMonitor(readerId: readerId, terminal: terminal)
     return reader
   }
 
   private func disconnectReader(readerId: String) throws {
-    guard let activeReader, activeReader.id == readerId else {
-      throw readerNotConnectedException(readerId: readerId)
+    let terminal = try withReaderStateLock {
+      guard let activeReader, activeReader.id == readerId else {
+        throw readerNotConnectedException(readerId: readerId)
+      }
+
+      return activeReader.terminal
     }
 
     stopCardMonitor()
     try withTerminalLock {
-      try scanManager.disconnect(terminal: activeReader.terminal)
+      try scanManager.disconnect(terminal: terminal)
     }
-    self.activeReader = nil
+    withReaderStateLock {
+      if activeReader?.id == readerId {
+        activeReader = nil
+      }
+    }
   }
 
   private func readCardUid(readerId: String) throws -> String {
@@ -308,34 +320,40 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
   }
 
   private func activeTerminal(readerId: String) throws -> any CardTerminal {
-    if !Thread.isMainThread {
-      return try DispatchQueue.main.sync {
-        try activeTerminal(readerId: readerId)
+    try withReaderStateLock {
+      guard let activeReader, activeReader.id == readerId else {
+        throw readerNotConnectedException(readerId: readerId)
       }
-    }
 
-    guard let activeReader, activeReader.id == readerId else {
-      throw readerNotConnectedException(readerId: readerId)
+      return activeReader.terminal
     }
-
-    return activeReader.terminal
   }
 
   private func startCardMonitor(readerId: String, terminal: any CardTerminal) {
     stopCardMonitor()
 
+    let generation = withReaderStateLock {
+      cardMonitorGeneration += 1
+      return cardMonitorGeneration
+    }
     let thread = Thread { [weak self] in
-      self?.monitorCardState(readerId: readerId, terminal: terminal)
+      self?.monitorCardState(readerId: readerId, terminal: terminal, generation: generation)
     }
 
-    cardMonitorThread = thread
+    withReaderStateLock {
+      cardMonitorThread = thread
+    }
     thread.start()
   }
 
   private func stopCardMonitor() {
-    let thread = cardMonitorThread
+    let thread = withReaderStateLock {
+      cardMonitorGeneration += 1
+      let thread = cardMonitorThread
+      cardMonitorThread = nil
+      return thread
+    }
     thread?.cancel()
-    cardMonitorThread = nil
 
     guard let thread, thread !== Thread.current else {
       return
@@ -347,10 +365,10 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
     }
   }
 
-  private func monitorCardState(readerId: String, terminal: any CardTerminal) {
+  private func monitorCardState(readerId: String, terminal: any CardTerminal, generation: Int) {
     var wasPresent: Bool?
 
-    while !Thread.current.isCancelled {
+    while !Thread.current.isCancelled && isCurrentCardMonitor(generation) {
       let present = cardPresent(terminal)
 
       guard let present else {
@@ -359,7 +377,7 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
       }
 
       if present && wasPresent != true {
-        sendCardEvent(cardPresentEvent, readerId: readerId)
+        sendCardEvent(cardPresentEvent, readerId: readerId, generation: generation)
       }
 
       if !present && wasPresent == true {
@@ -367,7 +385,7 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
           continue
         }
 
-        sendCardEvent(cardRemovedEvent, readerId: readerId)
+        sendCardEvent(cardRemovedEvent, readerId: readerId, generation: generation)
       }
 
       wasPresent = present
@@ -375,6 +393,12 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
       if !waitForCardChange(terminal, present: present) {
         break
       }
+    }
+  }
+
+  private func isCurrentCardMonitor(_ generation: Int) -> Bool {
+    return withReaderStateLock {
+      cardMonitorGeneration == generation && cardMonitorThread === Thread.current
     }
   }
 
@@ -417,13 +441,30 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
     return try block()
   }
 
-  private func sendCardEvent(_ eventName: String, readerId: String) {
+  private func withReaderStateLock<T>(_ block: () throws -> T) rethrows -> T {
+    readerStateLock.lock()
+    defer {
+      readerStateLock.unlock()
+    }
+
+    return try block()
+  }
+
+  private func sendCardEvent(_ eventName: String, readerId: String, generation: Int) {
     DispatchQueue.main.async { [weak self] in
-      guard self?.activeReader?.id == readerId else {
+      guard let self else {
         return
       }
 
-      self?.sendEvent(eventName, ["readerId": readerId])
+      let shouldSend = self.withReaderStateLock {
+        self.activeReader?.id == readerId && self.cardMonitorGeneration == generation
+      }
+
+      guard shouldSend else {
+        return
+      }
+
+      self.sendEvent(eventName, ["readerId": readerId])
     }
   }
 
