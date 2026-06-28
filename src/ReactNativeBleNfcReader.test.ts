@@ -378,27 +378,32 @@ describe('mifare', () => {
   it('rejects trailer block writes unless explicitly allowed', async () => {
     mockNativeModule.writeBlock = jest.fn(async () => undefined);
 
-    await expect(
-      mifare.writeBlock({
-        readerId: 'reader-1',
-        block: 7,
-        data: '00112233445566778899AABBCCDDEEFF',
-      })
-    ).rejects.toEqual(
-      expect.objectContaining({
-        code: 'INVALID_MIFARE_BLOCK',
-      })
-    );
+    for (const block of [3, 7, 143]) {
+      await expect(
+        mifare.writeBlock({
+          readerId: 'reader-1',
+          block,
+          data: '00112233445566778899AABBCCDDEEFF',
+        })
+      ).rejects.toEqual(
+        expect.objectContaining({
+          code: 'INVALID_MIFARE_BLOCK',
+        })
+      );
+    }
+
+    expect(mockNativeModule.writeBlock).not.toHaveBeenCalled();
+
     await mifare.writeBlock({
       readerId: 'reader-1',
-      block: 7,
+      block: 143,
       data: '00112233445566778899AABBCCDDEEFF',
       allowTrailerWrite: true,
     });
 
     expect(mockNativeModule.writeBlock).toHaveBeenCalledWith({
       readerId: 'reader-1',
-      block: 7,
+      block: 143,
       data: '00112233445566778899AABBCCDDEEFF',
       allowTrailerWrite: true,
     });
