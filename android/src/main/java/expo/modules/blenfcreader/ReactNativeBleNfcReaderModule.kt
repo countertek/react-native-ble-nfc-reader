@@ -293,22 +293,29 @@ class ReactNativeBleNfcReaderModule : Module() {
     val manager = readerManager()
     finishScan()
 
-    val terminal = synchronized(readerLock) {
+    val (terminal, shouldStartCardMonitor) = synchronized(readerLock) {
       val activeId = activeReaderId
 
       if (activeId != null && activeId != readerId) {
         throw ReaderAlreadyConnectedException(activeId)
       }
 
+      if (activeId == readerId) {
+        val activeTerminal = activeReaderTerminal ?: throw ReaderNotConnectedException(readerId)
+        return@synchronized Pair(activeTerminal, false)
+      }
+
       val knownTerminal = knownTerminals[readerId] ?: throw ReaderNotFoundException(readerId)
       activeReaderId = readerId
       activeReaderTerminal = knownTerminal
       activeReaderManager = manager
-      knownTerminal
+      Pair(knownTerminal, true)
     }
 
     val reader = readerForTerminal(terminal, manager)
-    startCardMonitor(readerId, terminal)
+    if (shouldStartCardMonitor) {
+      startCardMonitor(readerId, terminal)
+    }
     return reader
   }
 
@@ -366,7 +373,10 @@ class ReactNativeBleNfcReaderModule : Module() {
       try {
         return block(card)
       } finally {
-        card.disconnect(false)
+        try {
+          card.disconnect(false)
+        } catch (_: CardException) {
+        }
       }
     }
   }
