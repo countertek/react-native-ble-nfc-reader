@@ -223,6 +223,21 @@ describe('public native wrappers', () => {
     await expect(readCardUid('reader-1')).rejects.toBeInstanceOf(BleNfcReaderError);
   });
 
+  it('maps native APDU status into card command errors', async () => {
+    mockNativeModule.readCardUid = jest.fn(async () => {
+      const error = new Error('Card command failed with APDU Status 6300');
+      Object.assign(error, { code: 'CARD_COMMAND_FAILED' });
+      throw error;
+    });
+
+    await expect(readCardUid('reader-1')).rejects.toEqual(
+      expect.objectContaining({
+        apduStatus: '6300',
+        code: 'CARD_COMMAND_FAILED',
+      })
+    );
+  });
+
   it('stops an active Reader scan', async () => {
     mockNativeModule.stopReaderScan = jest.fn(async () => [{ id: 'reader-1' }]);
 
@@ -285,6 +300,7 @@ describe('public native wrappers', () => {
 describe('mifare', () => {
   it('normalizes keys and block data before native calls', async () => {
     mockNativeModule.authenticateBlock = jest.fn(async () => undefined);
+    mockNativeModule.readBlock = jest.fn(async () => '00112233445566778899aabbccddeeff');
     mockNativeModule.writeBlock = jest.fn(async () => undefined);
 
     await mifare.authenticateBlock({
@@ -298,6 +314,9 @@ describe('mifare', () => {
       block: 4,
       data: '00112233445566778899aabbccddeeff',
     });
+    await expect(mifare.readBlock({ readerId: 'reader-1', block: 4 })).resolves.toBe(
+      '00112233445566778899AABBCCDDEEFF'
+    );
 
     expect(mockNativeModule.authenticateBlock).toHaveBeenCalledWith({
       readerId: 'reader-1',
@@ -309,6 +328,10 @@ describe('mifare', () => {
       readerId: 'reader-1',
       block: 4,
       data: '00112233445566778899AABBCCDDEEFF',
+    });
+    expect(mockNativeModule.readBlock).toHaveBeenCalledWith({
+      readerId: 'reader-1',
+      block: 4,
     });
   });
 
@@ -333,6 +356,14 @@ describe('mifare', () => {
       })
     ).rejects.toThrow(BleNfcReaderError);
     await expect(
+      mifare.authenticateBlock({
+        readerId: 'reader-1',
+        block: 4,
+        keyType: 'C' as 'A',
+        key: 'FFFFFFFFFFFF',
+      })
+    ).rejects.toThrow(BleNfcReaderError);
+    await expect(
       mifare.writeBlock({
         readerId: 'reader-1',
         block: 4,
@@ -342,6 +373,35 @@ describe('mifare', () => {
 
     expect(mockNativeModule.authenticateBlock).not.toHaveBeenCalled();
     expect(mockNativeModule.writeBlock).not.toHaveBeenCalled();
+  });
+
+  it('rejects trailer block writes unless explicitly allowed', async () => {
+    mockNativeModule.writeBlock = jest.fn(async () => undefined);
+
+    await expect(
+      mifare.writeBlock({
+        readerId: 'reader-1',
+        block: 7,
+        data: '00112233445566778899AABBCCDDEEFF',
+      })
+    ).rejects.toEqual(
+      expect.objectContaining({
+        code: 'INVALID_MIFARE_BLOCK',
+      })
+    );
+    await mifare.writeBlock({
+      readerId: 'reader-1',
+      block: 7,
+      data: '00112233445566778899AABBCCDDEEFF',
+      allowTrailerWrite: true,
+    });
+
+    expect(mockNativeModule.writeBlock).toHaveBeenCalledWith({
+      readerId: 'reader-1',
+      block: 7,
+      data: '00112233445566778899AABBCCDDEEFF',
+      allowTrailerWrite: true,
+    });
   });
 });
 

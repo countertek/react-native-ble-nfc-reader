@@ -50,6 +50,15 @@ Reader. `readCardUid(readerId)` returns the presented card UID as a Hex String.
 `transmit(readerId, apdu)` sends a raw APDU Hex String and resolves with
 `responseData` and `status`; non-`9000` APDU statuses are returned, not thrown.
 
+## MIFARE Classic
+
+Use `mifare.authenticateBlock({ readerId, block, keyType, key })` with a
+caller-owned key before `mifare.readBlock({ readerId, block })` or
+`mifare.writeBlock({ readerId, block, data })`. Keys are loaded into the Reader
+only for the operation and are not stored by this package. `readBlock()` returns
+16 bytes as a Hex String. `writeBlock()` rejects trailer blocks unless
+`allowTrailerWrite` is set.
+
 ## Manual hardware checklist
 
 - Android: grant Reader permission, start a 5 second scan, confirm an ACS BLE
@@ -57,15 +66,17 @@ Reader. `readCardUid(readerId)` returns the presented card UID as a Hex String.
   after `stopReaderScan()`. Connect the discovered Reader, confirm optional
   metadata appears when available, present and remove a card, confirm the card
   presence events update, read the card UID, transmit `FFCA000000`, confirm APDU
-  Response Data and APDU Status are shown separately, disconnect it, then confirm
-  a second connect works only after disconnect.
+  Response Data and APDU Status are shown separately, authenticate a MIFARE
+  Classic block with a caller-owned key, read the block, write 16 bytes, read it
+  back, disconnect it, then confirm a second connect works only after disconnect.
 - iOS: grant Bluetooth permission, start a 5 second scan, confirm an ACS BLE
   Reader appears during the scan, then confirm scanning stops at timeout and
   after `stopReaderScan()`. Connect the discovered Reader, confirm optional
   metadata appears when available, present and remove a card, confirm the card
   presence events update, read the card UID, transmit `FFCA000000`, confirm APDU
-  Response Data and APDU Status are shown separately, disconnect it, then confirm
-  a second connect works only after disconnect.
+  Response Data and APDU Status are shown separately, authenticate a MIFARE
+  Classic block with a caller-owned key, read the block, write 16 bytes, read it
+  back, disconnect it, then confirm a second connect works only after disconnect.
 
 ## ACS SDK
 

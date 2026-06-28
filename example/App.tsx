@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { Button, SafeAreaView, StyleSheet, Text, TextInput, View } from 'react-native';
 import {
   addCardPresentListener,
   addCardRemovedListener,
@@ -8,6 +8,7 @@ import {
   connectReader,
   disconnectReader,
   getReaderPermissionStatus,
+  mifare,
   Reader,
   readCardUid,
   requestReaderPermissions,
@@ -27,6 +28,9 @@ export default function App() {
   const [cardPresent, setCardPresent] = useState(false);
   const [cardUid, setCardUid] = useState('');
   const [apduResponse, setApduResponse] = useState('');
+  const [mifareBlock, setMifareBlock] = useState('4');
+  const [mifareData, setMifareData] = useState('00112233445566778899AABBCCDDEEFF');
+  const [mifareResult, setMifareResult] = useState('');
   const [scanning, setScanning] = useState(false);
 
   async function refreshPermissionStatus() {
@@ -67,6 +71,7 @@ export default function App() {
       setCardPresent(false);
       setCardUid('');
       setApduResponse('');
+      setMifareResult('');
       setMessage('');
     } catch (error) {
       setMessage(formatError(error));
@@ -84,6 +89,7 @@ export default function App() {
       setCardPresent(false);
       setCardUid('');
       setApduResponse('');
+      setMifareResult('');
       setMessage('');
     } catch (error) {
       setMessage(formatError(error));
@@ -111,6 +117,60 @@ export default function App() {
     try {
       const response = await transmit(connectedReader.id, 'FFCA000000');
       setApduResponse(`Data: ${response.responseData || '(empty)'} Status: ${response.status}`);
+      setMessage('');
+    } catch (error) {
+      setMessage(formatError(error));
+    }
+  }
+
+  async function authenticateMifare(key: string) {
+    if (connectedReader === null) {
+      return;
+    }
+
+    try {
+      await mifare.authenticateBlock({
+        readerId: connectedReader.id,
+        block: Number(mifareBlock),
+        keyType: 'A',
+        key,
+      });
+      setMifareResult(`Authenticated block ${mifareBlock}`);
+      setMessage('');
+    } catch (error) {
+      setMessage(formatError(error));
+    }
+  }
+
+  async function readMifareBlock() {
+    if (connectedReader === null) {
+      return;
+    }
+
+    try {
+      setMifareResult(
+        await mifare.readBlock({ readerId: connectedReader.id, block: Number(mifareBlock) })
+      );
+      setMessage('');
+    } catch (error) {
+      setMessage(formatError(error));
+    }
+  }
+
+  async function writeMifareBlock() {
+    if (connectedReader === null) {
+      return;
+    }
+
+    try {
+      await mifare.writeBlock({
+        readerId: connectedReader.id,
+        block: Number(mifareBlock),
+        data: mifareData,
+      });
+      setMifareResult(
+        await mifare.readBlock({ readerId: connectedReader.id, block: Number(mifareBlock) })
+      );
       setMessage('');
     } catch (error) {
       setMessage(formatError(error));
@@ -158,6 +218,7 @@ export default function App() {
       setCardPresent(false);
       setCardUid('');
       setApduResponse('');
+      setMifareResult('');
     });
 
     return () => {
@@ -198,13 +259,42 @@ export default function App() {
         })}
         {connectedReader ? (
           <View style={styles.connectedReader}>
-            <Text style={styles.status}>Connected: {connectedReader.name ?? connectedReader.id}</Text>
+            <Text style={styles.status}>
+              Connected: {connectedReader.name ?? connectedReader.id}
+            </Text>
             <Text style={styles.reader}>{formatMetadata(connectedReader)}</Text>
             <Text style={styles.status}>Card: {cardPresent ? 'present' : 'removed'}</Text>
             <Button title="Read Card UID" onPress={readUid} />
             <Button title="Transmit UID APDU" onPress={transmitUidApdu} />
             {cardUid ? <Text style={styles.reader}>UID: {cardUid}</Text> : null}
             {apduResponse ? <Text style={styles.reader}>{apduResponse}</Text> : null}
+            <TextInput
+              style={styles.input}
+              value={mifareBlock}
+              onChangeText={setMifareBlock}
+              keyboardType="number-pad"
+              placeholder="MIFARE block"
+            />
+            <TextInput
+              style={styles.input}
+              autoCapitalize="characters"
+              autoCorrect={false}
+              secureTextEntry
+              placeholder="Submit key A hex to authenticate"
+              returnKeyType="send"
+              onSubmitEditing={(event) => authenticateMifare(event.nativeEvent.text)}
+            />
+            <Button title="Read MIFARE Block" onPress={readMifareBlock} />
+            <TextInput
+              style={styles.input}
+              value={mifareData}
+              onChangeText={setMifareData}
+              autoCapitalize="characters"
+              autoCorrect={false}
+              placeholder="16-byte block data hex"
+            />
+            <Button title="Write MIFARE Block And Read Back" onPress={writeMifareBlock} />
+            {mifareResult ? <Text style={styles.reader}>MIFARE: {mifareResult}</Text> : null}
             <Button title="Disconnect Reader" onPress={disconnectCurrentReader} />
           </View>
         ) : null}
@@ -282,6 +372,12 @@ const styles = StyleSheet.create({
   },
   connectedReader: {
     gap: 8,
+  },
+  input: {
+    borderColor: '#d1d5db',
+    borderRadius: 4,
+    borderWidth: 1,
+    padding: 8,
   },
   error: {
     color: '#b91c1c',

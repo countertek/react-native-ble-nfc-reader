@@ -123,10 +123,21 @@ function normalizeNativeError(error: unknown): unknown {
   }
 
   if (error.code === 'CARD_COMMAND_FAILED') {
-    return new BleNfcReaderError('CARD_COMMAND_FAILED', getErrorMessage(error));
+    const message = getErrorMessage(error);
+    return new BleNfcReaderError('CARD_COMMAND_FAILED', message, extractApduStatus(message));
   }
 
   return error;
+}
+
+function extractApduStatus(message: string): HexString | undefined {
+  const match = message.match(/\bAPDU Status ([0-9a-fA-F]{4})\b/);
+
+  if (match === null) {
+    return undefined;
+  }
+
+  return match[1].toUpperCase();
 }
 
 async function callNative<T>(call: () => Promise<T>): Promise<T> {
@@ -151,9 +162,32 @@ function normalizeSizedHexString(value: string, name: string, byteLength: number
 }
 
 function assertBlock(block: number): void {
-  if (!Number.isInteger(block) || block < 0) {
-    throw new BleNfcReaderError('INVALID_MIFARE_BLOCK', 'block must be a non-negative integer');
+  if (!Number.isInteger(block) || block < 0 || block > 255) {
+    throw new BleNfcReaderError(
+      'INVALID_MIFARE_BLOCK',
+      'block must be an integer between 0 and 255'
+    );
   }
+}
+
+function assertKeyType(keyType: string): void {
+  if (keyType === 'A') {
+    return;
+  }
+
+  if (keyType === 'B') {
+    return;
+  }
+
+  throw new BleNfcReaderError('INVALID_MIFARE_KEY_TYPE', 'keyType must be A or B');
+}
+
+function isMifareTrailerBlock(block: number): boolean {
+  if (block < 128) {
+    return block % 4 === 3;
+  }
+
+  return (block - 143) % 16 === 0;
 }
 
 function normalizeScanOptions(options?: ScanReadersOptions): ScanReadersOptions | undefined {
@@ -237,6 +271,7 @@ export async function transmit(readerId: ReaderId, apdu: HexString): Promise<Apd
 export const mifare = {
   async authenticateBlock(options: AuthenticateBlockOptions): Promise<void> {
     assertBlock(options.block);
+    assertKeyType(options.keyType);
 
     return callNative(() =>
       getNativeMethod('authenticateBlock')({
@@ -255,6 +290,13 @@ export const mifare = {
 
   async writeBlock(options: WriteBlockOptions): Promise<void> {
     assertBlock(options.block);
+
+    if (options.allowTrailerWrite !== true && isMifareTrailerBlock(options.block)) {
+      throw new BleNfcReaderError(
+        'INVALID_MIFARE_BLOCK',
+        'trailer block writes require allowTrailerWrite'
+      );
+    }
 
     return callNative(() =>
       getNativeMethod('writeBlock')({

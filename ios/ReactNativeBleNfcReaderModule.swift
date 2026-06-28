@@ -10,6 +10,7 @@ private let cardRemovedEvent = "onCardRemoved"
 private let defaultScanTimeoutMs = 5000.0
 private let metadataTimeoutMs = 1000
 private let readUidApdu = "FFCA000000"
+private let mifareKeySlot = "00"
 
 public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDelegate {
   private var bluetoothManager: CBCentralManager?
@@ -32,6 +33,7 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
   private var discoveredReaders: [[String: Any]] = []
   private var knownTerminals: [String: any CardTerminal] = [:]
   private var activeReader: (id: String, terminal: any CardTerminal)?
+  private var activeCard: (any Card)?
   private var cardMonitorThread: Thread?
   private var cardMonitorGeneration = 0
   private let readerStateLock = NSLock()
@@ -111,6 +113,38 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
     AsyncFunction("transmit") { (readerId: String, apdu: String, promise: Promise) in
       do {
         promise.resolve(try self.transmit(readerId: readerId, apdu: apdu))
+      } catch let error as Exception {
+        promise.reject(error)
+      } catch {
+        promise.reject(cardCommandFailedException(status: "unknown"))
+      }
+    }
+
+    AsyncFunction("authenticateBlock") { (options: AuthenticateBlockOptions, promise: Promise) in
+      do {
+        try self.authenticateBlock(options)
+        promise.resolve(nil)
+      } catch let error as Exception {
+        promise.reject(error)
+      } catch {
+        promise.reject(cardCommandFailedException(status: "unknown"))
+      }
+    }
+
+    AsyncFunction("readBlock") { (options: ReadBlockOptions, promise: Promise) in
+      do {
+        promise.resolve(try self.readBlock(options))
+      } catch let error as Exception {
+        promise.reject(error)
+      } catch {
+        promise.reject(cardCommandFailedException(status: "unknown"))
+      }
+    }
+
+    AsyncFunction("writeBlock") { (options: WriteBlockOptions, promise: Promise) in
+      do {
+        try self.writeBlock(options)
+        promise.resolve(nil)
       } catch let error as Exception {
         promise.reject(error)
       } catch {
@@ -277,6 +311,7 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
     }
 
     try withTerminalLock {
+      disconnectActiveCard()
       try scanManager.disconnect(terminal: terminal)
     }
     stopCardMonitor()
@@ -288,7 +323,37 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
   }
 
   private func readCardUid(readerId: String) throws -> String {
-    let response = try transmit(readerId: readerId, apdu: readUidApdu)
+    return try transmitSuccessful(readerId: readerId, apdu: readUidApdu)
+  }
+
+  private func authenticateBlock(_ options: AuthenticateBlockOptions) throws {
+    let block = try normalizeMifareBlock(options.block)
+    let key = try normalizeSizedHexString(options.key, name: "key", byteCount: 6)
+    let keyType = try mifareKeyTypeByte(options.keyType)
+    let blockHex = byteHex(block)
+
+    _ = try transmitSuccessful(readerId: options.readerId, apdu: "FF8200\(mifareKeySlot)06\(key)")
+    _ = try transmitSuccessful(readerId: options.readerId, apdu: "FF860000050100\(blockHex)\(keyType)\(mifareKeySlot)")
+  }
+
+  private func readBlock(_ options: ReadBlockOptions) throws -> String {
+    let block = try normalizeMifareBlock(options.block)
+    return try transmitSuccessful(readerId: options.readerId, apdu: "FFB000\(byteHex(block))10")
+  }
+
+  private func writeBlock(_ options: WriteBlockOptions) throws {
+    let block = try normalizeMifareBlock(options.block)
+
+    if options.allowTrailerWrite != true && isMifareTrailerBlock(block) {
+      throw invalidMifareBlockException(description: "trailer block writes require allowTrailerWrite")
+    }
+
+    let data = try normalizeSizedHexString(options.data, name: "data", byteCount: 16)
+    _ = try transmitSuccessful(readerId: options.readerId, apdu: "FFD600\(byteHex(block))10\(data)")
+  }
+
+  private func transmitSuccessful(readerId: String, apdu: String) throws -> String {
+    let response = try transmit(readerId: readerId, apdu: apdu)
 
     if response.count < 4 {
       throw cardCommandFailedException(status: "unknown")
@@ -306,17 +371,28 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
     let terminal = try activeTerminal(readerId: readerId)
 
     return try withTerminalLock {
-      let card = try terminal.connect(protocolString: "*")
-      defer {
-        try? card.disconnect(reset: false)
+      do {
+        let card = try activeCard ?? terminal.connect(protocolString: "*")
+        activeCard = card
+        let channel = try card.basicChannel()
+        let commandApdu = try CommandAPDU(apdu: hexBytes(apdu))
+        let responseApdu = try channel.transmit(apdu: commandApdu)
+
+        return hexString(responseApdu.bytes)
+      } catch {
+        disconnectActiveCard()
+        throw error
       }
-
-      let channel = try card.basicChannel()
-      let commandApdu = try CommandAPDU(apdu: hexBytes(apdu))
-      let responseApdu = try channel.transmit(apdu: commandApdu)
-
-      return hexString(responseApdu.bytes)
     }
+  }
+
+  private func disconnectActiveCard() {
+    guard let card = activeCard else {
+      return
+    }
+
+    activeCard = nil
+    try? card.disconnect(reset: false)
   }
 
   private func activeTerminal(readerId: String) throws -> any CardTerminal {
@@ -385,6 +461,9 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
           continue
         }
 
+        withTerminalLock {
+          disconnectActiveCard()
+        }
         sendCardEvent(cardRemovedEvent, readerId: readerId, generation: generation)
       }
 
@@ -468,9 +547,51 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
     }
   }
 
-  private func hexBytes(_ value: String) throws -> [UInt8] {
+  private func normalizeMifareBlock(_ block: Int) throws -> Int {
+    if block < 0 || block > 255 {
+      throw invalidMifareBlockException(description: "block must be an integer between 0 and 255")
+    }
+
+    return block
+  }
+
+  private func mifareKeyTypeByte(_ keyType: String) throws -> String {
+    if keyType == "A" {
+      return "60"
+    }
+
+    if keyType == "B" {
+      return "61"
+    }
+
+    throw invalidMifareKeyTypeException()
+  }
+
+  private func isMifareTrailerBlock(_ block: Int) -> Bool {
+    if block < 128 {
+      return block % 4 == 3
+    }
+
+    return (block - 143) % 16 == 0
+  }
+
+  private func normalizeSizedHexString(_ value: String, name: String, byteCount: Int) throws -> String {
+    let bytes = try hexBytes(value, name: name)
+
+    if bytes.count != byteCount {
+      throw invalidHexStringException(description: "\(name) must be \(byteCount) bytes (\(byteCount * 2) hex characters)")
+    }
+
+    return hexString(bytes)
+  }
+
+  private func byteHex(_ value: Int) -> String {
+    return String(format: "%02X", value)
+  }
+
+  private func hexBytes(_ value: String, name: String = "apdu") throws -> [UInt8] {
     if value.count % 2 != 0 {
-      throw invalidHexStringException()
+      throw invalidHexStringException(description: "\(name) must contain only hex characters and have an even number of characters")
     }
 
     var bytes: [UInt8] = []
@@ -479,7 +600,7 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
     while index < value.endIndex {
       let nextIndex = value.index(index, offsetBy: 2)
       guard let byte = UInt8(value[index..<nextIndex], radix: 16) else {
-        throw invalidHexStringException()
+        throw invalidHexStringException(description: "\(name) must contain only hex characters and have an even number of characters")
       }
 
       bytes.append(byte)
@@ -561,6 +682,42 @@ private struct ScanReadersOptions: Record {
   var timeoutMs: Double?
 }
 
+private struct AuthenticateBlockOptions: Record {
+  @Field
+  var readerId: String = ""
+
+  @Field
+  var block: Int = -1
+
+  @Field
+  var keyType: String = ""
+
+  @Field
+  var key: String = ""
+}
+
+private struct ReadBlockOptions: Record {
+  @Field
+  var readerId: String = ""
+
+  @Field
+  var block: Int = -1
+}
+
+private struct WriteBlockOptions: Record {
+  @Field
+  var readerId: String = ""
+
+  @Field
+  var block: Int = -1
+
+  @Field
+  var data: String = ""
+
+  @Field
+  var allowTrailerWrite: Bool?
+}
+
 private func readerPermissionUndeterminedException() -> Exception {
   return Exception(
     name: "ReaderPermissionUndeterminedException",
@@ -617,11 +774,27 @@ private func readerConnectionUnavailableException() -> Exception {
   )
 }
 
-private func invalidHexStringException() -> Exception {
+private func invalidHexStringException(description: String = "apdu must contain only hex characters") -> Exception {
   return Exception(
     name: "InvalidHexStringException",
-    description: "apdu must contain only hex characters",
+    description: description,
     code: "INVALID_HEX_STRING"
+  )
+}
+
+private func invalidMifareBlockException(description: String) -> Exception {
+  return Exception(
+    name: "InvalidMifareBlockException",
+    description: description,
+    code: "INVALID_MIFARE_BLOCK"
+  )
+}
+
+private func invalidMifareKeyTypeException() -> Exception {
+  return Exception(
+    name: "InvalidMifareKeyTypeException",
+    description: "keyType must be A or B",
+    code: "INVALID_MIFARE_KEY_TYPE"
   )
 }
 
