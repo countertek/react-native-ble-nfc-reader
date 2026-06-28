@@ -430,8 +430,10 @@ class ReactNativeBleNfcReaderModule : Module() {
   }
 
   private fun transmit(readerId: String, apdu: String): String {
+    val command = CommandAPDU(hexToBytes(apdu))
+
     return withConnectedCard(readerId) { card ->
-      val response = card.basicChannel.transmit(CommandAPDU(hexToBytes(apdu)))
+      val response = card.basicChannel.transmit(command)
       bytesToHex(response.bytes)
     }
   }
@@ -443,7 +445,7 @@ class ReactNativeBleNfcReaderModule : Module() {
       try {
         val card = activeCard ?: terminal.connect("*").also { activeCard = it }
         return block(card)
-      } catch (error: CardException) {
+      } catch (error: Exception) {
         disconnectActiveCardLocked()
         throw error
       }
