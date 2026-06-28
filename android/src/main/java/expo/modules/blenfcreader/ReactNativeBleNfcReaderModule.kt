@@ -31,6 +31,7 @@ private const val READ_UID_APDU = "FFCA000000"
 class ReactNativeBleNfcReaderModule : Module() {
   private val scanHandler = Handler(Looper.getMainLooper())
   private val readerLock = Any()
+  private val terminalIoLock = Any()
   private val scanTerminalTypes = intArrayOf(
     BluetoothTerminalManager.TERMINAL_TYPE_ACR3901U_S1,
     BluetoothTerminalManager.TERMINAL_TYPE_ACR1255U_J1,
@@ -112,6 +113,8 @@ class ReactNativeBleNfcReaderModule : Module() {
         promise.resolve(readCardUid(readerId))
       } catch (error: CodedException) {
         promise.reject(error)
+      } catch (_: CardException) {
+        promise.reject(CardCommandFailedException("unknown"))
       } catch (_: Exception) {
         promise.reject(ReaderConnectionUnavailableException())
       }
@@ -122,6 +125,8 @@ class ReactNativeBleNfcReaderModule : Module() {
         promise.resolve(transmit(readerId, apdu))
       } catch (error: CodedException) {
         promise.reject(error)
+      } catch (_: CardException) {
+        promise.reject(CardCommandFailedException("unknown"))
       } catch (_: Exception) {
         promise.reject(ReaderConnectionUnavailableException())
       }
@@ -302,8 +307,9 @@ class ReactNativeBleNfcReaderModule : Module() {
       knownTerminal
     }
 
+    val reader = readerForTerminal(terminal, manager)
     startCardMonitor(readerId, terminal)
-    return readerForTerminal(terminal, manager)
+    return reader
   }
 
   private fun disconnectReader(readerId: String) {
@@ -317,8 +323,10 @@ class ReactNativeBleNfcReaderModule : Module() {
       Pair(manager, terminal)
     }
 
-    activeConnection.first.disconnect(activeConnection.second)
     stopCardMonitor()
+    synchronized(terminalIoLock) {
+      activeConnection.first.disconnect(activeConnection.second)
+    }
 
     synchronized(readerLock) {
       activeReaderId = null
@@ -351,12 +359,15 @@ class ReactNativeBleNfcReaderModule : Module() {
 
   private fun <T> withConnectedCard(readerId: String, block: (Card) -> T): T {
     val terminal = activeTerminal(readerId)
-    val card = terminal.connect("*")
 
-    try {
-      return block(card)
-    } finally {
-      card.disconnect(false)
+    synchronized(terminalIoLock) {
+      val card = terminal.connect("*")
+
+      try {
+        return block(card)
+      } finally {
+        card.disconnect(false)
+      }
     }
   }
 
@@ -377,11 +388,7 @@ class ReactNativeBleNfcReaderModule : Module() {
       var wasPresent: Boolean? = null
 
       while (!Thread.currentThread().isInterrupted) {
-        val present = try {
-          terminal.isCardPresent
-        } catch (_: CardException) {
-          null
-        }
+        val present = cardPresent(terminal)
 
         if (present == null) {
           sleepCardMonitor()
@@ -393,21 +400,17 @@ class ReactNativeBleNfcReaderModule : Module() {
         }
 
         if (!present && wasPresent == true) {
+          if (!cardStillAbsent(terminal)) {
+            continue
+          }
+
           sendCardEvent(CARD_REMOVED_EVENT, readerId)
         }
 
         wasPresent = present
 
-        try {
-          if (present) {
-            terminal.waitForCardAbsent(1000)
-          } else {
-            terminal.waitForCardPresent(1000)
-          }
-        } catch (error: CardException) {
-          if (error.cause is InterruptedException) {
-            break
-          }
+        if (!waitForCardChange(terminal, present)) {
+          break
         }
       }
     }
@@ -417,13 +420,54 @@ class ReactNativeBleNfcReaderModule : Module() {
   }
 
   private fun stopCardMonitor() {
-    cardMonitorThread?.interrupt()
+    val thread = cardMonitorThread
+    thread?.interrupt()
     cardMonitorThread = null
+
+    if (thread == null || thread == Thread.currentThread()) {
+      return
+    }
+
+    try {
+      thread.join(1500)
+    } catch (_: InterruptedException) {
+      Thread.currentThread().interrupt()
+    }
   }
 
-  private fun sleepCardMonitor() {
+  private fun cardPresent(terminal: CardTerminal): Boolean? {
+    return synchronized(terminalIoLock) {
+      try {
+        terminal.isCardPresent
+      } catch (_: CardException) {
+        null
+      }
+    }
+  }
+
+  private fun cardStillAbsent(terminal: CardTerminal): Boolean {
+    sleepCardMonitor(250)
+    return cardPresent(terminal) != true
+  }
+
+  private fun waitForCardChange(terminal: CardTerminal, present: Boolean): Boolean {
+    return synchronized(terminalIoLock) {
+      try {
+        if (present) {
+          terminal.waitForCardAbsent(1000)
+        } else {
+          terminal.waitForCardPresent(1000)
+        }
+        true
+      } catch (error: CardException) {
+        error.cause !is InterruptedException
+      }
+    }
+  }
+
+  private fun sleepCardMonitor(delayMs: Long = 500) {
     try {
-      Thread.sleep(500)
+      Thread.sleep(delayMs)
     } catch (_: InterruptedException) {
       Thread.currentThread().interrupt()
     }
