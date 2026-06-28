@@ -27,6 +27,7 @@ private const val CARD_REMOVED_EVENT = "onCardRemoved"
 private const val DEFAULT_SCAN_TIMEOUT_MS = 5000.0
 private const val METADATA_TIMEOUT_MS = 1000L
 private const val READ_UID_APDU = "FFCA000000"
+private const val MIFARE_KEY_SLOT = "00"
 
 class ReactNativeBleNfcReaderModule : Module() {
   private val scanHandler = Handler(Looper.getMainLooper())
@@ -124,6 +125,44 @@ class ReactNativeBleNfcReaderModule : Module() {
     AsyncFunction("transmit") { readerId: String, apdu: String, promise: Promise ->
       try {
         promise.resolve(transmit(readerId, apdu))
+      } catch (error: CodedException) {
+        promise.reject(error)
+      } catch (_: CardException) {
+        promise.reject(CardCommandFailedException("unknown"))
+      } catch (_: Exception) {
+        promise.reject(ReaderConnectionUnavailableException())
+      }
+    }
+
+    AsyncFunction("authenticateBlock") { options: AuthenticateBlockOptions, promise: Promise ->
+      try {
+        authenticateBlock(options)
+        promise.resolve(null)
+      } catch (error: CodedException) {
+        promise.reject(error)
+      } catch (_: CardException) {
+        promise.reject(CardCommandFailedException("unknown"))
+      } catch (_: Exception) {
+        promise.reject(ReaderConnectionUnavailableException())
+      }
+    }
+
+    AsyncFunction("readBlock") { options: ReadBlockOptions, promise: Promise ->
+      try {
+        promise.resolve(readBlock(options))
+      } catch (error: CodedException) {
+        promise.reject(error)
+      } catch (_: CardException) {
+        promise.reject(CardCommandFailedException("unknown"))
+      } catch (_: Exception) {
+        promise.reject(ReaderConnectionUnavailableException())
+      }
+    }
+
+    AsyncFunction("writeBlock") { options: WriteBlockOptions, promise: Promise ->
+      try {
+        writeBlock(options)
+        promise.resolve(null)
       } catch (error: CodedException) {
         promise.reject(error)
       } catch (_: CardException) {
@@ -344,7 +383,37 @@ class ReactNativeBleNfcReaderModule : Module() {
   }
 
   private fun readCardUid(readerId: String): String {
-    val response = transmit(readerId, READ_UID_APDU)
+    return transmitSuccessful(readerId, READ_UID_APDU)
+  }
+
+  private fun authenticateBlock(options: AuthenticateBlockOptions) {
+    val block = normalizeMifareBlock(options.block)
+    val key = normalizeSizedHexString(options.key, "key", 6)
+    val keyType = mifareKeyTypeByte(options.keyType)
+    val blockHex = byteHex(block)
+
+    transmitSuccessful(options.readerId, "FF8200${MIFARE_KEY_SLOT}06$key")
+    transmitSuccessful(options.readerId, "FF860000050100$blockHex$keyType$MIFARE_KEY_SLOT")
+  }
+
+  private fun readBlock(options: ReadBlockOptions): String {
+    val block = normalizeMifareBlock(options.block)
+    return transmitSuccessful(options.readerId, "FFB000${byteHex(block)}10")
+  }
+
+  private fun writeBlock(options: WriteBlockOptions) {
+    val block = normalizeMifareBlock(options.block)
+
+    if (options.allowTrailerWrite != true && isMifareTrailerBlock(block)) {
+      throw InvalidMifareBlockException("trailer block writes require allowTrailerWrite")
+    }
+
+    val data = normalizeSizedHexString(options.data, "data", 16)
+    transmitSuccessful(options.readerId, "FFD600${byteHex(block)}10$data")
+  }
+
+  private fun transmitSuccessful(readerId: String, apdu: String): String {
+    val response = transmit(readerId, apdu)
 
     if (response.length < 4) {
       throw CardCommandFailedException("unknown")
@@ -516,9 +585,51 @@ class ReactNativeBleNfcReaderModule : Module() {
     }
   }
 
-  private fun hexToBytes(value: String): ByteArray {
+  private fun normalizeMifareBlock(block: Int): Int {
+    if (block < 0 || block > 255) {
+      throw InvalidMifareBlockException("block must be an integer between 0 and 255")
+    }
+
+    return block
+  }
+
+  private fun mifareKeyTypeByte(keyType: String): String {
+    if (keyType == "A") {
+      return "60"
+    }
+
+    if (keyType == "B") {
+      return "61"
+    }
+
+    throw InvalidMifareKeyTypeException()
+  }
+
+  private fun isMifareTrailerBlock(block: Int): Boolean {
+    if (block < 128) {
+      return block % 4 == 3
+    }
+
+    return (block - 143) % 16 == 0
+  }
+
+  private fun normalizeSizedHexString(value: String, name: String, byteLength: Int): String {
+    val bytes = hexToBytes(value, name)
+
+    if (bytes.size != byteLength) {
+      throw InvalidHexStringException("$name must be $byteLength bytes (${byteLength * 2} hex characters)")
+    }
+
+    return bytesToHex(bytes)
+  }
+
+  private fun byteHex(value: Int): String {
+    return "%02X".format(value and 0xFF)
+  }
+
+  private fun hexToBytes(value: String, name: String = "apdu"): ByteArray {
     if (value.length % 2 != 0 || !value.all { it in '0'..'9' || it in 'a'..'f' || it in 'A'..'F' }) {
-      throw InvalidHexStringException()
+      throw InvalidHexStringException("$name must contain only hex characters and have an even number of characters")
     }
 
     return value.chunked(2).map { byte ->
@@ -633,6 +744,42 @@ private class ScanReadersOptions : Record {
   var timeoutMs: Double? = null
 }
 
+private class AuthenticateBlockOptions : Record {
+  @Field
+  var readerId: String = ""
+
+  @Field
+  var block: Int = -1
+
+  @Field
+  var keyType: String = ""
+
+  @Field
+  var key: String = ""
+}
+
+private class ReadBlockOptions : Record {
+  @Field
+  var readerId: String = ""
+
+  @Field
+  var block: Int = -1
+}
+
+private class WriteBlockOptions : Record {
+  @Field
+  var readerId: String = ""
+
+  @Field
+  var block: Int = -1
+
+  @Field
+  var data: String = ""
+
+  @Field
+  var allowTrailerWrite: Boolean? = null
+}
+
 private class ReaderPermissionMissingException : CodedException(
   "READER_PERMISSION_MISSING",
   "Required Reader Bluetooth permissions are missing from the Android manifest",
@@ -651,9 +798,21 @@ private class InvalidScanTimeoutException : CodedException(
   null
 )
 
-private class InvalidHexStringException : CodedException(
+private class InvalidHexStringException(message: String = "apdu must contain only hex characters and have an even number of characters") : CodedException(
   "INVALID_HEX_STRING",
-  "apdu must contain only hex characters and have an even number of characters",
+  message,
+  null
+)
+
+private class InvalidMifareBlockException(message: String) : CodedException(
+  "INVALID_MIFARE_BLOCK",
+  message,
+  null
+)
+
+private class InvalidMifareKeyTypeException : CodedException(
+  "INVALID_MIFARE_KEY_TYPE",
+  "keyType must be A or B",
   null
 )
 
