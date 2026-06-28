@@ -33,6 +33,7 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
   private var discoveredReaders: [[String: Any]] = []
   private var knownTerminals: [String: any CardTerminal] = [:]
   private var activeReader: (id: String, terminal: any CardTerminal)?
+  private var activeCard: (any Card)?
   private var cardMonitorThread: Thread?
   private var cardMonitorGeneration = 0
   private let readerStateLock = NSLock()
@@ -310,6 +311,7 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
     }
 
     try withTerminalLock {
+      disconnectActiveCard()
       try scanManager.disconnect(terminal: terminal)
     }
     stopCardMonitor()
@@ -369,17 +371,28 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
     let terminal = try activeTerminal(readerId: readerId)
 
     return try withTerminalLock {
-      let card = try terminal.connect(protocolString: "*")
-      defer {
-        try? card.disconnect(reset: false)
+      do {
+        let card = try activeCard ?? terminal.connect(protocolString: "*")
+        activeCard = card
+        let channel = try card.basicChannel()
+        let commandApdu = try CommandAPDU(apdu: hexBytes(apdu))
+        let responseApdu = try channel.transmit(apdu: commandApdu)
+
+        return hexString(responseApdu.bytes)
+      } catch {
+        disconnectActiveCard()
+        throw error
       }
-
-      let channel = try card.basicChannel()
-      let commandApdu = try CommandAPDU(apdu: hexBytes(apdu))
-      let responseApdu = try channel.transmit(apdu: commandApdu)
-
-      return hexString(responseApdu.bytes)
     }
+  }
+
+  private func disconnectActiveCard() {
+    guard let card = activeCard else {
+      return
+    }
+
+    activeCard = nil
+    try? card.disconnect(reset: false)
   }
 
   private func activeTerminal(readerId: String) throws -> any CardTerminal {
@@ -448,6 +461,9 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
           continue
         }
 
+        withTerminalLock {
+          disconnectActiveCard()
+        }
         sendCardEvent(cardRemovedEvent, readerId: readerId, generation: generation)
       }
 

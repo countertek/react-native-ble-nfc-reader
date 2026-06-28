@@ -46,6 +46,7 @@ class ReactNativeBleNfcReaderModule : Module() {
   private var activeReaderId: String? = null
   private var activeReaderTerminal: CardTerminal? = null
   private var activeReaderManager: BluetoothTerminalManager? = null
+  private var activeCard: Card? = null
   private var cardMonitorThread: Thread? = null
   private var cardMonitorGeneration = 0
   private var scanPromise: Promise? = null
@@ -371,6 +372,7 @@ class ReactNativeBleNfcReaderModule : Module() {
     }
 
     synchronized(terminalIoLock) {
+      disconnectActiveCardLocked()
       activeConnection.first.disconnect(activeConnection.second)
     }
 
@@ -438,16 +440,23 @@ class ReactNativeBleNfcReaderModule : Module() {
     val terminal = activeTerminal(readerId)
 
     synchronized(terminalIoLock) {
-      val card = terminal.connect("*")
-
       try {
+        val card = activeCard ?: terminal.connect("*").also { activeCard = it }
         return block(card)
-      } finally {
-        try {
-          card.disconnect(false)
-        } catch (_: CardException) {
-        }
+      } catch (error: CardException) {
+        disconnectActiveCardLocked()
+        throw error
       }
+    }
+  }
+
+  private fun disconnectActiveCardLocked() {
+    val card = activeCard ?: return
+    activeCard = null
+
+    try {
+      card.disconnect(false)
+    } catch (_: CardException) {
     }
   }
 
@@ -488,6 +497,9 @@ class ReactNativeBleNfcReaderModule : Module() {
             continue
           }
 
+          synchronized(terminalIoLock) {
+            disconnectActiveCardLocked()
+          }
           sendCardEvent(CARD_REMOVED_EVENT, readerId, generation)
         }
 
