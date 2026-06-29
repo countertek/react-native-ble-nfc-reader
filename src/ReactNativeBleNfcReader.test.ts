@@ -17,6 +17,10 @@ import {
 import { BleNfcReaderError } from './ReactNativeBleNfcReader.types';
 import webModule from './ReactNativeBleNfcReaderModule.web';
 
+jest.mock('react-native', () => ({
+  Platform: { OS: 'ios' },
+}));
+
 jest.mock('expo', () => {
   const nativeModule = {};
 
@@ -28,9 +32,11 @@ jest.mock('expo', () => {
   };
 });
 
+const mockPlatform = jest.requireMock('react-native').Platform as { OS: string };
 const mockNativeModule = jest.requireMock('expo').__mockNativeModule as Record<string, jest.Mock>;
 
 beforeEach(() => {
+  mockPlatform.OS = 'ios';
   Object.keys(mockNativeModule).forEach((key) => {
     delete mockNativeModule[key];
   });
@@ -206,6 +212,75 @@ describe('public native wrappers', () => {
     expect(addCardRemovedListener(listener)).toBe(subscription);
     expect(mockNativeModule.addListener).toHaveBeenCalledWith('onCardPresent', listener);
     expect(mockNativeModule.addListener).toHaveBeenCalledWith('onCardRemoved', listener);
+  });
+
+  it('rejects event listeners on web with unsupported-platform errors', () => {
+    mockPlatform.OS = 'web';
+    const listener = jest.fn();
+
+    expect(() => addReaderDiscoveredListener(listener)).toThrow(
+      expect.objectContaining({
+        code: 'UNSUPPORTED_PLATFORM',
+      })
+    );
+    expect(() => addCardPresentListener(listener)).toThrow(
+      expect.objectContaining({
+        code: 'UNSUPPORTED_PLATFORM',
+      })
+    );
+    expect(() => addCardRemovedListener(listener)).toThrow(
+      expect.objectContaining({
+        code: 'UNSUPPORTED_PLATFORM',
+      })
+    );
+  });
+
+  it('maps native validation errors to typed errors', async () => {
+    mockNativeModule.readBlock = jest.fn(async () => {
+      const error = new Error('block must be an integer between 0 and 255');
+      Object.assign(error, { code: 'INVALID_MIFARE_BLOCK' });
+      throw error;
+    });
+
+    await expect(mifare.readBlock({ readerId: 'reader-1', block: 4 })).rejects.toEqual(
+      expect.objectContaining({
+        code: 'INVALID_MIFARE_BLOCK',
+      })
+    );
+    await expect(mifare.readBlock({ readerId: 'reader-1', block: 4 })).rejects.toBeInstanceOf(
+      BleNfcReaderError
+    );
+
+    mockNativeModule.authenticateBlock = jest.fn(async () => {
+      const error = new Error('keyType must be A or B');
+      Object.assign(error, { code: 'INVALID_MIFARE_KEY_TYPE' });
+      throw error;
+    });
+
+    await expect(
+      mifare.authenticateBlock({
+        readerId: 'reader-1',
+        block: 4,
+        keyType: 'A',
+        key: 'FFFFFFFFFFFF',
+      })
+    ).rejects.toEqual(
+      expect.objectContaining({
+        code: 'INVALID_MIFARE_KEY_TYPE',
+      })
+    );
+
+    mockNativeModule.transmit = jest.fn(async () => {
+      const error = new Error('apdu must contain only hex characters');
+      Object.assign(error, { code: 'INVALID_HEX_STRING' });
+      throw error;
+    });
+
+    await expect(transmit('reader-1', '00a4')).rejects.toEqual(
+      expect.objectContaining({
+        code: 'INVALID_HEX_STRING',
+      })
+    );
   });
 
   it('maps native card command failures to typed errors', async () => {
@@ -416,6 +491,18 @@ describe('web module', () => {
       expect.objectContaining({
         code: 'UNSUPPORTED_PLATFORM',
       })
+    );
+  });
+
+  it('fails all public async entrypoints with unsupported-platform rejections', async () => {
+    await expect(webModule.getReaderPermissionStatus()).rejects.toEqual(
+      expect.objectContaining({ code: 'UNSUPPORTED_PLATFORM' })
+    );
+    await expect(webModule.requestReaderPermissions()).rejects.toEqual(
+      expect.objectContaining({ code: 'UNSUPPORTED_PLATFORM' })
+    );
+    await expect(webModule.connectReader('reader-1')).rejects.toEqual(
+      expect.objectContaining({ code: 'UNSUPPORTED_PLATFORM' })
     );
   });
 });

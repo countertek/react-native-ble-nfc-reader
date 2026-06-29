@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import androidx.core.app.ActivityCompat
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -181,7 +182,17 @@ class ReactNativeBleNfcReaderModule : Module() {
       return "granted"
     }
 
-    return "denied"
+    val activity = appContext.currentActivity
+    if (activity != null) {
+      val previouslyDenied = requiredReaderPermissions().any { permission ->
+        ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)
+      }
+      if (previouslyDenied) {
+        return "denied"
+      }
+    }
+
+    return "undetermined"
   }
 
   private fun requestReaderPermissions(promise: Promise) {
@@ -264,8 +275,9 @@ class ReactNativeBleNfcReaderModule : Module() {
   private fun scanReaders(options: ScanReadersOptions?, promise: Promise) {
     ensureReaderPermissionsDeclared()
 
-    if (!requiredReaderPermissions().all(::isPermissionGranted)) {
-      throw ReaderPermissionDeniedException()
+    when (getReaderPermissionStatus()) {
+      "undetermined" -> throw ReaderPermissionUndeterminedException()
+      "denied" -> throw ReaderPermissionDeniedException()
     }
 
     val timeoutMs = normalizedTimeoutMs(options)
@@ -818,6 +830,12 @@ private class ReaderPermissionMissingException : CodedException(
 private class ReaderPermissionDeniedException : CodedException(
   "READER_PERMISSION_DENIED",
   "Reader Bluetooth permission is denied",
+  null
+)
+
+private class ReaderPermissionUndeterminedException : CodedException(
+  "READER_PERMISSION_UNDETERMINED",
+  "Reader Bluetooth permission has not been requested",
   null
 )
 

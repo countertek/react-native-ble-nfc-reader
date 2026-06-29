@@ -59,8 +59,8 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
       self.pendingPermissionPromises.append(promise)
 
       if self.bluetoothManager == nil {
-        self.bluetoothDelegate = ReaderPermissionDelegate { [weak self] in
-          self?.resolvePendingPermissionPromises()
+        self.bluetoothDelegate = ReaderPermissionDelegate { [weak self] state in
+          self?.resolvePendingPermissionPromises(bluetoothState: state)
         }
         self.bluetoothManager = CBCentralManager(delegate: self.bluetoothDelegate, queue: nil)
       }
@@ -166,11 +166,20 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
     }
   }
 
-  private func resolvePendingPermissionPromises() {
-    let status = readerPermissionStatus()
+  private func resolvePendingPermissionPromises(bluetoothState: CBManagerState? = nil) {
+    var status = readerPermissionStatus()
 
     if status == "undetermined" {
-      return
+      guard let bluetoothState else {
+        return
+      }
+
+      switch bluetoothState {
+      case .poweredOff, .unsupported, .unauthorized:
+        status = "denied"
+      default:
+        return
+      }
     }
 
     let promises = pendingPermissionPromises
@@ -807,13 +816,13 @@ private func cardCommandFailedException(status: String) -> Exception {
 }
 
 private class ReaderPermissionDelegate: NSObject, CBCentralManagerDelegate {
-  private let onAuthorizationChanged: () -> Void
+  private let onAuthorizationChanged: (CBManagerState) -> Void
 
-  init(onAuthorizationChanged: @escaping () -> Void) {
+  init(onAuthorizationChanged: @escaping (CBManagerState) -> Void) {
     self.onAuthorizationChanged = onAuthorizationChanged
   }
 
   func centralManagerDidUpdateState(_ central: CBCentralManager) {
-    onAuthorizationChanged()
+    onAuthorizationChanged(central.state)
   }
 }
