@@ -1,12 +1,28 @@
 # react-native-ble-nfc-reader
 
-Expo native module for ACS BLE NFC readers.
+Expo native module for ACS BLE NFC Readers.
+
+## Installation
+
+Install the package from npm:
+
+```sh
+npm install react-native-ble-nfc-reader
+```
+
+npm is the primary install path for native React Native and Expo apps. JSR is
+secondary and, if used, is only for TypeScript API, types, and docs.
 
 ## Requirements
 
 - Android 6.0+ (API 23+)
 - iOS 15.0+
-- Native development build or prebuilt app; Expo Go is not supported.
+- Native development build or prebuilt app; Expo Go and web are not supported.
+- ACS BLE Reader supported by the bundled ACS SDK binaries.
+- MIFARE Classic Card for the MIFARE Classic helpers.
+
+This package contains native Android and iOS code. After installing it, build a
+native development build or run prebuild before using the module.
 
 Add the config plugin to your app config:
 
