@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name           = 'ReactNativeBleNfcReader'
-  s.version        = '1.0.0'
+  s.version        = '0.1.0'
   s.summary        = 'React Native BLE NFC reader'
   s.description    = 'Expo native module for ACS BLE NFC readers'
   s.author         = 'countertek'

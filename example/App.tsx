@@ -54,6 +54,11 @@ export default function App() {
   }
 
   async function scanForReaders() {
+    if (permissionStatus !== 'granted') {
+      setMessage('Reader permission is required before scanning. Use Request Reader Permission first.');
+      return;
+    }
+
     try {
       setScanning(true);
       setReaders([]);
@@ -300,6 +305,11 @@ export default function App() {
           onPress={scanForReaders}
           disabled={permissionStatus !== 'granted' || scanning || connectedReader !== null}
         />
+        {permissionStatus !== 'granted' && permissionStatus !== 'loading' && (
+          <Text style={styles.reader}>
+            Reader permission is required before scanning. Use Request Reader Permission first.
+          </Text>
+        )}
         <Button title="Stop Scan" onPress={stopScan} disabled={!scanning} />
 
         <Text style={styles.step}>3. Connect Reader</Text>
