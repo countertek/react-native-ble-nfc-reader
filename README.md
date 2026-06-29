@@ -25,13 +25,21 @@ The plugin adds Android BLE permissions and iOS Bluetooth usage descriptions.
 Use `getReaderPermissionStatus()` before scanning and `requestReaderPermissions()`
 when the app needs to prompt. Android reports missing runtime Bluetooth/location
 permission as `denied` even before the first request; call
-`requestReaderPermissions()` to ask for access.
+`requestReaderPermissions()` to ask for access. On iOS, calling `scanReaders()`
+before Bluetooth permission has been requested rejects with
+`READER_PERMISSION_UNDETERMINED`; check status and request Reader permission
+before scanning. `READER_PERMISSION_DENIED` means runtime access was denied,
+while `READER_PERMISSION_MISSING` means the native permission declaration is
+missing.
 
 ## Reader scanning
 
 Use `scanReaders({ timeoutMs })` for bounded scans and
 `addReaderDiscoveredListener()` to receive Readers during the scan window. Call
-`stopReaderScan()` to end the active scan early.
+`stopReaderScan()` to end the active scan early. Starting a new `scanReaders()`
+while one is active supersedes the prior bounded scan: the prior promise resolves
+with partial Reader results collected so far, and discovery events for that scan
+stop once it ends.
 
 ## Reader connection
 

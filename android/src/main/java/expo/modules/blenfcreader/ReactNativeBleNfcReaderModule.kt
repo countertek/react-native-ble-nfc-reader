@@ -230,9 +230,7 @@ class ReactNativeBleNfcReaderModule : Module() {
   }
 
   private fun ensureReaderPermissionsDeclared() {
-    val declaredPermissions = context()
-      .packageManager
-      .getPackageInfo(context().packageName, PackageManager.GET_PERMISSIONS)
+    val declaredPermissions = packageInfoWithPermissions()
       .requestedPermissions
       ?.toSet()
       ?: emptySet()
@@ -245,6 +243,19 @@ class ReactNativeBleNfcReaderModule : Module() {
       throw ReaderPermissionMissingException()
     }
   }
+
+  private fun packageInfoWithPermissions() =
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      val context = context()
+      context.packageManager.getPackageInfo(
+        context.packageName,
+        PackageManager.PackageInfoFlags.of(PackageManager.GET_PERMISSIONS.toLong())
+      )
+    } else {
+      val context = context()
+      @Suppress("DEPRECATION")
+      context.packageManager.getPackageInfo(context.packageName, PackageManager.GET_PERMISSIONS)
+    }
 
   private fun context(): Context {
     return appContext.reactContext ?: throw ReaderPermissionMissingException()
@@ -294,6 +305,10 @@ class ReactNativeBleNfcReaderModule : Module() {
   }
 
   private fun startCurrentScanType() {
+    if (scanPromise == null) {
+      return
+    }
+
     val manager = activeScanManager ?: return
 
     manager.stopScan()
