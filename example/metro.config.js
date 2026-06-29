@@ -2,28 +2,35 @@
 const { getDefaultConfig } = require('expo/metro-config');
 const path = require('path');
 
-const config = getDefaultConfig(__dirname);
+const projectRoot = __dirname;
+const workspaceRoot = path.resolve(projectRoot, '..');
+const parentNodeModules = path.resolve(workspaceRoot, 'node_modules').replace(/\\/g, '\\\\');
 
-// npm v7+ will install ../node_modules/react and ../node_modules/react-native because of peerDependencies.
-// To prevent the incompatible react-native between ./node_modules/react-native and ../node_modules/react-native,
-// excludes the one from the parent folder when bundling.
+const config = getDefaultConfig(projectRoot);
+
+// Never resolve JS dependencies from the library root's node_modules. That tree
+// pins react-native@0.82 for package tests while the example uses Expo 56 / RN 0.85.
 config.resolver.blockList = [
   ...Array.from(config.resolver.blockList ?? []),
-  // On windows the path will resolve with `\`. We need to escape it with `\\` for the RegExp.
-  new RegExp(path.resolve('..', 'node_modules', 'react').replace(/\\/g, '\\\\')),
-  new RegExp(path.resolve('..', 'node_modules', 'react-native').replace(/\\/g, '\\\\')),
+  new RegExp(`${parentNodeModules}(?:/|$)`),
 ];
 
-config.resolver.nodeModulesPaths = [
-  path.resolve(__dirname, './node_modules'),
-  path.resolve(__dirname, '../node_modules'),
-];
+config.resolver.nodeModulesPaths = [path.resolve(projectRoot, 'node_modules')];
 
-config.resolver.extraNodeModules = {
-  'react-native-ble-nfc-reader': '..',
+const forcedModules = ['expo', 'react', 'react-native', '@react-native/virtualized-lists'];
+const extraNodeModules = {
+  'react-native-ble-nfc-reader': workspaceRoot,
 };
 
-config.watchFolders = [path.resolve(__dirname, '..')];
+for (const moduleName of forcedModules) {
+  extraNodeModules[moduleName] = path.dirname(
+    require.resolve(`${moduleName}/package.json`, { paths: [projectRoot] })
+  );
+}
+
+config.resolver.extraNodeModules = extraNodeModules;
+
+config.watchFolders = [workspaceRoot];
 
 config.transformer.getTransformOptions = async () => ({
   transform: {

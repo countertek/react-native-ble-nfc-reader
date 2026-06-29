@@ -282,7 +282,12 @@ export default function App() {
   }, [connectedReader?.id]);
 
   return (
-    <ScrollView contentContainerStyle={styles.container} contentInsetAdjustmentBehavior="automatic">
+    <ScrollView
+      style={styles.scroll}
+      contentContainerStyle={styles.container}
+      contentInsetAdjustmentBehavior="automatic"
+      keyboardShouldPersistTaps="handled"
+    >
       <View style={styles.panel}>
         <Text style={styles.header}>Generic Reader Flow</Text>
 
@@ -462,9 +467,12 @@ function formatError(error: unknown): string {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  scroll: {
     flex: 1,
     backgroundColor: '#f3f4f6',
+  },
+  container: {
+    flexGrow: 1,
     padding: 20,
   },
   panel: {
