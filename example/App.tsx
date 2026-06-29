@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button, SafeAreaView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, Button, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import {
   addCardPresentListener,
   addCardRemovedListener,
@@ -30,6 +30,8 @@ export default function App() {
   const [apduResponse, setApduResponse] = useState('');
   const [mifareBlock, setMifareBlock] = useState('4');
   const [mifareData, setMifareData] = useState('00112233445566778899AABBCCDDEEFF');
+  const [mifareKey, setMifareKey] = useState('');
+  const [mifareKeyType, setMifareKeyType] = useState<'A' | 'B'>('A');
   const [mifareResult, setMifareResult] = useState('');
   const [scanning, setScanning] = useState(false);
 
@@ -128,14 +130,21 @@ export default function App() {
       return;
     }
 
+    const block = parseMifareBlock(mifareBlock);
+
+    if (block === null) {
+      setMessage('Enter a MIFARE data block between 0 and 255.');
+      return;
+    }
+
     try {
       await mifare.authenticateBlock({
         readerId: connectedReader.id,
-        block: Number(mifareBlock),
-        keyType: 'A',
+        block,
+        keyType: mifareKeyType,
         key,
       });
-      setMifareResult(`Authenticated block ${mifareBlock}`);
+      setMifareResult(`Authenticated block ${block} with key ${mifareKeyType}`);
       setMessage('');
     } catch (error) {
       setMessage(formatError(error));
@@ -147,9 +156,16 @@ export default function App() {
       return;
     }
 
+    const block = parseMifareBlock(mifareBlock);
+
+    if (block === null) {
+      setMessage('Enter a MIFARE data block between 0 and 255.');
+      return;
+    }
+
     try {
       setMifareResult(
-        await mifare.readBlock({ readerId: connectedReader.id, block: Number(mifareBlock) })
+        await mifare.readBlock({ readerId: connectedReader.id, block })
       );
       setMessage('');
     } catch (error) {
@@ -157,7 +173,40 @@ export default function App() {
     }
   }
 
-  async function writeMifareBlock() {
+  function confirmWriteMifareBlock() {
+    if (connectedReader === null) {
+      return;
+    }
+
+    const block = parseMifareBlock(mifareBlock);
+
+    if (block === null) {
+      setMessage('Enter a MIFARE data block between 0 and 255.');
+      return;
+    }
+
+    if (isMifareTrailerBlock(block)) {
+      setMessage('Trailer writes are not part of this example flow. Choose a data block.');
+      return;
+    }
+
+    Alert.alert(
+      'Confirm block write',
+      `Write ${mifareData.toUpperCase()} to MIFARE block ${block}?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Write',
+          style: 'destructive',
+          onPress: () => {
+            void writeMifareBlock(block);
+          },
+        },
+      ]
+    );
+  }
+
+  async function writeMifareBlock(block: number) {
     if (connectedReader === null) {
       return;
     }
@@ -165,11 +214,11 @@ export default function App() {
     try {
       await mifare.writeBlock({
         readerId: connectedReader.id,
-        block: Number(mifareBlock),
+        block,
         data: mifareData,
       });
       setMifareResult(
-        await mifare.readBlock({ readerId: connectedReader.id, block: Number(mifareBlock) })
+        await mifare.readBlock({ readerId: connectedReader.id, block })
       );
       setMessage('');
     } catch (error) {
@@ -228,21 +277,32 @@ export default function App() {
   }, [connectedReader?.id]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container} contentInsetAdjustmentBehavior="automatic">
       <View style={styles.panel}>
-        <Text style={styles.header}>Reader Permission</Text>
+        <Text style={styles.header}>Generic Reader Flow</Text>
+
+        <Text style={styles.step}>1. Reader Permission</Text>
         <Text style={styles.status}>Status: {permissionStatus}</Text>
+        <Button
+          title="Check Reader Permission"
+          onPress={refreshPermissionStatus}
+          disabled={permissionStatus === 'loading'}
+        />
         <Button
           title="Request Reader Permission"
           onPress={requestPermissions}
           disabled={permissionStatus === 'loading'}
         />
+
+        <Text style={styles.step}>2. Bounded Reader Scan</Text>
         <Button
-          title="Scan For Readers"
+          title="Scan For Readers (5 seconds)"
           onPress={scanForReaders}
           disabled={permissionStatus !== 'granted' || scanning || connectedReader !== null}
         />
         <Button title="Stop Scan" onPress={stopScan} disabled={!scanning} />
+
+        <Text style={styles.step}>3. Connect Reader</Text>
         {readers.map((reader) => {
           const connected = connectedReader?.id === reader.id;
 
@@ -263,11 +323,15 @@ export default function App() {
               Connected: {connectedReader.name ?? connectedReader.id}
             </Text>
             <Text style={styles.reader}>{formatMetadata(connectedReader)}</Text>
+
+            <Text style={styles.step}>4. Place Card</Text>
             <Text style={styles.status}>Card: {cardPresent ? 'present' : 'removed'}</Text>
             <Button title="Read Card UID" onPress={readUid} />
             <Button title="Transmit UID APDU" onPress={transmitUidApdu} />
             {cardUid ? <Text style={styles.reader}>UID: {cardUid}</Text> : null}
             {apduResponse ? <Text style={styles.reader}>{apduResponse}</Text> : null}
+
+            <Text style={styles.step}>5. Authenticate MIFARE Classic Card</Text>
             <TextInput
               style={styles.input}
               value={mifareBlock}
@@ -275,16 +339,34 @@ export default function App() {
               keyboardType="number-pad"
               placeholder="MIFARE block"
             />
+            <Text style={styles.reader}>Key Type: {mifareKeyType}</Text>
+            <View style={styles.keyTypeRow}>
+              <Button
+                title="Use Key A"
+                onPress={() => setMifareKeyType('A')}
+                disabled={mifareKeyType === 'A'}
+              />
+              <Button
+                title="Use Key B"
+                onPress={() => setMifareKeyType('B')}
+                disabled={mifareKeyType === 'B'}
+              />
+            </View>
             <TextInput
               style={styles.input}
+              value={mifareKey}
+              onChangeText={setMifareKey}
               autoCapitalize="characters"
               autoCorrect={false}
               secureTextEntry
-              placeholder="Submit key A hex to authenticate"
-              returnKeyType="send"
-              onSubmitEditing={(event) => authenticateMifare(event.nativeEvent.text)}
+              placeholder="MIFARE key hex"
             />
+            <Button title="Authenticate Block" onPress={() => authenticateMifare(mifareKey)} />
+
+            <Text style={styles.step}>6. Read One Block</Text>
             <Button title="Read MIFARE Block" onPress={readMifareBlock} />
+
+            <Text style={styles.step}>7. Confirm One Block Write</Text>
             <TextInput
               style={styles.input}
               value={mifareData}
@@ -293,15 +375,39 @@ export default function App() {
               autoCorrect={false}
               placeholder="16-byte block data hex"
             />
-            <Button title="Write MIFARE Block And Read Back" onPress={writeMifareBlock} />
+            <Button title="Confirm Write And Read Back" onPress={confirmWriteMifareBlock} />
             {mifareResult ? <Text style={styles.reader}>MIFARE: {mifareResult}</Text> : null}
+
+            <Text style={styles.step}>8. Disconnect</Text>
             <Button title="Disconnect Reader" onPress={disconnectCurrentReader} />
           </View>
         ) : null}
         {message ? <Text style={styles.error}>{message}</Text> : null}
       </View>
-    </SafeAreaView>
+    </ScrollView>
   );
+}
+
+function parseMifareBlock(value: string): number | null {
+  if (!/^\d+$/.test(value)) {
+    return null;
+  }
+
+  const block = Number(value);
+
+  if (!Number.isInteger(block) || block < 0 || block > 255) {
+    return null;
+  }
+
+  return block;
+}
+
+function isMifareTrailerBlock(block: number): boolean {
+  if (block < 128) {
+    return block % 4 === 3;
+  }
+
+  return (block - 143) % 16 === 0;
 }
 
 function formatMetadata(reader: Reader): string {
@@ -361,6 +467,10 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '600',
   },
+  step: {
+    fontSize: 18,
+    fontWeight: '600',
+  },
   status: {
     fontSize: 16,
   },
@@ -371,6 +481,10 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   connectedReader: {
+    gap: 8,
+  },
+  keyTypeRow: {
+    flexDirection: 'row',
     gap: 8,
   },
   input: {
