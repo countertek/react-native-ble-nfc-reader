@@ -55,6 +55,7 @@ class ReactNativeBleNfcReaderModule : Module() {
   private var scanTypeRunnable: Runnable? = null
   private var scanTypeIndex = 0
   private var scanTypeDelayMs = 1000L
+  private var readerPermissionsRequested = false
 
   override fun definition() = ModuleDefinition {
     Name("ReactNativeBleNfcReader")
@@ -182,17 +183,20 @@ class ReactNativeBleNfcReaderModule : Module() {
       return "granted"
     }
 
-    val activity = appContext.currentActivity
-    if (activity != null) {
-      val previouslyDenied = requiredReaderPermissions().any { permission ->
-        ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)
+    if (!readerPermissionsRequested) {
+      val activity = appContext.currentActivity
+      if (activity != null) {
+        val previouslyDenied = requiredReaderPermissions().any { permission ->
+          ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)
+        }
+        if (previouslyDenied) {
+          return "denied"
+        }
       }
-      if (previouslyDenied) {
-        return "denied"
-      }
+      return "undetermined"
     }
 
-    return "undetermined"
+    return "denied"
   }
 
   private fun requestReaderPermissions(promise: Promise) {
@@ -212,6 +216,7 @@ class ReactNativeBleNfcReaderModule : Module() {
 
     permissions.askForPermissions(
       { response ->
+        readerPermissionsRequested = true
         val granted = permissionsToRequest.all { permission ->
           response[permission]?.status == PermissionsStatus.GRANTED || isPermissionGranted(permission)
         }

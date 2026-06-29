@@ -175,7 +175,9 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
       }
 
       switch bluetoothState {
-      case .poweredOff, .unsupported, .unauthorized:
+      case .poweredOff, .unsupported:
+        status = "undetermined"
+      case .unauthorized:
         status = "denied"
       default:
         return
