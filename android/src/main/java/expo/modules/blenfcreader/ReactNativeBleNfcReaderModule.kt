@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import androidx.core.app.ActivityCompat
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -54,6 +55,7 @@ class ReactNativeBleNfcReaderModule : Module() {
   private var scanTypeRunnable: Runnable? = null
   private var scanTypeIndex = 0
   private var scanTypeDelayMs = 1000L
+  private var readerPermissionsRequested = false
 
   override fun definition() = ModuleDefinition {
     Name("ReactNativeBleNfcReader")
@@ -181,6 +183,19 @@ class ReactNativeBleNfcReaderModule : Module() {
       return "granted"
     }
 
+    if (!readerPermissionsRequested) {
+      val activity = appContext.currentActivity
+      if (activity != null) {
+        val previouslyDenied = requiredReaderPermissions().any { permission ->
+          ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)
+        }
+        if (previouslyDenied) {
+          return "denied"
+        }
+      }
+      return "undetermined"
+    }
+
     return "denied"
   }
 
@@ -201,6 +216,7 @@ class ReactNativeBleNfcReaderModule : Module() {
 
     permissions.askForPermissions(
       { response ->
+        readerPermissionsRequested = true
         val granted = permissionsToRequest.all { permission ->
           response[permission]?.status == PermissionsStatus.GRANTED || isPermissionGranted(permission)
         }
@@ -264,8 +280,9 @@ class ReactNativeBleNfcReaderModule : Module() {
   private fun scanReaders(options: ScanReadersOptions?, promise: Promise) {
     ensureReaderPermissionsDeclared()
 
-    if (!requiredReaderPermissions().all(::isPermissionGranted)) {
-      throw ReaderPermissionDeniedException()
+    when (getReaderPermissionStatus()) {
+      "undetermined" -> throw ReaderPermissionUndeterminedException()
+      "denied" -> throw ReaderPermissionDeniedException()
     }
 
     val timeoutMs = normalizedTimeoutMs(options)
@@ -818,6 +835,12 @@ private class ReaderPermissionMissingException : CodedException(
 private class ReaderPermissionDeniedException : CodedException(
   "READER_PERMISSION_DENIED",
   "Reader Bluetooth permission is denied",
+  null
+)
+
+private class ReaderPermissionUndeterminedException : CodedException(
+  "READER_PERMISSION_UNDETERMINED",
+  "Reader Bluetooth permission has not been requested",
   null
 )
 

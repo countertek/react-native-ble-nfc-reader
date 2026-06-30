@@ -4,11 +4,14 @@
   "main": "index.ts",
   "dependencies": {
     "expo": "~56.0.12",
+    "expo-dev-client": "^56.0.20",
     "react": "19.2.3",
-    "react-native": "0.85.3"
+    "react-native": "0.85.3",
+    "react-native-ble-nfc-reader": "file:.."
   },
   "devDependencies": {
     "@types/react": "~19.2.2",
+    "babel-preset-expo": "~56.0.15",
     "typescript": "~6.0.3"
   },
   "scripts": {

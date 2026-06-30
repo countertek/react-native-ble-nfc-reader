@@ -2,10 +2,12 @@
   "expo": {
     "name": "react-native-ble-nfc-reader-example",
     "slug": "react-native-ble-nfc-reader-example",
+    "scheme": "blenfcreaderexample",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "plugins": ["react-native-ble-nfc-reader"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "expo.modules.blenfcreader.example"

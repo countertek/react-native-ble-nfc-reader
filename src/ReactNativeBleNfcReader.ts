@@ -1,7 +1,10 @@
+import { Platform } from 'react-native';
+
 import {
   ApduResponse,
   AuthenticateBlockOptions,
   BleNfcReaderError,
+  createUnsupportedPlatformError,
   HexString,
   Reader,
   ReaderCardEvent,
@@ -127,6 +130,18 @@ function normalizeNativeError(error: unknown): unknown {
     return new BleNfcReaderError('CARD_COMMAND_FAILED', message, extractApduStatus(message));
   }
 
+  if (error.code === 'INVALID_HEX_STRING') {
+    return new BleNfcReaderError('INVALID_HEX_STRING', getErrorMessage(error));
+  }
+
+  if (error.code === 'INVALID_MIFARE_BLOCK') {
+    return new BleNfcReaderError('INVALID_MIFARE_BLOCK', getErrorMessage(error));
+  }
+
+  if (error.code === 'INVALID_MIFARE_KEY_TYPE') {
+    return new BleNfcReaderError('INVALID_MIFARE_KEY_TYPE', getErrorMessage(error));
+  }
+
   return error;
 }
 
@@ -240,6 +255,10 @@ export function addCardRemovedListener(
 }
 
 function assertNativeListenerAvailable(): void {
+  if (Platform.OS === 'web') {
+    throw createUnsupportedPlatformError();
+  }
+
   if (typeof nativeModule.addListener !== 'function') {
     throw new BleNfcReaderError(
       'NATIVE_METHOD_UNAVAILABLE',
