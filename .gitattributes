@@ -1,0 +1,6 @@
+# Keep GitHub language stats on the shipped module code.
+docs/** linguist-documentation
+example/** linguist-vendored
+internal/** linguist-vendored
+ios/Frameworks/** linguist-vendored
+android/libs/** linguist-vendored
