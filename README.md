@@ -1,5 +1,7 @@
 # react-native-ble-nfc-reader
 
+[![npm version](https://img.shields.io/npm/v/@countertek/react-native-ble-nfc-reader)](https://www.npmjs.com/package/@countertek/react-native-ble-nfc-reader)
+
 Expo native module for ACS BLE NFC Readers — scan for a Reader, connect over Bluetooth, read card UIDs, send raw APDUs, and work with MIFARE Classic Cards.
 
 > [!IMPORTANT]
