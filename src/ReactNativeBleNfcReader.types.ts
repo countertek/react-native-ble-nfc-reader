@@ -94,6 +94,6 @@ export class BleNfcReaderError extends Error {
 export function createUnsupportedPlatformError(): BleNfcReaderError {
   return new BleNfcReaderError(
     'UNSUPPORTED_PLATFORM',
-    'react-native-ble-nfc-reader requires a native development build on iOS or Android'
+    '@countertek/react-native-ble-nfc-reader requires a native development build on iOS or Android'
   );
 }

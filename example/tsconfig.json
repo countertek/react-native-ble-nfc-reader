@@ -3,8 +3,8 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "react-native-ble-nfc-reader": ["../src/index"],
-      "react-native-ble-nfc-reader/*": ["../src/*"]
+      "@countertek/react-native-ble-nfc-reader": ["../src/index"],
+      "@countertek/react-native-ble-nfc-reader/*": ["../src/*"]
     }
   }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "react-native-ble-nfc-reader",
+  "name": "@countertek/react-native-ble-nfc-reader",
   "version": "0.1.0",
   "description": "Expo native module for ACS BLE NFC Readers",
   "main": "build/index.js",
@@ -19,7 +19,13 @@
     "react-native-ble-nfc-reader",
     "ReactNativeBleNfcReader"
   ],
-  "repository": "https://github.com/countertek/react-native-ble-nfc-reader",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/countertek/react-native-ble-nfc-reader.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "bugs": {
     "url": "https://github.com/countertek/react-native-ble-nfc-reader/issues"
   },

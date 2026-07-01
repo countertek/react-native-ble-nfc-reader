@@ -7,18 +7,31 @@ Expo native module for ACS BLE NFC Readers — scan for a Reader, connect over B
 
 ## Installation
 
-Install from [npmjs.com](https://www.npmjs.com/package/react-native-ble-nfc-reader):
+Install the package from [npmjs.com](https://www.npmjs.com/package/@countertek/react-native-ble-nfc-reader):
 
 ```sh
-npm install react-native-ble-nfc-reader
+npm install @countertek/react-native-ble-nfc-reader
 ```
+
+npm is the public distribution path for this native module. See [docs/release.md](docs/release.md) for maintainer release steps.
+
+## Requirements
+
+- Android 6.0+ (API 23+)
+- iOS 15.0+
+- Native development build or prebuilt app; Expo Go and web are not supported.
+- ACS BLE Reader supported by the bundled ACS SDK binaries.
+- MIFARE Classic Card for the MIFARE Classic helpers.
+
+This package contains native Android and iOS code. After installing it, build a
+native development build or run prebuild before using the module.
 
 Add the config plugin to your app config:
 
 ```json
 {
   "expo": {
-    "plugins": ["react-native-ble-nfc-reader"]
+    "plugins": ["@countertek/react-native-ble-nfc-reader"]
   }
 }
 ```
