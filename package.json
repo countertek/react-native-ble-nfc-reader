@@ -19,7 +19,14 @@
     "react-native-ble-nfc-reader",
     "ReactNativeBleNfcReader"
   ],
-  "repository": "https://github.com/countertek/react-native-ble-nfc-reader",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/countertek/react-native-ble-nfc-reader.git"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "bugs": {
     "url": "https://github.com/countertek/react-native-ble-nfc-reader/issues"
   },

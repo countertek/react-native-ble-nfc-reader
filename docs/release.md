@@ -6,7 +6,7 @@ Public releases of `@countertek/react-native-ble-nfc-reader` are published to [n
 npm install @countertek/react-native-ble-nfc-reader
 ```
 
-GitHub Actions automates publishing; npm is the package registry.
+GitHub Actions automates publishing via [npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers/) (OIDC). No long-lived `NPM_TOKEN` is required.
 
 ## Maintainer setup
 
@@ -20,48 +20,82 @@ Before the first automated publish can succeed, a maintainer with publish access
    - **If it does not exist:** create it from [Create an organization](https://www.npmjs.com/org/create). Public orgs that publish only public packages are free.
 3. Confirm your npm user can publish under `@countertek` (org **Owner**, **Admin**, or **Member** with write access to the scope).
 
-**Scoped vs unscoped names:** `@countertek/react-native-ble-nfc-reader` is a separate package name from `react-native-ble-nfc-reader`. The unscoped name is already taken on npm by another project; that does **not** block publishing under the `@countertek` scope. The org owns the `@countertek` namespace; the first successful publish claims `@countertek/react-native-ble-nfc-reader`.
+**Scoped vs unscoped names:** `@countertek/react-native-ble-nfc-reader` is a separate package name from `react-native-ble-nfc-reader`. The unscoped name is already taken on npm by another project; that does **not** block publishing under the `@countertek` scope.
 
-### 2. Create a granular npm access token (for CI)
+### 2. Bootstrap: one-time manual first publish
 
-npm no longer supports legacy Automation/Publish tokens. Use a [granular access token](https://docs.npmjs.com/creating-and-viewing-access-tokens):
+Trusted Publishing can only be configured **after** the package exists on npm. The first publish must be done manually from your machine (interactive `npm login` + 2FA):
 
-1. Open [Access Tokens](https://www.npmjs.com/settings/~/tokens) → **Generate New Token**.
-2. Under **Packages and scopes**, choose **Only select packages and scopes** and grant **Read and write** to the `@countertek` scope (or to `@countertek/react-native-ble-nfc-reader` after the first publish).
-3. Enable **Bypass two-factor authentication** so GitHub Actions can publish without an interactive OTP prompt.
-4. Set a reasonable expiration, generate the token, and copy the value immediately (npm shows the full token only once).
+```sh
+git clone https://github.com/countertek/react-native-ble-nfc-reader.git
+cd react-native-ble-nfc-reader
+pnpm install
+pnpm run build
+npm login
+npm publish --access public
+```
 
-**Important:** granting an org token **Read and write** under **Organizations** only manages org settings and teams—it does **not** authorize package publishes. Publish rights come from **Packages and scopes**.
+This creates `@countertek/react-native-ble-nfc-reader` on the registry. You only do this once; all later releases use GitHub Actions + OIDC.
 
-### 3. Add the `NPM_TOKEN` GitHub Actions secret
+**Do not** create a granular access token with **Bypass 2FA** for CI. npm shows a security warning for that option and recommends Trusted Publishing instead.
 
-1. In this GitHub repository, open [Settings → Secrets and variables → Actions](https://github.com/countertek/react-native-ble-nfc-reader/settings/secrets/actions).
-2. Create a repository secret named `NPM_TOKEN` with the granular token value.
+### 3. Configure Trusted Publishing on npm
 
-The [Release workflow](../.github/workflows/release.yml) passes it as `NODE_AUTH_TOKEN` to `npm publish --provenance --access public`.
+After the first manual publish:
 
-### 4. First publish considerations
+1. Open package settings: [Trusted publishing for `@countertek/react-native-ble-nfc-reader`](https://www.npmjs.com/package/@countertek/react-native-ble-nfc-reader/access).
+2. Under **Trusted Publisher**, choose **GitHub Actions**.
+3. Enter these values exactly (case-sensitive):
 
-- Scoped packages are **private by default** on npm. This workflow passes `--access public` so the first publish is public.
-- The first successful `npm publish` creates `@countertek/react-native-ble-nfc-reader` on npm under the org (currently unclaimed).
-- After merging release automation, cut a GitHub Release to verify the workflow end-to-end.
+| Field | Value |
+| --- | --- |
+| Organization or user | `countertek` |
+| Repository | `react-native-ble-nfc-reader` |
+| Workflow filename | `release.yml` |
+| Environment name | *(leave blank)* |
+
+4. Under **Allowed actions**, enable **`npm publish`**.
+5. Save the configuration.
+
+npm does not validate these fields until the first CI publish. Double-check the workflow filename matches [`.github/workflows/release.yml`](../.github/workflows/release.yml).
+
+### 4. Verify the Release workflow
+
+The [Release workflow](../.github/workflows/release.yml) is already configured for OIDC:
+
+- `permissions.id-token: write` — lets GitHub issue short-lived OIDC credentials
+- Node 24 + latest npm CLI (requires npm 11.5.1+)
+- `npm publish --access public` with **no** `NODE_AUTH_TOKEN`
+
+Merge [PR #38](https://github.com/countertek/react-native-ble-nfc-reader/pull/38) (or ensure equivalent workflow is on `main`), then cut a GitHub Release to verify end-to-end.
+
+### 5. Harden publishing access (recommended after OIDC works)
+
+Once Trusted Publishing succeeds from CI:
+
+1. Open [package publishing access](https://www.npmjs.com/package/@countertek/react-native-ble-nfc-reader/access).
+2. Set **Publishing access** to **Require two-factor authentication and disallow tokens**.
+3. Revoke any automation tokens you created during setup.
+
+Trusted publishers keep working; only long-lived write tokens are blocked.
 
 ### Troubleshooting
 
 | Symptom | Likely cause | Fix |
 | --- | --- | --- |
-| `403 Forbidden` on publish | Token lacks **Read and write** on `@countertek` scope/package, or user lacks org publish rights | Regenerate token with correct **Packages and scopes** permissions; confirm org membership |
-| `403` / OTP required | 2FA enabled, token missing **Bypass 2FA** | Regenerate token with **Bypass two-factor authentication** checked |
-| `402 Payment Required` | Scoped publish without `--access public` on a free account | Workflow already uses `--access public`; verify `package.json` `name` is `@countertek/react-native-ble-nfc-reader` |
-| `404` on org settings URL | Org name typo or org not created yet | Verify [npmjs.com/org/countertek](https://www.npmjs.com/org/countertek); create or get invited |
-| Package name mismatch | `package.json` `name` does not match intended scope | Must be exactly `@countertek/react-native-ble-nfc-reader` |
-| `ENEEDAUTH` / missing token | `NPM_TOKEN` secret missing or empty in GitHub | Add or update the repository secret |
+| `ENEEDAUTH` / Unable to authenticate | Trusted publisher not configured, or fields mismatch | Verify org/repo/workflow filename exactly; package must exist on npm first |
+| `403 Forbidden` | User lacks org publish rights | Confirm org membership at [Members](https://www.npmjs.com/settings/countertek/members) |
+| `402 Payment Required` | Scoped publish without public access | Workflow uses `--access public`; verify `publishConfig.access` in `package.json` |
+| OIDC ignored, token errors | `NODE_AUTH_TOKEN` set in workflow | Remove token env vars from the publish step; OIDC is used when no write token is present |
+| Workflow filename mismatch | Configured name differs from file | Must be exactly `release.yml` |
+| Provenance missing | Private GitHub repo | Provenance requires a **public** source repository |
+| `npm publish` uses old auth | npm CLI too old | Workflow upgrades to latest npm; requires npm 11.5.1+ and Node 22.14+ |
 
 ## Publish a release
 
 1. Bump `version` in `package.json` on `main` and merge the change.
 2. Create a GitHub Release from the matching tag (for example `v0.1.1`). Publishing the release triggers the `Release` workflow.
-3. The workflow runs `pnpm run lint`, `pnpm run build`, then `npm publish --provenance --access public`.
+3. The workflow runs `pnpm run lint`, `pnpm run build`, then `npm publish --access public` via OIDC.
 4. Confirm the new version appears on npm and that `npm install @countertek/react-native-ble-nfc-reader@<version>` resolves.
 
 ## Manual verification after publish
