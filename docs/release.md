@@ -37,6 +37,8 @@ npm publish --access public
 
 This creates `@countertek/react-native-ble-nfc-reader` on the registry. You only do this once; all later releases use GitHub Actions + OIDC.
 
+**Note:** Do not set `"provenance": true` in `publishConfig` for the bootstrap publish. Provenance requires a CI OIDC environment (Trusted Publishing). If you see `EUSAGE: Automatic provenance generation not supported for provider: null`, remove provenance from `publishConfig` or run `npm publish --access public --provenance=false`.
+
 **Do not** create a granular access token with **Bypass 2FA** for CI. npm shows a security warning for that option and recommends Trusted Publishing instead.
 
 ### 3. Configure Trusted Publishing on npm
@@ -89,7 +91,7 @@ Trusted publishers keep working; only long-lived write tokens are blocked.
 | OIDC ignored, token errors | `NODE_AUTH_TOKEN` set in workflow | Remove token env vars from the publish step; OIDC is used when no write token is present |
 | Workflow filename mismatch | Configured name differs from file | Must be exactly `release.yml` |
 | Provenance missing | Private GitHub repo | Provenance requires a **public** source repository |
-| `npm publish` uses old auth | npm CLI too old | Workflow upgrades to latest npm; requires npm 11.5.1+ and Node 22.14+ |
+| `EUSAGE` / provenance provider null | `publishConfig.provenance` set during local publish | Remove provenance from `publishConfig`; CI Trusted Publishing generates it automatically |
 
 ## Publish a release
 
