@@ -9,6 +9,7 @@ Closes #
 ## Checks
 
 - [ ] `pnpm run lint` passed locally or in CI
+- [ ] `pnpm run test` passed locally or in CI
 - [ ] `pnpm run build` passed locally or in CI
 
 ## Manual hardware validation
