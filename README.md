@@ -1,6 +1,7 @@
 # react-native-ble-nfc-reader
 
 [![npm version](https://img.shields.io/npm/v/@countertek/react-native-ble-nfc-reader)](https://www.npmjs.com/package/@countertek/react-native-ble-nfc-reader)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/countertek/react-native-ble-nfc-reader)
 
 Expo native module for ACS BLE NFC Readers — scan for a Reader, connect over Bluetooth, read card UIDs, send raw APDUs, and work with MIFARE Classic Cards.
 
@@ -39,6 +40,10 @@ The plugin adds Android BLE permissions and iOS Bluetooth usage descriptions. Re
 | **Cards** | MIFARE Classic Card for the `mifare` helpers |
 
 See the [`example/`](example/) app for a minimal Expo development-build setup.
+
+## Documentation
+
+Detailed guides — installation troubleshooting, Reader lifecycle, card/APDU usage, MIFARE Classic, and release expectations — are on [DeepWiki](https://deepwiki.com/countertek/react-native-ble-nfc-reader). The [docs/deepwiki.md](docs/deepwiki.md) outline in this repo seeds that structure.
 
 ## Reader flow
 
