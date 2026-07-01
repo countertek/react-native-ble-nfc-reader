@@ -7,7 +7,7 @@
     "expo-dev-client": "^56.0.20",
     "react": "19.2.3",
     "react-native": "0.85.3",
-    "react-native-ble-nfc-reader": "file:.."
+    "@countertek/react-native-ble-nfc-reader": "file:.."
   },
   "devDependencies": {
     "@types/react": "~19.2.2",

@@ -19,7 +19,7 @@ config.resolver.nodeModulesPaths = [path.resolve(projectRoot, 'node_modules')];
 
 const forcedModules = ['expo', 'react', 'react-native', '@react-native/virtualized-lists'];
 const extraNodeModules = {
-  'react-native-ble-nfc-reader': workspaceRoot,
+  '@countertek/react-native-ble-nfc-reader': workspaceRoot,
 };
 
 for (const moduleName of forcedModules) {

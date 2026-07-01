@@ -6,7 +6,7 @@ module.exports = async (env, argv) => {
     {
       ...env,
       babel: {
-        dangerouslyAddModulePathsToTranspile: ['react-native-ble-nfc-reader'],
+        dangerouslyAddModulePathsToTranspile: ['@countertek/react-native-ble-nfc-reader'],
       },
     },
     argv

@@ -4,14 +4,13 @@ Expo native module for ACS BLE NFC Readers.
 
 ## Installation
 
-Install the package from npm:
+Install the package from [npmjs.com](https://www.npmjs.com/package/@countertek/react-native-ble-nfc-reader):
 
 ```sh
-npm install react-native-ble-nfc-reader
+npm install @countertek/react-native-ble-nfc-reader
 ```
 
-npm is the primary install path for native React Native and Expo apps. JSR is
-secondary and, if used, is only for TypeScript API, types, and docs.
+npm is the public distribution path for this native module. See [docs/release.md](docs/release.md) for maintainer release steps.
 
 ## Requirements
 
@@ -29,7 +28,7 @@ Add the config plugin to your app config:
 ```json
 {
   "expo": {
-    "plugins": ["react-native-ble-nfc-reader"]
+    "plugins": ["@countertek/react-native-ble-nfc-reader"]
   }
 }
 ```
