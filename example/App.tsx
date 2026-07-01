@@ -16,7 +16,7 @@ import {
   scanReaders,
   stopReaderScan,
   transmit,
-} from 'react-native-ble-nfc-reader';
+} from '@countertek/react-native-ble-nfc-reader';
 
 type PermissionState = ReaderPermissionStatus | 'loading';
 
