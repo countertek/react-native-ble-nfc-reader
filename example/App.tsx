@@ -14,18 +14,22 @@ import {
   requestReaderPermissions,
   ReaderPermissionStatus,
   scanReaders,
+  startCardMonitor,
   stopReaderScan,
+  stopCardMonitor,
   transmit,
 } from '@countertek/react-native-ble-nfc-reader';
 
 type PermissionState = ReaderPermissionStatus | 'loading';
+type CardPresence = 'unknown' | 'present' | 'removed';
 
 export default function App() {
   const [permissionStatus, setPermissionStatus] = useState<PermissionState>('loading');
   const [message, setMessage] = useState('');
   const [readers, setReaders] = useState<Reader[]>([]);
   const [connectedReader, setConnectedReader] = useState<Reader | null>(null);
-  const [cardPresent, setCardPresent] = useState(false);
+  const [cardPresence, setCardPresence] = useState<CardPresence>('unknown');
+  const [cardMonitorRunning, setCardMonitorRunning] = useState(false);
   const [cardUid, setCardUid] = useState('');
   const [apduResponse, setApduResponse] = useState('');
   const [mifareBlock, setMifareBlock] = useState('4');
@@ -55,7 +59,9 @@ export default function App() {
 
   async function scanForReaders() {
     if (permissionStatus !== 'granted') {
-      setMessage('Reader permission is required before scanning. Use Request Reader Permission first.');
+      setMessage(
+        'Reader permission is required before scanning. Use Request Reader Permission first.'
+      );
       return;
     }
 
@@ -63,6 +69,8 @@ export default function App() {
       setScanning(true);
       setReaders([]);
       setConnectedReader(null);
+      setCardMonitorRunning(false);
+      setCardPresence('unknown');
       setReaders(await scanReaders({ timeoutMs: 5000 }));
       setMessage('');
     } catch (error) {
@@ -75,10 +83,40 @@ export default function App() {
   async function connectToReader(readerId: string) {
     try {
       setConnectedReader(await connectReader(readerId));
-      setCardPresent(false);
+      setCardMonitorRunning(false);
+      setCardPresence('unknown');
       setCardUid('');
       setApduResponse('');
       setMifareResult('');
+      setMessage('');
+    } catch (error) {
+      setMessage(formatError(error));
+    }
+  }
+
+  async function startMonitor() {
+    if (connectedReader === null) {
+      return;
+    }
+
+    try {
+      await startCardMonitor(connectedReader.id);
+      setCardMonitorRunning(true);
+      setMessage('');
+    } catch (error) {
+      setMessage(formatError(error));
+    }
+  }
+
+  async function stopMonitor() {
+    if (connectedReader === null) {
+      return;
+    }
+
+    try {
+      await stopCardMonitor(connectedReader.id);
+      setCardMonitorRunning(false);
+      setCardPresence('unknown');
       setMessage('');
     } catch (error) {
       setMessage(formatError(error));
@@ -91,9 +129,14 @@ export default function App() {
     }
 
     try {
+      if (cardMonitorRunning) {
+        await stopCardMonitor(connectedReader.id);
+      }
+
       await disconnectReader(connectedReader.id);
       setConnectedReader(null);
-      setCardPresent(false);
+      setCardMonitorRunning(false);
+      setCardPresence('unknown');
       setCardUid('');
       setApduResponse('');
       setMifareResult('');
@@ -169,9 +212,7 @@ export default function App() {
     }
 
     try {
-      setMifareResult(
-        await mifare.readBlock({ readerId: connectedReader.id, block })
-      );
+      setMifareResult(await mifare.readBlock({ readerId: connectedReader.id, block }));
       setMessage('');
     } catch (error) {
       setMessage(formatError(error));
@@ -222,9 +263,7 @@ export default function App() {
         block,
         data: mifareData,
       });
-      setMifareResult(
-        await mifare.readBlock({ readerId: connectedReader.id, block })
-      );
+      setMifareResult(await mifare.readBlock({ readerId: connectedReader.id, block }));
       setMessage('');
     } catch (error) {
       setMessage(formatError(error));
@@ -262,14 +301,14 @@ export default function App() {
         return;
       }
 
-      setCardPresent(true);
+      setCardPresence('present');
     });
     const removedSubscription = addCardRemovedListener((event) => {
       if (event.readerId !== connectedReader?.id) {
         return;
       }
 
-      setCardPresent(false);
+      setCardPresence('removed');
       setCardUid('');
       setApduResponse('');
       setMifareResult('');
@@ -286,8 +325,7 @@ export default function App() {
       style={styles.scroll}
       contentContainerStyle={styles.container}
       contentInsetAdjustmentBehavior="automatic"
-      keyboardShouldPersistTaps="handled"
-    >
+      keyboardShouldPersistTaps="handled">
       <View style={styles.panel}>
         <Text style={styles.header}>Generic Reader Flow</Text>
 
@@ -339,14 +377,27 @@ export default function App() {
             </Text>
             <Text style={styles.reader}>{formatMetadata(connectedReader)}</Text>
 
-            <Text style={styles.step}>4. Place Card</Text>
-            <Text style={styles.status}>Card: {cardPresent ? 'present' : 'removed'}</Text>
+            <Text style={styles.step}>4. Card Presence Monitor</Text>
+            <Text style={styles.status}>Monitor: {cardMonitorRunning ? 'running' : 'stopped'}</Text>
+            <Text style={styles.status}>Card: {cardPresence}</Text>
+            <Button
+              title="Start Card Monitor"
+              onPress={startMonitor}
+              disabled={cardMonitorRunning}
+            />
+            <Button
+              title="Stop Card Monitor"
+              onPress={stopMonitor}
+              disabled={!cardMonitorRunning}
+            />
+
+            <Text style={styles.step}>5. Place Card</Text>
             <Button title="Read Card UID" onPress={readUid} />
             <Button title="Transmit UID APDU" onPress={transmitUidApdu} />
             {cardUid ? <Text style={styles.reader}>UID: {cardUid}</Text> : null}
             {apduResponse ? <Text style={styles.reader}>{apduResponse}</Text> : null}
 
-            <Text style={styles.step}>5. Authenticate MIFARE Classic Card</Text>
+            <Text style={styles.step}>6. Authenticate MIFARE Classic Card</Text>
             <TextInput
               style={styles.input}
               value={mifareBlock}
@@ -378,10 +429,10 @@ export default function App() {
             />
             <Button title="Authenticate Block" onPress={() => authenticateMifare(mifareKey)} />
 
-            <Text style={styles.step}>6. Read One Block</Text>
+            <Text style={styles.step}>7. Read One Block</Text>
             <Button title="Read MIFARE Block" onPress={readMifareBlock} />
 
-            <Text style={styles.step}>7. Confirm One Block Write</Text>
+            <Text style={styles.step}>8. Confirm One Block Write</Text>
             <TextInput
               style={styles.input}
               value={mifareData}
@@ -393,7 +444,7 @@ export default function App() {
             <Button title="Confirm Write And Read Back" onPress={confirmWriteMifareBlock} />
             {mifareResult ? <Text style={styles.reader}>MIFARE: {mifareResult}</Text> : null}
 
-            <Text style={styles.step}>8. Disconnect</Text>
+            <Text style={styles.step}>9. Disconnect</Text>
             <Button title="Disconnect Reader" onPress={disconnectCurrentReader} />
           </View>
         ) : null}
