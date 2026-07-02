@@ -52,7 +52,7 @@ Typical integration order:
 1. **Permissions** — check and request Reader permission before scanning.
 2. **Scan** — discover nearby Readers for a bounded window.
 3. **Connect** — connect one Reader at a time.
-4. **Card** — listen for card presence, read UIDs, transmit APDUs, or use MIFARE Classic helpers.
+4. **Card** — start monitoring when you need card presence events, read UIDs, transmit APDUs, or use MIFARE Classic helpers.
 
 ### Reader permissions
 
@@ -83,9 +83,32 @@ Starting a new `scanReaders()` while one is active supersedes the prior scan: th
 
 After connecting a Reader:
 
-- `addCardPresentListener()` / `addCardRemovedListener()` — card presence events.
+- `addCardPresentListener()` / `addCardRemovedListener()` — subscribe to card presence events.
+- `startCardMonitor(readerId, options?)` — explicitly start Card Presence Event monitoring. Connecting a Reader no longer starts monitoring by default in v0.2.0.
+- `stopCardMonitor(readerId)` — stop monitoring silently. A manual stop or auto-stop does not mean the card was physically removed and does not emit a card removal event.
 - `readCardUid(readerId)` — card UID as a Hex String.
 - `transmit(readerId, apdu)` — send a raw APDU Hex String; resolves with `responseData` (APDU Response Data) and `status` (APDU Status). Non-`9000` statuses are returned, not thrown.
+
+`startCardMonitor()` defaults to `{ pollingIntervalMs: 1000, autoStopAfterMs: null }`. `pollingIntervalMs` must be an integer of at least `100`. `autoStopAfterMs`, when provided, must be a positive integer. Repeated starts with the same options are idempotent; repeated starts with different options reject with `CARD_MONITOR_ALREADY_ACTIVE`.
+
+Card commands do not require Card Presence Event monitoring. For example, `readCardUid(readerId)` works after `connectReader(readerId)` even when no monitor is running.
+
+```ts
+const present = addCardPresentListener(({ readerId }) => {
+  console.log('Card present', readerId);
+});
+const removed = addCardRemovedListener(({ readerId }) => {
+  console.log('Card removed', readerId);
+});
+
+const reader = await connectReader(readerId);
+await startCardMonitor(reader.id, { pollingIntervalMs: 1000, autoStopAfterMs: 30000 });
+await stopCardMonitor(reader.id);
+await disconnectReader(reader.id);
+
+present.remove();
+removed.remove();
+```
 
 ### MIFARE Classic
 
@@ -105,11 +128,15 @@ Run these checks on real hardware when changing Reader, card, or MIFARE behavior
 2. Start a 5 second scan; confirm an ACS BLE Reader appears.
 3. Confirm scanning stops at timeout and after `stopReaderScan()`.
 4. Connect the discovered Reader; confirm optional metadata when available.
-5. Present and remove a card; confirm presence events update.
-6. Read the card UID.
-7. Transmit `FFCA000000`; confirm APDU Response Data and APDU Status are shown separately.
-8. Authenticate a MIFARE Classic block with a caller-owned key, read the block, write 16 bytes, read it back.
-9. Disconnect; confirm a second connect works only after disconnect.
+5. Confirm no Card Presence Events arrive after `connectReader()` alone.
+6. Start Card Presence Event monitoring; present and remove a card; confirm presence events update.
+7. Start monitoring while a card is already present; confirm an immediate Card Presence Event.
+8. Stop monitoring; confirm stop is silent and later card changes do not emit events.
+9. Start monitoring with `autoStopAfterMs`; confirm auto-stop is silent.
+10. Read the card UID without monitoring running.
+11. Transmit `FFCA000000`; confirm APDU Response Data and APDU Status are shown separately.
+12. Authenticate a MIFARE Classic block with a caller-owned key, read the block, write 16 bytes, read it back.
+13. Disconnect; confirm a second connect works only after disconnect.
 
 **iOS**
 
@@ -117,11 +144,15 @@ Run these checks on real hardware when changing Reader, card, or MIFARE behavior
 2. Start a 5 second scan; confirm an ACS BLE Reader appears.
 3. Confirm scanning stops at timeout and after `stopReaderScan()`.
 4. Connect the discovered Reader; confirm optional metadata when available.
-5. Present and remove a card; confirm presence events update.
-6. Read the card UID.
-7. Transmit `FFCA000000`; confirm APDU Response Data and APDU Status are shown separately.
-8. Authenticate a MIFARE Classic block with a caller-owned key, read the block, write 16 bytes, read it back.
-9. Disconnect; confirm a second connect works only after disconnect.
+5. Confirm no Card Presence Events arrive after `connectReader()` alone.
+6. Start Card Presence Event monitoring; present and remove a card; confirm presence events update.
+7. Start monitoring while a card is already present; confirm an immediate Card Presence Event.
+8. Stop monitoring; confirm stop is silent and later card changes do not emit events.
+9. Start monitoring with `autoStopAfterMs`; confirm auto-stop is silent.
+10. Read the card UID without monitoring running.
+11. Transmit `FFCA000000`; confirm APDU Response Data and APDU Status are shown separately.
+12. Authenticate a MIFARE Classic block with a caller-owned key, read the block, write 16 bytes, read it back.
+13. Disconnect; confirm a second connect works only after disconnect.
 
 ## ACS SDK
 

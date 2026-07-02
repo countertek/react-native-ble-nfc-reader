@@ -8,6 +8,8 @@ private let readerDiscoveredEvent = "onReaderDiscovered"
 private let cardPresentEvent = "onCardPresent"
 private let cardRemovedEvent = "onCardRemoved"
 private let defaultScanTimeoutMs = 5000.0
+private let defaultCardMonitorPollingIntervalMs = 1000.0
+private let minCardMonitorPollingIntervalMs = 100.0
 private let metadataTimeoutMs = 1000
 private let readUidApdu = "FFCA000000"
 private let mifareKeySlot = "00"
@@ -35,7 +37,10 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
   private var activeReader: (id: String, terminal: any CardTerminal)?
   private var activeCard: (any Card)?
   private var cardMonitorThread: Thread?
+  private var cardMonitorAutoStopTimer: Timer?
   private var cardMonitorGeneration = 0
+  private var activeCardMonitorReaderId: String?
+  private var activeCardMonitorOptions: NormalizedCardMonitorOptions?
   private let readerStateLock = NSLock()
   private let terminalIoLock = NSLock()
 
@@ -91,6 +96,30 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
     AsyncFunction("disconnectReader") { (readerId: String, promise: Promise) in
       do {
         try self.disconnectReader(readerId: readerId)
+        promise.resolve(nil)
+      } catch let error as Exception {
+        promise.reject(error)
+      } catch {
+        promise.reject(readerConnectionUnavailableException())
+      }
+    }
+    .runOnQueue(.main)
+
+    AsyncFunction("startCardMonitor") { (readerId: String, options: CardMonitorOptions?, promise: Promise) in
+      do {
+        try self.startCardMonitor(readerId: readerId, options: options)
+        promise.resolve(nil)
+      } catch let error as Exception {
+        promise.reject(error)
+      } catch {
+        promise.reject(readerConnectionUnavailableException())
+      }
+    }
+    .runOnQueue(.main)
+
+    AsyncFunction("stopCardMonitor") { (readerId: String, promise: Promise) in
+      do {
+        try self.stopCardMonitor(readerId: readerId)
         promise.resolve(nil)
       } catch let error as Exception {
         promise.reject(error)
@@ -308,7 +337,6 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
       activeReader = (readerId, terminal)
     }
     let reader = readerForTerminal(terminal, includeMetadata: true)
-    startCardMonitor(readerId: readerId, terminal: terminal)
     return reader
   }
 
@@ -325,7 +353,7 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
       disconnectActiveCard()
       try scanManager.disconnect(terminal: terminal)
     }
-    stopCardMonitor()
+    stopCardMonitorInternal()
     withReaderStateLock {
       if activeReader?.id == readerId {
         activeReader = nil
@@ -416,28 +444,84 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
     }
   }
 
-  private func startCardMonitor(readerId: String, terminal: any CardTerminal) {
-    stopCardMonitor()
+  private func startCardMonitor(readerId: String, options: CardMonitorOptions?) throws {
+    let normalizedOptions = try normalizeCardMonitorOptions(options)
+    let terminal = try withReaderStateLock {
+      guard let activeReader, activeReader.id == readerId else {
+        throw readerNotConnectedException(readerId: readerId)
+      }
+
+      if cardMonitorThread != nil {
+        if activeCardMonitorReaderId == readerId && activeCardMonitorOptions == normalizedOptions {
+          return nil
+        }
+
+        throw cardMonitorAlreadyActiveException()
+      }
+
+      return activeReader.terminal
+    }
+
+    guard let terminal else {
+      return
+    }
 
     let generation = withReaderStateLock {
       cardMonitorGeneration += 1
       return cardMonitorGeneration
     }
     let thread = Thread { [weak self] in
-      self?.monitorCardState(readerId: readerId, terminal: terminal, generation: generation)
+      self?.monitorCardState(
+        readerId: readerId,
+        terminal: terminal,
+        generation: generation,
+        pollingIntervalMs: normalizedOptions.pollingIntervalMs
+      )
     }
 
     withReaderStateLock {
       cardMonitorThread = thread
+      activeCardMonitorReaderId = readerId
+      activeCardMonitorOptions = normalizedOptions
+    }
+    if let autoStopAfterMs = normalizedOptions.autoStopAfterMs {
+      cardMonitorAutoStopTimer = Timer.scheduledTimer(withTimeInterval: Double(autoStopAfterMs) / 1000.0, repeats: false) {
+        [weak self] _ in
+        self?.stopCardMonitorIfCurrent(generation: generation)
+      }
     }
     thread.start()
   }
 
-  private func stopCardMonitor() {
+  private func stopCardMonitor(readerId: String) throws {
+    try withReaderStateLock {
+      guard activeReader?.id == readerId else {
+        throw readerNotConnectedException(readerId: readerId)
+      }
+    }
+
+    stopCardMonitorInternal()
+  }
+
+  private func stopCardMonitorIfCurrent(generation: Int) {
+    let shouldStop = withReaderStateLock {
+      cardMonitorGeneration == generation
+    }
+
+    if shouldStop {
+      stopCardMonitorInternal()
+    }
+  }
+
+  private func stopCardMonitorInternal() {
     let thread = withReaderStateLock {
       cardMonitorGeneration += 1
+      cardMonitorAutoStopTimer?.invalidate()
+      cardMonitorAutoStopTimer = nil
       let thread = cardMonitorThread
       cardMonitorThread = nil
+      activeCardMonitorReaderId = nil
+      activeCardMonitorOptions = nil
       return thread
     }
     thread?.cancel()
@@ -452,14 +536,23 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
     }
   }
 
-  private func monitorCardState(readerId: String, terminal: any CardTerminal, generation: Int) {
+  private func monitorCardState(
+    readerId: String,
+    terminal: any CardTerminal,
+    generation: Int,
+    pollingIntervalMs: Int
+  ) {
+    defer {
+      clearCardMonitorIfCurrent(generation)
+    }
+
     var wasPresent: Bool?
 
     while !Thread.current.isCancelled && isCurrentCardMonitor(generation) {
       let present = cardPresent(terminal)
 
       guard let present else {
-        Thread.sleep(forTimeInterval: 0.5)
+        Thread.sleep(forTimeInterval: Double(pollingIntervalMs) / 1000.0)
         continue
       }
 
@@ -480,9 +573,24 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
 
       wasPresent = present
 
-      if !waitForCardChange(terminal, present: present) {
+      if !waitForCardChange(terminal, present: present, pollingIntervalMs: pollingIntervalMs) {
         break
       }
+    }
+  }
+
+  private func clearCardMonitorIfCurrent(_ generation: Int) {
+    withReaderStateLock {
+      if cardMonitorGeneration != generation || cardMonitorThread !== Thread.current {
+        return
+      }
+
+      cardMonitorGeneration += 1
+      cardMonitorAutoStopTimer?.invalidate()
+      cardMonitorAutoStopTimer = nil
+      cardMonitorThread = nil
+      activeCardMonitorReaderId = nil
+      activeCardMonitorOptions = nil
     }
   }
 
@@ -507,13 +615,17 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
     return cardPresent(terminal) != true
   }
 
-  private func waitForCardChange(_ terminal: any CardTerminal, present: Bool) -> Bool {
+  private func waitForCardChange(
+    _ terminal: any CardTerminal,
+    present: Bool,
+    pollingIntervalMs: Int
+  ) -> Bool {
     do {
       try withTerminalLock {
         if present {
-          _ = try terminal.waitForCardAbsent(timeout: 1000)
+          _ = try terminal.waitForCardAbsent(timeout: pollingIntervalMs)
         } else {
-          _ = try terminal.waitForCardPresent(timeout: 1000)
+          _ = try terminal.waitForCardPresent(timeout: pollingIntervalMs)
         }
       }
       return true
@@ -556,6 +668,29 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
 
       self.sendEvent(eventName, ["readerId": readerId])
     }
+  }
+
+  private func normalizeCardMonitorOptions(_ options: CardMonitorOptions?) throws -> NormalizedCardMonitorOptions {
+    let pollingIntervalMs = options?.pollingIntervalMs ?? defaultCardMonitorPollingIntervalMs
+    let autoStopAfterMs = options?.autoStopAfterMs
+
+    if !pollingIntervalMs.isFinite ||
+      pollingIntervalMs.rounded() != pollingIntervalMs ||
+      pollingIntervalMs < minCardMonitorPollingIntervalMs {
+      throw invalidCardMonitorOptionsException(
+        description: "pollingIntervalMs must be an integer greater than or equal to \(Int(minCardMonitorPollingIntervalMs))"
+      )
+    }
+
+    if let autoStopAfterMs,
+      (!autoStopAfterMs.isFinite || autoStopAfterMs.rounded() != autoStopAfterMs || autoStopAfterMs <= 0) {
+      throw invalidCardMonitorOptionsException(description: "autoStopAfterMs must be a positive integer")
+    }
+
+    return NormalizedCardMonitorOptions(
+      pollingIntervalMs: Int(pollingIntervalMs),
+      autoStopAfterMs: autoStopAfterMs.map { Int($0) }
+    )
   }
 
   private func normalizeMifareBlock(_ block: Int) throws -> Int {
@@ -693,6 +828,19 @@ private struct ScanReadersOptions: Record {
   var timeoutMs: Double?
 }
 
+private struct CardMonitorOptions: Record {
+  @Field
+  var pollingIntervalMs: Double?
+
+  @Field
+  var autoStopAfterMs: Double?
+}
+
+private struct NormalizedCardMonitorOptions: Equatable {
+  let pollingIntervalMs: Int
+  let autoStopAfterMs: Int?
+}
+
 private struct AuthenticateBlockOptions: Record {
   @Field
   var readerId: String = ""
@@ -753,6 +901,14 @@ private func invalidScanTimeoutException() -> Exception {
   )
 }
 
+private func invalidCardMonitorOptionsException(description: String) -> Exception {
+  return Exception(
+    name: "InvalidCardMonitorOptionsException",
+    description: description,
+    code: "INVALID_CARD_MONITOR_OPTIONS"
+  )
+}
+
 private func readerNotFoundException(readerId: String) -> Exception {
   return Exception(
     name: "ReaderNotFoundException",
@@ -782,6 +938,14 @@ private func readerConnectionUnavailableException() -> Exception {
     name: "ReaderConnectionUnavailableException",
     description: "Reader connection is not available",
     code: "READER_CONNECTION_UNAVAILABLE"
+  )
+}
+
+private func cardMonitorAlreadyActiveException() -> Exception {
+  return Exception(
+    name: "CardMonitorAlreadyActiveException",
+    description: "Card monitor is already active with different options",
+    code: "CARD_MONITOR_ALREADY_ACTIVE"
   )
 }
 

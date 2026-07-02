@@ -2,6 +2,7 @@ import { registerWebModule, NativeModule } from 'expo';
 
 import {
   createUnsupportedPlatformError,
+  CardMonitorOptions,
   HexString,
   Reader,
   ReaderId,
@@ -36,6 +37,14 @@ class ReactNativeBleNfcReaderModule extends NativeModule {
   }
 
   disconnectReader(_readerId: ReaderId): Promise<void> {
+    return this.rejectUnsupported();
+  }
+
+  startCardMonitor(_readerId: ReaderId, _options?: CardMonitorOptions): Promise<void> {
+    return this.rejectUnsupported();
+  }
+
+  stopCardMonitor(_readerId: ReaderId): Promise<void> {
     return this.rejectUnsupported();
   }
 

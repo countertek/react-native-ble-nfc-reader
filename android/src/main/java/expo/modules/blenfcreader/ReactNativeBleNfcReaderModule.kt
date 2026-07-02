@@ -26,6 +26,8 @@ private const val READER_DISCOVERED_EVENT = "onReaderDiscovered"
 private const val CARD_PRESENT_EVENT = "onCardPresent"
 private const val CARD_REMOVED_EVENT = "onCardRemoved"
 private const val DEFAULT_SCAN_TIMEOUT_MS = 5000.0
+private const val DEFAULT_CARD_MONITOR_POLLING_INTERVAL_MS = 1000.0
+private const val MIN_CARD_MONITOR_POLLING_INTERVAL_MS = 100.0
 private const val METADATA_TIMEOUT_MS = 1000L
 private const val READ_UID_APDU = "FFCA000000"
 private const val MIFARE_KEY_SLOT = "00"
@@ -49,7 +51,10 @@ class ReactNativeBleNfcReaderModule : Module() {
   private var activeReaderManager: BluetoothTerminalManager? = null
   private var activeCard: Card? = null
   private var cardMonitorThread: Thread? = null
+  private var cardMonitorAutoStopRunnable: Runnable? = null
   private var cardMonitorGeneration = 0
+  private var activeCardMonitorReaderId: String? = null
+  private var activeCardMonitorOptions: NormalizedCardMonitorOptions? = null
   private var scanPromise: Promise? = null
   private var scanStopRunnable: Runnable? = null
   private var scanTypeRunnable: Runnable? = null
@@ -104,6 +109,32 @@ class ReactNativeBleNfcReaderModule : Module() {
       scanHandler.post {
         try {
           disconnectReader(readerId)
+          promise.resolve(null)
+        } catch (error: CodedException) {
+          promise.reject(error)
+        } catch (_: Exception) {
+          promise.reject(ReaderConnectionUnavailableException())
+        }
+      }
+    }
+
+    AsyncFunction("startCardMonitor") { readerId: String, options: CardMonitorOptions?, promise: Promise ->
+      scanHandler.post {
+        try {
+          startCardMonitor(readerId, options)
+          promise.resolve(null)
+        } catch (error: CodedException) {
+          promise.reject(error)
+        } catch (_: Exception) {
+          promise.reject(ReaderConnectionUnavailableException())
+        }
+      }
+    }
+
+    AsyncFunction("stopCardMonitor") { readerId: String, promise: Promise ->
+      scanHandler.post {
+        try {
+          stopCardMonitor(readerId)
           promise.resolve(null)
         } catch (error: CodedException) {
           promise.reject(error)
@@ -321,6 +352,33 @@ class ReactNativeBleNfcReaderModule : Module() {
     return timeoutMs.toLong()
   }
 
+  private fun normalizeCardMonitorOptions(options: CardMonitorOptions?): NormalizedCardMonitorOptions {
+    val pollingIntervalMs = options?.pollingIntervalMs ?: DEFAULT_CARD_MONITOR_POLLING_INTERVAL_MS
+    val autoStopAfterMs = options?.autoStopAfterMs
+
+    if (
+      !pollingIntervalMs.isFinite() ||
+      pollingIntervalMs % 1.0 != 0.0 ||
+      pollingIntervalMs < MIN_CARD_MONITOR_POLLING_INTERVAL_MS
+    ) {
+      throw InvalidCardMonitorOptionsException(
+        "pollingIntervalMs must be an integer greater than or equal to ${MIN_CARD_MONITOR_POLLING_INTERVAL_MS.toInt()}"
+      )
+    }
+
+    if (
+      autoStopAfterMs != null &&
+      (!autoStopAfterMs.isFinite() || autoStopAfterMs % 1.0 != 0.0 || autoStopAfterMs <= 0)
+    ) {
+      throw InvalidCardMonitorOptionsException("autoStopAfterMs must be a positive integer")
+    }
+
+    return NormalizedCardMonitorOptions(
+      pollingIntervalMs = pollingIntervalMs.toLong(),
+      autoStopAfterMs = autoStopAfterMs?.toLong()
+    )
+  }
+
   private fun startCurrentScanType() {
     if (scanPromise == null) {
       return
@@ -366,7 +424,7 @@ class ReactNativeBleNfcReaderModule : Module() {
     val manager = readerManager()
     finishScan()
 
-    val (terminal, shouldStartCardMonitor) = synchronized(readerLock) {
+    val terminal = synchronized(readerLock) {
       val activeId = activeReaderId
 
       if (activeId != null && activeId != readerId) {
@@ -375,21 +433,17 @@ class ReactNativeBleNfcReaderModule : Module() {
 
       if (activeId == readerId) {
         val activeTerminal = activeReaderTerminal ?: throw ReaderNotConnectedException(readerId)
-        return@synchronized Pair(activeTerminal, false)
+        return@synchronized activeTerminal
       }
 
       val knownTerminal = knownTerminals[readerId] ?: throw ReaderNotFoundException(readerId)
       activeReaderId = readerId
       activeReaderTerminal = knownTerminal
       activeReaderManager = manager
-      Pair(knownTerminal, true)
+      knownTerminal
     }
 
-    val reader = readerForTerminal(terminal, manager)
-    if (shouldStartCardMonitor) {
-      startCardMonitor(readerId, terminal)
-    }
-    return reader
+    return readerForTerminal(terminal, manager)
   }
 
   private fun disconnectReader(readerId: String) {
@@ -408,7 +462,7 @@ class ReactNativeBleNfcReaderModule : Module() {
       activeConnection.first.disconnect(activeConnection.second)
     }
 
-    stopCardMonitor()
+    stopCardMonitorInternal()
     synchronized(readerLock) {
       activeReaderId = null
       activeReaderTerminal = null
@@ -504,58 +558,127 @@ class ReactNativeBleNfcReaderModule : Module() {
     }
   }
 
-  private fun startCardMonitor(readerId: String, terminal: CardTerminal) {
-    stopCardMonitor()
+  private fun startCardMonitor(readerId: String, options: CardMonitorOptions?) {
+    val normalizedOptions = normalizeCardMonitorOptions(options)
+    val terminal = synchronized(readerLock) {
+      if (activeReaderId != readerId) {
+        throw ReaderNotConnectedException(readerId)
+      }
+
+      if (cardMonitorThread != null) {
+        if (activeCardMonitorReaderId == readerId && activeCardMonitorOptions == normalizedOptions) {
+          return
+        }
+
+        throw CardMonitorAlreadyActiveException()
+      }
+
+      activeReaderTerminal ?: throw ReaderNotConnectedException(readerId)
+    }
 
     val generation = synchronized(readerLock) {
       cardMonitorGeneration += 1
       cardMonitorGeneration
     }
     val thread = Thread {
-      var wasPresent: Boolean? = null
+      try {
+        var wasPresent: Boolean? = null
 
-      while (!Thread.currentThread().isInterrupted && isCurrentCardMonitor(generation)) {
-        val present = cardPresent(terminal)
+        while (!Thread.currentThread().isInterrupted && isCurrentCardMonitor(generation)) {
+          val present = cardPresent(terminal)
 
-        if (present == null) {
-          sleepCardMonitor()
-          continue
-        }
-
-        if (present && wasPresent != true) {
-          sendCardEvent(CARD_PRESENT_EVENT, readerId, generation)
-        }
-
-        if (!present && wasPresent == true) {
-          if (!cardStillAbsent(terminal)) {
+          if (present == null) {
+            sleepCardMonitor(normalizedOptions.pollingIntervalMs)
             continue
           }
 
-          synchronized(terminalIoLock) {
-            disconnectActiveCardLocked()
+          if (present && wasPresent != true) {
+            sendCardEvent(CARD_PRESENT_EVENT, readerId, generation)
           }
-          sendCardEvent(CARD_REMOVED_EVENT, readerId, generation)
-        }
 
-        wasPresent = present
+          if (!present && wasPresent == true) {
+            if (!cardStillAbsent(terminal)) {
+              continue
+            }
 
-        if (!waitForCardChange(terminal, present)) {
-          break
+            synchronized(terminalIoLock) {
+              disconnectActiveCardLocked()
+            }
+            sendCardEvent(CARD_REMOVED_EVENT, readerId, generation)
+          }
+
+          wasPresent = present
+
+          if (!waitForCardChange(terminal, present, normalizedOptions.pollingIntervalMs)) {
+            break
+          }
         }
+      } finally {
+        clearCardMonitorIfCurrent(generation)
       }
     }
 
     synchronized(readerLock) {
       cardMonitorThread = thread
+      activeCardMonitorReaderId = readerId
+      activeCardMonitorOptions = normalizedOptions
+    }
+    normalizedOptions.autoStopAfterMs?.let { autoStopAfterMs ->
+      val autoStopRunnable = Runnable {
+        stopCardMonitorIfCurrent(generation)
+      }
+      synchronized(readerLock) {
+        cardMonitorAutoStopRunnable = autoStopRunnable
+      }
+      scanHandler.postDelayed(autoStopRunnable, autoStopAfterMs)
     }
     thread.start()
   }
 
-  private fun stopCardMonitor() {
+  private fun stopCardMonitor(readerId: String) {
+    synchronized(readerLock) {
+      if (activeReaderId != readerId) {
+        throw ReaderNotConnectedException(readerId)
+      }
+    }
+
+    stopCardMonitorInternal()
+  }
+
+  private fun stopCardMonitorIfCurrent(generation: Int) {
+    val shouldStop = synchronized(readerLock) {
+      cardMonitorGeneration == generation
+    }
+
+    if (shouldStop) {
+      stopCardMonitorInternal()
+    }
+  }
+
+  private fun clearCardMonitorIfCurrent(generation: Int) {
+    synchronized(readerLock) {
+      if (cardMonitorGeneration != generation || cardMonitorThread != Thread.currentThread()) {
+        return
+      }
+
+      cardMonitorGeneration += 1
+      cardMonitorAutoStopRunnable?.let(scanHandler::removeCallbacks)
+      cardMonitorAutoStopRunnable = null
+      cardMonitorThread = null
+      activeCardMonitorReaderId = null
+      activeCardMonitorOptions = null
+    }
+  }
+
+  private fun stopCardMonitorInternal() {
     val thread = synchronized(readerLock) {
       cardMonitorGeneration += 1
+      cardMonitorAutoStopRunnable?.let(scanHandler::removeCallbacks)
+      cardMonitorAutoStopRunnable = null
       val currentThread = cardMonitorThread
       cardMonitorThread = null
+      activeCardMonitorReaderId = null
+      activeCardMonitorOptions = null
       currentThread
     }
     thread?.interrupt()
@@ -592,13 +715,13 @@ class ReactNativeBleNfcReaderModule : Module() {
     return cardPresent(terminal) != true
   }
 
-  private fun waitForCardChange(terminal: CardTerminal, present: Boolean): Boolean {
+  private fun waitForCardChange(terminal: CardTerminal, present: Boolean, pollingIntervalMs: Long): Boolean {
     return synchronized(terminalIoLock) {
       try {
         if (present) {
-          terminal.waitForCardAbsent(1000)
+          terminal.waitForCardAbsent(pollingIntervalMs)
         } else {
-          terminal.waitForCardPresent(1000)
+          terminal.waitForCardPresent(pollingIntervalMs)
         }
         true
       } catch (error: CardException) {
@@ -607,7 +730,7 @@ class ReactNativeBleNfcReaderModule : Module() {
     }
   }
 
-  private fun sleepCardMonitor(delayMs: Long = 500) {
+  private fun sleepCardMonitor(delayMs: Long) {
     try {
       Thread.sleep(delayMs)
     } catch (_: InterruptedException) {
@@ -790,6 +913,19 @@ private class ScanReadersOptions : Record {
   var timeoutMs: Double? = null
 }
 
+private class CardMonitorOptions : Record {
+  @Field
+  var pollingIntervalMs: Double? = null
+
+  @Field
+  var autoStopAfterMs: Double? = null
+}
+
+private data class NormalizedCardMonitorOptions(
+  val pollingIntervalMs: Long,
+  val autoStopAfterMs: Long?
+)
+
 private class AuthenticateBlockOptions : Record {
   @Field
   var readerId: String = ""
@@ -850,6 +986,12 @@ private class InvalidScanTimeoutException : CodedException(
   null
 )
 
+private class InvalidCardMonitorOptionsException(message: String) : CodedException(
+  "INVALID_CARD_MONITOR_OPTIONS",
+  message,
+  null
+)
+
 private class InvalidHexStringException(message: String = "apdu must contain only hex characters and have an even number of characters") : CodedException(
   "INVALID_HEX_STRING",
   message,
@@ -895,6 +1037,12 @@ private class ReaderNotConnectedException(readerId: String) : CodedException(
 private class ReaderConnectionUnavailableException : CodedException(
   "READER_CONNECTION_UNAVAILABLE",
   "Reader connection is not available on this Android device",
+  null
+)
+
+private class CardMonitorAlreadyActiveException : CodedException(
+  "CARD_MONITOR_ALREADY_ACTIVE",
+  "Card monitor is already active with different options",
   null
 )
 

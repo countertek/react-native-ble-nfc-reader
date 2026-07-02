@@ -4,6 +4,7 @@ import {
   ApduResponse,
   AuthenticateBlockOptions,
   BleNfcReaderError,
+  CardMonitorOptions,
   createUnsupportedPlatformError,
   HexString,
   Reader,
@@ -105,6 +106,10 @@ function normalizeNativeError(error: unknown): unknown {
     return new BleNfcReaderError('INVALID_SCAN_TIMEOUT', getErrorMessage(error));
   }
 
+  if (error.code === 'INVALID_CARD_MONITOR_OPTIONS') {
+    return new BleNfcReaderError('INVALID_CARD_MONITOR_OPTIONS', getErrorMessage(error));
+  }
+
   if (error.code === 'READER_SCAN_UNAVAILABLE') {
     return new BleNfcReaderError('READER_SCAN_UNAVAILABLE', getErrorMessage(error));
   }
@@ -123,6 +128,10 @@ function normalizeNativeError(error: unknown): unknown {
 
   if (error.code === 'READER_CONNECTION_UNAVAILABLE') {
     return new BleNfcReaderError('READER_CONNECTION_UNAVAILABLE', getErrorMessage(error));
+  }
+
+  if (error.code === 'CARD_MONITOR_ALREADY_ACTIVE') {
+    return new BleNfcReaderError('CARD_MONITOR_ALREADY_ACTIVE', getErrorMessage(error));
   }
 
   if (error.code === 'CARD_COMMAND_FAILED') {
@@ -217,6 +226,39 @@ function normalizeScanOptions(options?: ScanReadersOptions): ScanReadersOptions 
   return options;
 }
 
+function normalizeCardMonitorOptions(options?: CardMonitorOptions): Required<CardMonitorOptions> {
+  const pollingIntervalMs = options?.pollingIntervalMs ?? 1000;
+  const autoStopAfterMs = options?.autoStopAfterMs ?? null;
+
+  if (
+    !Number.isFinite(pollingIntervalMs) ||
+    !Number.isInteger(pollingIntervalMs) ||
+    pollingIntervalMs < 100
+  ) {
+    throw new BleNfcReaderError(
+      'INVALID_CARD_MONITOR_OPTIONS',
+      'pollingIntervalMs must be an integer greater than or equal to 100'
+    );
+  }
+
+  if (
+    autoStopAfterMs !== null &&
+    (!Number.isFinite(autoStopAfterMs) ||
+      !Number.isInteger(autoStopAfterMs) ||
+      autoStopAfterMs <= 0)
+  ) {
+    throw new BleNfcReaderError(
+      'INVALID_CARD_MONITOR_OPTIONS',
+      'autoStopAfterMs must be a positive integer'
+    );
+  }
+
+  return {
+    pollingIntervalMs,
+    autoStopAfterMs,
+  };
+}
+
 export async function getReaderPermissionStatus(): Promise<ReaderPermissionStatus> {
   return callNative(() => getNativeMethod('getReaderPermissionStatus')());
 }
@@ -273,6 +315,19 @@ export async function connectReader(readerId: ReaderId): Promise<Reader> {
 
 export async function disconnectReader(readerId: ReaderId): Promise<void> {
   return callNative(() => getNativeMethod('disconnectReader')(readerId));
+}
+
+export async function startCardMonitor(
+  readerId: ReaderId,
+  options?: CardMonitorOptions
+): Promise<void> {
+  return callNative(() =>
+    getNativeMethod('startCardMonitor')(readerId, normalizeCardMonitorOptions(options))
+  );
+}
+
+export async function stopCardMonitor(readerId: ReaderId): Promise<void> {
+  return callNative(() => getNativeMethod('stopCardMonitor')(readerId));
 }
 
 export async function readCardUid(readerId: ReaderId): Promise<HexString> {

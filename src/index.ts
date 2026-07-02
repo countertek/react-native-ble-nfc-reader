@@ -11,7 +11,9 @@ export {
   requestReaderPermissions,
   scanReaders,
   splitApduResponse,
+  startCardMonitor,
   stopReaderScan,
+  stopCardMonitor,
   transmit,
 } from './ReactNativeBleNfcReader';
 export * from './ReactNativeBleNfcReader.types';
