@@ -20,6 +20,11 @@ export type ScanReadersOptions = {
   timeoutMs?: number;
 };
 
+export type CardMonitorOptions = {
+  pollingIntervalMs?: number;
+  autoStopAfterMs?: number | null;
+};
+
 export type ReaderDiscoveredEvent = {
   reader: Reader;
 };
@@ -62,6 +67,7 @@ export type BleNfcReaderErrorCode =
   | 'INVALID_HEX_STRING'
   | 'INVALID_APDU_RESPONSE'
   | 'INVALID_SCAN_TIMEOUT'
+  | 'INVALID_CARD_MONITOR_OPTIONS'
   | 'INVALID_MIFARE_BLOCK'
   | 'INVALID_MIFARE_KEY_TYPE'
   | 'NATIVE_METHOD_UNAVAILABLE'
@@ -73,6 +79,7 @@ export type BleNfcReaderErrorCode =
   | 'READER_ALREADY_CONNECTED'
   | 'READER_NOT_CONNECTED'
   | 'READER_CONNECTION_UNAVAILABLE'
+  | 'CARD_MONITOR_ALREADY_ACTIVE'
   | 'CARD_COMMAND_FAILED'
   | 'UNSUPPORTED_PLATFORM';
 

@@ -2,6 +2,7 @@ import { NativeModule, requireNativeModule } from 'expo';
 
 import {
   AuthenticateBlockOptions,
+  CardMonitorOptions,
   HexString,
   Reader,
   ReaderCardEvent,
@@ -26,6 +27,8 @@ export declare class ReactNativeBleNfcReaderModule extends NativeModule<ReactNat
   stopReaderScan?: () => Promise<Reader[]>;
   connectReader?: (readerId: ReaderId) => Promise<Reader>;
   disconnectReader?: (readerId: ReaderId) => Promise<void>;
+  startCardMonitor?: (readerId: ReaderId, options?: CardMonitorOptions) => Promise<void>;
+  stopCardMonitor?: (readerId: ReaderId) => Promise<void>;
   readCardUid?: (readerId: ReaderId) => Promise<HexString>;
   transmit?: (readerId: ReaderId, apdu: HexString) => Promise<HexString>;
   authenticateBlock?: (options: AuthenticateBlockOptions) => Promise<void>;

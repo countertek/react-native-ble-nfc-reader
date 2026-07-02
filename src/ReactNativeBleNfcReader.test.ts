@@ -1,4 +1,6 @@
 import {
+  addCardPresentListener,
+  addCardRemovedListener,
   addReaderDiscoveredListener,
   connectReader,
   disconnectReader,
@@ -9,10 +11,10 @@ import {
   requestReaderPermissions,
   scanReaders,
   splitApduResponse,
+  startCardMonitor,
   stopReaderScan,
+  stopCardMonitor,
   transmit,
-  addCardPresentListener,
-  addCardRemovedListener,
 } from './ReactNativeBleNfcReader';
 import { BleNfcReaderError } from './ReactNativeBleNfcReader.types';
 import webModule from './ReactNativeBleNfcReaderModule.web';
@@ -319,6 +321,69 @@ describe('public native wrappers', () => {
     await expect(stopReaderScan()).resolves.toEqual([{ id: 'reader-1' }]);
   });
 
+  it('starts and stops card monitoring through native calls', async () => {
+    mockNativeModule.startCardMonitor = jest.fn(async () => undefined);
+    mockNativeModule.stopCardMonitor = jest.fn(async () => undefined);
+
+    await expect(startCardMonitor('reader-1')).resolves.toBeUndefined();
+    await expect(
+      startCardMonitor('reader-1', { pollingIntervalMs: 250, autoStopAfterMs: 1000 })
+    ).resolves.toBeUndefined();
+    await expect(stopCardMonitor('reader-1')).resolves.toBeUndefined();
+
+    expect(mockNativeModule.startCardMonitor).toHaveBeenNthCalledWith(1, 'reader-1', {
+      pollingIntervalMs: 1000,
+      autoStopAfterMs: null,
+    });
+    expect(mockNativeModule.startCardMonitor).toHaveBeenNthCalledWith(2, 'reader-1', {
+      pollingIntervalMs: 250,
+      autoStopAfterMs: 1000,
+    });
+    expect(mockNativeModule.stopCardMonitor).toHaveBeenCalledWith('reader-1');
+  });
+
+  it('rejects invalid card monitor options before native calls', async () => {
+    mockNativeModule.startCardMonitor = jest.fn(async () => undefined);
+
+    await expect(startCardMonitor('reader-1', { pollingIntervalMs: 99 })).rejects.toEqual(
+      expect.objectContaining({
+        code: 'INVALID_CARD_MONITOR_OPTIONS',
+      })
+    );
+    await expect(startCardMonitor('reader-1', { pollingIntervalMs: Number.NaN })).rejects.toEqual(
+      expect.objectContaining({
+        code: 'INVALID_CARD_MONITOR_OPTIONS',
+      })
+    );
+    await expect(startCardMonitor('reader-1', { pollingIntervalMs: 100.5 })).rejects.toEqual(
+      expect.objectContaining({
+        code: 'INVALID_CARD_MONITOR_OPTIONS',
+      })
+    );
+    await expect(startCardMonitor('reader-1', { autoStopAfterMs: 0 })).rejects.toEqual(
+      expect.objectContaining({
+        code: 'INVALID_CARD_MONITOR_OPTIONS',
+      })
+    );
+
+    expect(mockNativeModule.startCardMonitor).not.toHaveBeenCalled();
+  });
+
+  it('maps active card monitor conflicts to typed errors', async () => {
+    mockNativeModule.startCardMonitor = jest.fn(async () => {
+      const error = new Error('Card monitor is already active with different options');
+      Object.assign(error, { code: 'CARD_MONITOR_ALREADY_ACTIVE' });
+      throw error;
+    });
+
+    await expect(startCardMonitor('reader-1')).rejects.toEqual(
+      expect.objectContaining({
+        code: 'CARD_MONITOR_ALREADY_ACTIVE',
+      })
+    );
+    await expect(startCardMonitor('reader-1')).rejects.toBeInstanceOf(BleNfcReaderError);
+  });
+
   it('connects and disconnects Readers by Reader ID', async () => {
     mockNativeModule.connectReader = jest.fn(async () => ({
       id: 'reader-1',
@@ -502,6 +567,12 @@ describe('web module', () => {
       expect.objectContaining({ code: 'UNSUPPORTED_PLATFORM' })
     );
     await expect(webModule.connectReader('reader-1')).rejects.toEqual(
+      expect.objectContaining({ code: 'UNSUPPORTED_PLATFORM' })
+    );
+    await expect(webModule.startCardMonitor('reader-1')).rejects.toEqual(
+      expect.objectContaining({ code: 'UNSUPPORTED_PLATFORM' })
+    );
+    await expect(webModule.stopCardMonitor('reader-1')).rejects.toEqual(
       expect.objectContaining({ code: 'UNSUPPORTED_PLATFORM' })
     );
   });

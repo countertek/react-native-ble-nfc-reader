@@ -27,3 +27,7 @@ _Avoid_: response, raw response
 **APDU Status**:
 The two-byte status word returned at the end of an APDU response, represented as a four-character Hex String such as `9000`.
 _Avoid_: status code, result code
+
+**Card Presence Event**:
+The public event emitted when a connected Reader reports that a card is present.
+_Avoid_: card detection, tap event
