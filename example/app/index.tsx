@@ -411,7 +411,7 @@ export default function ReaderTestScreen() {
                     </Text>
                   </View>
                   <ActionButton
-                    disabled={(connectedReader !== null && !connected) || scanning}
+                    disabled={scanning || connectedReader !== null}
                     onPress={() => connectToReader(reader.id)}
                     title={connected ? 'Connected' : 'Connect'}
                   />
