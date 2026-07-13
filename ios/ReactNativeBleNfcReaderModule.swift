@@ -446,7 +446,7 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
 
   private func startCardMonitor(readerId: String, options: CardMonitorOptions?) throws {
     let normalizedOptions = try normalizeCardMonitorOptions(options)
-    let terminal = try withReaderStateLock {
+    let terminal: (any CardTerminal)? = try withReaderStateLock {
       guard let activeReader, activeReader.id == readerId else {
         throw readerNotConnectedException(readerId: readerId)
       }
