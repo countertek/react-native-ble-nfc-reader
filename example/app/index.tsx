@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Alert, Button, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import {
   addCardPresentListener,
   addCardRemovedListener,
   addReaderDiscoveredListener,
-  BleNfcReaderError,
   connectReader,
   disconnectReader,
   getReaderPermissionStatus,
@@ -15,15 +14,33 @@ import {
   ReaderPermissionStatus,
   scanReaders,
   startCardMonitor,
-  stopReaderScan,
   stopCardMonitor,
+  stopReaderScan,
   transmit,
 } from '@countertek/react-native-ble-nfc-reader';
+
+import {
+  ActionButton,
+  ButtonRow,
+  DataBlock,
+  EmptyState,
+  Field,
+  Section,
+  SegmentedChoice,
+  StatusPill,
+} from '../components/reader-ui';
+import {
+  addReader,
+  formatError,
+  formatMetadata,
+  isMifareTrailerBlock,
+  parseMifareBlock,
+} from '../lib/reader-format';
 
 type PermissionState = ReaderPermissionStatus | 'loading';
 type CardPresence = 'unknown' | 'present' | 'removed';
 
-export default function App() {
+export default function ReaderTestScreen() {
   const [permissionStatus, setPermissionStatus] = useState<PermissionState>('loading');
   const [message, setMessage] = useState('');
   const [readers, setReaders] = useState<Reader[]>([]);
@@ -72,6 +89,17 @@ export default function App() {
       setCardMonitorRunning(false);
       setCardPresence('unknown');
       setReaders(await scanReaders({ timeoutMs: 5000 }));
+      setMessage('');
+    } catch (error) {
+      setMessage(formatError(error));
+    } finally {
+      setScanning(false);
+    }
+  }
+
+  async function stopScan() {
+    try {
+      setReaders(await stopReaderScan());
       setMessage('');
     } catch (error) {
       setMessage(formatError(error));
@@ -166,7 +194,7 @@ export default function App() {
 
     try {
       const response = await transmit(connectedReader.id, 'FFCA000000');
-      setApduResponse(`Data: ${response.responseData || '(empty)'} Status: ${response.status}`);
+      setApduResponse(`Data: ${response.responseData || '(empty)'}\nStatus: ${response.status}`);
       setMessage('');
     } catch (error) {
       setMessage(formatError(error));
@@ -270,17 +298,6 @@ export default function App() {
     }
   }
 
-  async function stopScan() {
-    try {
-      setReaders(await stopReaderScan());
-      setMessage('');
-    } catch (error) {
-      setMessage(formatError(error));
-    } finally {
-      setScanning(false);
-    }
-  }
-
   useEffect(() => {
     void refreshPermissionStatus();
   }, []);
@@ -320,249 +337,226 @@ export default function App() {
     };
   }, [connectedReader?.id]);
 
+  const hasPermission = permissionStatus === 'granted';
+  const connectedReaderLabel = connectedReader?.name ?? connectedReader?.id ?? 'None';
+
   return (
     <ScrollView
-      style={styles.scroll}
       contentContainerStyle={styles.container}
       contentInsetAdjustmentBehavior="automatic"
-      keyboardShouldPersistTaps="handled">
-      <View style={styles.panel}>
-        <Text style={styles.header}>Generic Reader Flow</Text>
-
-        <Text style={styles.step}>1. Reader Permission</Text>
-        <Text style={styles.status}>Status: {permissionStatus}</Text>
-        <Button
-          title="Check Reader Permission"
-          onPress={refreshPermissionStatus}
-          disabled={permissionStatus === 'loading'}
-        />
-        <Button
-          title="Request Reader Permission"
-          onPress={requestPermissions}
-          disabled={permissionStatus === 'loading'}
-        />
-
-        <Text style={styles.step}>2. Bounded Reader Scan</Text>
-        <Button
-          title="Scan For Readers (5 seconds)"
-          onPress={scanForReaders}
-          disabled={permissionStatus !== 'granted' || scanning || connectedReader !== null}
-        />
-        {permissionStatus !== 'granted' && permissionStatus !== 'loading' && (
-          <Text style={styles.reader}>
-            Reader permission is required before scanning. Use Request Reader Permission first.
-          </Text>
-        )}
-        <Button title="Stop Scan" onPress={stopScan} disabled={!scanning} />
-
-        <Text style={styles.step}>3. Connect Reader</Text>
-        {readers.map((reader) => {
-          const connected = connectedReader?.id === reader.id;
-
-          return (
-            <View key={reader.id} style={styles.readerRow}>
-              <Text style={styles.reader}>{reader.name ?? reader.id}</Text>
-              <Button
-                title={connected ? 'Connected' : 'Connect'}
-                onPress={() => connectToReader(reader.id)}
-                disabled={connectedReader !== null || scanning}
-              />
-            </View>
-          );
-        })}
-        {connectedReader ? (
-          <View style={styles.connectedReader}>
-            <Text style={styles.status}>
-              Connected: {connectedReader.name ?? connectedReader.id}
-            </Text>
-            <Text style={styles.reader}>{formatMetadata(connectedReader)}</Text>
-
-            <Text style={styles.step}>4. Card Presence Monitor</Text>
-            <Text style={styles.status}>Monitor: {cardMonitorRunning ? 'running' : 'stopped'}</Text>
-            <Text style={styles.status}>Card: {cardPresence}</Text>
-            <Button
-              title="Start Card Monitor"
-              onPress={startMonitor}
-              disabled={cardMonitorRunning}
-            />
-            <Button
-              title="Stop Card Monitor"
-              onPress={stopMonitor}
-              disabled={!cardMonitorRunning}
-            />
-
-            <Text style={styles.step}>5. Place Card</Text>
-            <Button title="Read Card UID" onPress={readUid} />
-            <Button title="Transmit UID APDU" onPress={transmitUidApdu} />
-            {cardUid ? <Text style={styles.reader}>UID: {cardUid}</Text> : null}
-            {apduResponse ? <Text style={styles.reader}>{apduResponse}</Text> : null}
-
-            <Text style={styles.step}>6. Authenticate MIFARE Classic Card</Text>
-            <TextInput
-              style={styles.input}
-              value={mifareBlock}
-              onChangeText={setMifareBlock}
-              keyboardType="number-pad"
-              placeholder="MIFARE block"
-            />
-            <Text style={styles.reader}>Key Type: {mifareKeyType}</Text>
-            <View style={styles.keyTypeRow}>
-              <Button
-                title="Use Key A"
-                onPress={() => setMifareKeyType('A')}
-                disabled={mifareKeyType === 'A'}
-              />
-              <Button
-                title="Use Key B"
-                onPress={() => setMifareKeyType('B')}
-                disabled={mifareKeyType === 'B'}
-              />
-            </View>
-            <TextInput
-              style={styles.input}
-              value={mifareKey}
-              onChangeText={setMifareKey}
-              autoCapitalize="characters"
-              autoCorrect={false}
-              secureTextEntry
-              placeholder="MIFARE key hex"
-            />
-            <Button title="Authenticate Block" onPress={() => authenticateMifare(mifareKey)} />
-
-            <Text style={styles.step}>7. Read One Block</Text>
-            <Button title="Read MIFARE Block" onPress={readMifareBlock} />
-
-            <Text style={styles.step}>8. Confirm One Block Write</Text>
-            <TextInput
-              style={styles.input}
-              value={mifareData}
-              onChangeText={setMifareData}
-              autoCapitalize="characters"
-              autoCorrect={false}
-              placeholder="16-byte block data hex"
-            />
-            <Button title="Confirm Write And Read Back" onPress={confirmWriteMifareBlock} />
-            {mifareResult ? <Text style={styles.reader}>MIFARE: {mifareResult}</Text> : null}
-
-            <Text style={styles.step}>9. Disconnect</Text>
-            <Button title="Disconnect Reader" onPress={disconnectCurrentReader} />
-          </View>
-        ) : null}
-        {message ? <Text style={styles.error}>{message}</Text> : null}
+      keyboardShouldPersistTaps="handled"
+      style={styles.scroll}>
+      <View style={styles.header}>
+        <Text style={styles.kicker}>Manual hardware test</Text>
+        <Text style={styles.title}>Generic BLE NFC Reader Flow</Text>
+        <Text style={styles.subtitle}>
+          Work top to bottom with a supported Reader and a test card. Results stay selectable for
+          logs and issue reports.
+        </Text>
       </View>
+
+      <View style={styles.statusGrid}>
+        <StatusPill label="Permission" value={permissionStatus} tone={hasPermission ? 'good' : 'warn'} />
+        <StatusPill label="Scan" value={scanning ? 'running' : 'stopped'} tone={scanning ? 'warn' : 'default'} />
+        <StatusPill label="Reader" value={connectedReaderLabel} tone={connectedReader ? 'good' : 'default'} />
+        <StatusPill label="Card" value={cardPresence} tone={cardPresence === 'present' ? 'good' : 'default'} />
+      </View>
+
+      {message ? <DataBlock label="Message" value={message} tone="bad" /> : null}
+
+      <Section
+        title="1. Reader Permission"
+        detail="Bluetooth reader access must be granted before scanning.">
+        <ButtonRow>
+          <ActionButton
+            disabled={permissionStatus === 'loading'}
+            onPress={refreshPermissionStatus}
+            title="Check Status"
+          />
+          <ActionButton
+            disabled={permissionStatus === 'loading'}
+            onPress={requestPermissions}
+            title="Request Permission"
+          />
+        </ButtonRow>
+      </Section>
+
+      <Section
+        title="2. Scan And Connect"
+        detail="Run a bounded scan, then connect one discovered Reader.">
+        <ButtonRow>
+          <ActionButton
+            disabled={!hasPermission || scanning || connectedReader !== null}
+            onPress={scanForReaders}
+            title="Scan 5 Seconds"
+          />
+          <ActionButton disabled={!scanning} onPress={stopScan} title="Stop Scan" />
+        </ButtonRow>
+
+        {readers.length === 0 ? (
+          <EmptyState>No readers discovered yet.</EmptyState>
+        ) : (
+          <View style={styles.readerList}>
+            {readers.map((reader) => {
+              const connected = connectedReader?.id === reader.id;
+
+              return (
+                <View key={reader.id} style={styles.readerCard}>
+                  <View style={styles.readerText}>
+                    <Text style={styles.readerName} selectable>
+                      {reader.name ?? reader.id}
+                    </Text>
+                    <Text style={styles.readerMeta} selectable>
+                      {formatMetadata(reader)}
+                    </Text>
+                  </View>
+                  <ActionButton
+                    disabled={scanning || connectedReader !== null}
+                    onPress={() => connectToReader(reader.id)}
+                    title={connected ? 'Connected' : 'Connect'}
+                  />
+                </View>
+              );
+            })}
+          </View>
+        )}
+      </Section>
+
+      {connectedReader ? (
+        <>
+          <Section
+            title="3. Card Presence Monitor"
+            detail="Start monitoring before placing or removing a card.">
+            <ButtonRow>
+              <ActionButton disabled={cardMonitorRunning} onPress={startMonitor} title="Start Monitor" />
+              <ActionButton disabled={!cardMonitorRunning} onPress={stopMonitor} title="Stop Monitor" />
+            </ButtonRow>
+          </Section>
+
+          <Section title="4. UID And APDU" detail="Read the card UID directly or through the UID APDU.">
+            <ButtonRow>
+              <ActionButton onPress={readUid} title="Read UID" />
+              <ActionButton onPress={transmitUidApdu} title="Transmit UID APDU" />
+            </ButtonRow>
+            {cardUid ? <DataBlock label="UID" value={cardUid} /> : null}
+            {apduResponse ? <DataBlock label="APDU Response" value={apduResponse} /> : null}
+          </Section>
+
+          <Section
+            title="5. MIFARE Classic Block"
+            detail="Authenticate, read, or write one user-entered data block. Trailer writes stay blocked.">
+            <Field
+              keyboardType="number-pad"
+              label="Block"
+              onChangeText={setMifareBlock}
+              placeholder="4"
+              value={mifareBlock}
+            />
+            <View style={styles.keyType}>
+              <Text style={styles.label}>Key Type</Text>
+              <SegmentedChoice
+                onChange={setMifareKeyType}
+                options={['A', 'B']}
+                value={mifareKeyType}
+              />
+            </View>
+            <Field
+              label="Key Hex"
+              onChangeText={setMifareKey}
+              placeholder="FFFFFFFFFFFF"
+              secureTextEntry
+              value={mifareKey}
+            />
+            <ButtonRow>
+              <ActionButton onPress={() => authenticateMifare(mifareKey)} title="Authenticate" />
+              <ActionButton onPress={readMifareBlock} title="Read Block" />
+            </ButtonRow>
+            <Field
+              label="Write Data Hex"
+              onChangeText={setMifareData}
+              placeholder="00112233445566778899AABBCCDDEEFF"
+              value={mifareData}
+            />
+            <ActionButton destructive onPress={confirmWriteMifareBlock} title="Confirm Write And Read Back" />
+            {mifareResult ? <DataBlock label="MIFARE Result" value={mifareResult} /> : null}
+          </Section>
+
+          <Section title="6. Disconnect" detail="Disconnect before testing another Reader.">
+            <ActionButton destructive onPress={disconnectCurrentReader} title="Disconnect Reader" />
+          </Section>
+        </>
+      ) : null}
     </ScrollView>
   );
-}
-
-function parseMifareBlock(value: string): number | null {
-  if (!/^\d+$/.test(value)) {
-    return null;
-  }
-
-  const block = Number(value);
-
-  if (!Number.isInteger(block) || block < 0 || block > 255) {
-    return null;
-  }
-
-  return block;
-}
-
-function isMifareTrailerBlock(block: number): boolean {
-  if (block < 128) {
-    return block % 4 === 3;
-  }
-
-  return (block - 143) % 16 === 0;
-}
-
-function formatMetadata(reader: Reader): string {
-  const metadata = reader.metadata;
-
-  if (metadata === undefined) {
-    return 'Metadata unavailable';
-  }
-
-  const fields = [
-    metadata.model ? `Model: ${metadata.model}` : undefined,
-    metadata.firmwareVersion ? `Firmware: ${metadata.firmwareVersion}` : undefined,
-    metadata.serialNumber ? `Serial: ${metadata.serialNumber}` : undefined,
-    metadata.batteryLevel !== undefined ? `Battery: ${metadata.batteryLevel}%` : undefined,
-  ].filter((field): field is string => field !== undefined);
-
-  if (fields.length === 0) {
-    return 'Metadata unavailable';
-  }
-
-  return fields.join('\n');
-}
-
-function addReader(readers: Reader[], reader: Reader): Reader[] {
-  if (readers.some((currentReader) => currentReader.id === reader.id)) {
-    return readers;
-  }
-
-  return [...readers, reader];
-}
-
-function formatError(error: unknown): string {
-  if (error instanceof BleNfcReaderError) {
-    return `${error.code}: ${error.message}`;
-  }
-
-  if (error instanceof Error) {
-    return error.message;
-  }
-
-  return 'Reader permission failed';
 }
 
 const styles = StyleSheet.create({
   scroll: {
     flex: 1,
-    backgroundColor: '#f3f4f6',
+    backgroundColor: '#f5f5f7',
   },
   container: {
-    flexGrow: 1,
-    padding: 20,
-  },
-  panel: {
-    gap: 16,
-    padding: 20,
-    backgroundColor: '#fff',
-    borderRadius: 8,
+    gap: 14,
+    padding: 16,
+    paddingBottom: 32,
   },
   header: {
-    fontSize: 24,
-    fontWeight: '600',
+    gap: 6,
+    paddingVertical: 8,
   },
-  step: {
-    fontSize: 18,
-    fontWeight: '600',
+  kicker: {
+    color: '#6b7280',
+    fontSize: 13,
+    fontWeight: '700',
+    textTransform: 'uppercase',
   },
-  status: {
+  title: {
+    color: '#111827',
+    fontSize: 30,
+    fontWeight: '800',
+  },
+  subtitle: {
+    color: '#4b5563',
     fontSize: 16,
+    lineHeight: 22,
   },
-  reader: {
-    fontSize: 14,
-  },
-  readerRow: {
-    gap: 8,
-  },
-  connectedReader: {
-    gap: 8,
-  },
-  keyTypeRow: {
+  statusGrid: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 8,
   },
-  input: {
-    borderColor: '#d1d5db',
-    borderRadius: 4,
-    borderWidth: 1,
-    padding: 8,
+  readerList: {
+    gap: 10,
   },
-  error: {
-    color: '#b91c1c',
+  readerCard: {
+    alignItems: 'flex-start',
+    backgroundColor: '#f9fafb',
+    borderColor: '#e5e7eb',
+    borderCurve: 'continuous',
+    borderRadius: 12,
+    borderWidth: 1,
+    gap: 12,
+    padding: 12,
+  },
+  readerText: {
+    gap: 4,
+  },
+  readerName: {
+    color: '#111827',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  readerMeta: {
+    color: '#4b5563',
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  keyType: {
+    gap: 6,
+  },
+  label: {
+    color: '#374151',
+    fontSize: 13,
+    fontWeight: '700',
   },
 });

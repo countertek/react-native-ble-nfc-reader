@@ -1,13 +1,14 @@
 {
   "name": "react-native-ble-nfc-reader-example",
   "version": "1.0.0",
-  "main": "index.ts",
+  "main": "expo-router/entry",
   "dependencies": {
+    "@countertek/react-native-ble-nfc-reader": "file:..",
     "expo": "~56.0.12",
     "expo-dev-client": "^56.0.20",
+    "expo-router": "56.2.12",
     "react": "19.2.3",
-    "react-native": "0.85.3",
-    "@countertek/react-native-ble-nfc-reader": "file:.."
+    "react-native": "0.85.3"
   },
   "devDependencies": {
     "@types/react": "~19.2.2",
