@@ -25,6 +25,8 @@ import javax.smartcardio.CommandAPDU
 private const val READER_DISCOVERED_EVENT = "onReaderDiscovered"
 private const val CARD_PRESENT_EVENT = "onCardPresent"
 private const val CARD_REMOVED_EVENT = "onCardRemoved"
+private const val CARD_MONITOR_ERROR_EVENT = "onCardMonitorError"
+private const val DEFAULT_CARD_MONITOR_ERROR_MESSAGE = "Card monitor failed"
 private const val DEFAULT_SCAN_TIMEOUT_MS = 5000.0
 private const val DEFAULT_CARD_MONITOR_POLLING_INTERVAL_MS = 1000.0
 private const val MIN_CARD_MONITOR_POLLING_INTERVAL_MS = 100.0
@@ -55,6 +57,7 @@ class ReactNativeBleNfcReaderModule : Module() {
   private var cardMonitorGeneration = 0
   private var activeCardMonitorReaderId: String? = null
   private var activeCardMonitorOptions: NormalizedCardMonitorOptions? = null
+  private var pendingMonitorErrorGeneration: Int? = null
   private var scanPromise: Promise? = null
   private var scanStopRunnable: Runnable? = null
   private var scanTypeRunnable: Runnable? = null
@@ -65,7 +68,12 @@ class ReactNativeBleNfcReaderModule : Module() {
   override fun definition() = ModuleDefinition {
     Name("ReactNativeBleNfcReader")
 
-    Events(READER_DISCOVERED_EVENT, CARD_PRESENT_EVENT, CARD_REMOVED_EVENT)
+    Events(
+      READER_DISCOVERED_EVENT,
+      CARD_PRESENT_EVENT,
+      CARD_REMOVED_EVENT,
+      CARD_MONITOR_ERROR_EVENT
+    )
 
     AsyncFunction("getReaderPermissionStatus") {
       getReaderPermissionStatus()
@@ -584,33 +592,61 @@ class ReactNativeBleNfcReaderModule : Module() {
       try {
         var wasPresent: Boolean? = null
 
-        while (!Thread.currentThread().isInterrupted && isCurrentCardMonitor(generation)) {
-          val present = cardPresent(terminal)
-
-          if (present == null) {
-            sleepCardMonitor(normalizedOptions.pollingIntervalMs)
-            continue
-          }
-
-          if (present && wasPresent != true) {
-            sendCardEvent(CARD_PRESENT_EVENT, readerId, generation)
-          }
-
-          if (!present && wasPresent == true) {
-            if (!cardStillAbsent(terminal)) {
-              continue
+        monitorLoop@ while (!Thread.currentThread().isInterrupted && isCurrentCardMonitor(generation)) {
+          when (val pollStep = pollCardPresent(terminal, generation)) {
+            CardMonitorStep.Stop -> break@monitorLoop
+            is CardMonitorStep.Error -> {
+              terminateCardMonitorWithError(readerId, generation, pollStep.error)
+              break@monitorLoop
             }
+            is CardMonitorStep.CardState -> {
+              val present = pollStep.isPresent
 
-            synchronized(terminalIoLock) {
-              disconnectActiveCardLocked()
+              if (present && wasPresent != true) {
+                sendCardEvent(CARD_PRESENT_EVENT, readerId, generation)
+              }
+
+              if (!present && wasPresent == true) {
+                when (val absentStep = confirmCardAbsent(terminal, generation)) {
+                  CardMonitorStep.Stop -> break@monitorLoop
+                  is CardMonitorStep.Error -> {
+                    terminateCardMonitorWithError(readerId, generation, absentStep.error)
+                    break@monitorLoop
+                  }
+                  is CardMonitorStep.CardState -> {
+                    if (absentStep.isPresent) {
+                      continue@monitorLoop
+                    }
+
+                    synchronized(terminalIoLock) {
+                      disconnectActiveCardLocked()
+                    }
+                    sendCardEvent(CARD_REMOVED_EVENT, readerId, generation)
+                  }
+                  CardMonitorStep.Continue -> break@monitorLoop
+                }
+              }
+
+              wasPresent = present
+
+              when (
+                val waitStep = waitForCardChange(
+                  terminal,
+                  present,
+                  normalizedOptions.pollingIntervalMs,
+                  generation
+                )
+              ) {
+                CardMonitorStep.Continue -> Unit
+                CardMonitorStep.Stop -> break@monitorLoop
+                is CardMonitorStep.Error -> {
+                  terminateCardMonitorWithError(readerId, generation, waitStep.error)
+                  break@monitorLoop
+                }
+                is CardMonitorStep.CardState -> break@monitorLoop
+              }
             }
-            sendCardEvent(CARD_REMOVED_EVENT, readerId, generation)
-          }
-
-          wasPresent = present
-
-          if (!waitForCardChange(terminal, present, normalizedOptions.pollingIntervalMs)) {
-            break
+            CardMonitorStep.Continue -> break@monitorLoop
           }
         }
       } finally {
@@ -657,6 +693,10 @@ class ReactNativeBleNfcReaderModule : Module() {
 
   private fun clearCardMonitorIfCurrent(generation: Int) {
     synchronized(readerLock) {
+      if (pendingMonitorErrorGeneration == generation) {
+        return
+      }
+
       if (cardMonitorGeneration != generation || cardMonitorThread != Thread.currentThread()) {
         return
       }
@@ -700,22 +740,35 @@ class ReactNativeBleNfcReaderModule : Module() {
     }
   }
 
-  private fun cardPresent(terminal: CardTerminal): Boolean? {
+  private fun pollCardPresent(terminal: CardTerminal, generation: Int): CardMonitorStep {
+    if (isCardMonitorStopRequested(generation)) {
+      return CardMonitorStep.Stop
+    }
+
     return synchronized(terminalIoLock) {
       try {
-        terminal.isCardPresent
-      } catch (_: CardException) {
-        null
+        CardMonitorStep.CardState(terminal.isCardPresent)
+      } catch (error: CardException) {
+        cardMonitorFailureStep(error, generation)
       }
     }
   }
 
-  private fun cardStillAbsent(terminal: CardTerminal): Boolean {
+  private fun confirmCardAbsent(terminal: CardTerminal, generation: Int): CardMonitorStep {
     sleepCardMonitor(250)
-    return cardPresent(terminal) != true
+    return pollCardPresent(terminal, generation)
   }
 
-  private fun waitForCardChange(terminal: CardTerminal, present: Boolean, pollingIntervalMs: Long): Boolean {
+  private fun waitForCardChange(
+    terminal: CardTerminal,
+    present: Boolean,
+    pollingIntervalMs: Long,
+    generation: Int
+  ): CardMonitorStep {
+    if (isCardMonitorStopRequested(generation)) {
+      return CardMonitorStep.Stop
+    }
+
     return synchronized(terminalIoLock) {
       try {
         if (present) {
@@ -723,10 +776,73 @@ class ReactNativeBleNfcReaderModule : Module() {
         } else {
           terminal.waitForCardPresent(pollingIntervalMs)
         }
-        true
+        CardMonitorStep.Continue
       } catch (error: CardException) {
-        error.cause !is InterruptedException
+        cardMonitorFailureStep(error, generation)
       }
+    }
+  }
+
+  private fun cardMonitorFailureStep(error: CardException, generation: Int): CardMonitorStep {
+    if (isCardMonitorStopRequested(generation) || error.cause is InterruptedException) {
+      return CardMonitorStep.Stop
+    }
+
+    return CardMonitorStep.Error(error)
+  }
+
+  private fun isCardMonitorStopRequested(generation: Int): Boolean {
+    return Thread.currentThread().isInterrupted || !isCurrentCardMonitor(generation)
+  }
+
+  private fun terminateCardMonitorWithError(readerId: String, generation: Int, error: CardException) {
+    synchronized(readerLock) {
+      pendingMonitorErrorGeneration = generation
+    }
+    deliverCardMonitorError(
+      readerId,
+      generation,
+      error.message ?: DEFAULT_CARD_MONITOR_ERROR_MESSAGE
+    )
+  }
+
+  private fun deliverCardMonitorError(readerId: String, generation: Int, message: String) {
+    scanHandler.post {
+      try {
+        val shouldSend = synchronized(readerLock) {
+          activeReaderId == readerId && cardMonitorGeneration == generation
+        }
+
+        if (shouldSend) {
+          sendEvent(CARD_MONITOR_ERROR_EVENT, Bundle().apply {
+            putString("readerId", readerId)
+            putString("message", message)
+          })
+        }
+      } finally {
+        finalizePendingCardMonitorErrorCleanup(generation)
+      }
+    }
+  }
+
+  private fun finalizePendingCardMonitorErrorCleanup(generation: Int) {
+    synchronized(readerLock) {
+      if (pendingMonitorErrorGeneration != generation) {
+        return
+      }
+
+      pendingMonitorErrorGeneration = null
+
+      if (cardMonitorGeneration != generation) {
+        return
+      }
+
+      cardMonitorGeneration += 1
+      cardMonitorAutoStopRunnable?.let(scanHandler::removeCallbacks)
+      cardMonitorAutoStopRunnable = null
+      cardMonitorThread = null
+      activeCardMonitorReaderId = null
+      activeCardMonitorOptions = null
     }
   }
 
@@ -1051,3 +1167,13 @@ private class CardCommandFailedException(status: String) : CodedException(
   "Card command failed with APDU Status $status",
   null
 )
+
+private sealed class CardMonitorStep {
+  data object Continue : CardMonitorStep()
+
+  data object Stop : CardMonitorStep()
+
+  data class CardState(val isPresent: Boolean) : CardMonitorStep()
+
+  data class Error(val error: CardException) : CardMonitorStep()
+}

@@ -1,4 +1,5 @@
 import {
+  addCardMonitorErrorListener,
   addCardPresentListener,
   addCardRemovedListener,
   addReaderDiscoveredListener,
@@ -216,6 +217,15 @@ describe('public native wrappers', () => {
     expect(mockNativeModule.addListener).toHaveBeenCalledWith('onCardRemoved', listener);
   });
 
+  it('subscribes to card monitor error events', () => {
+    const listener = jest.fn();
+    const subscription = { remove: jest.fn() };
+    mockNativeModule.addListener = jest.fn(() => subscription);
+
+    expect(addCardMonitorErrorListener(listener)).toBe(subscription);
+    expect(mockNativeModule.addListener).toHaveBeenCalledWith('onCardMonitorError', listener);
+  });
+
   it('rejects event listeners on web with unsupported-platform errors', () => {
     mockPlatform.OS = 'web';
     const listener = jest.fn();
@@ -231,6 +241,11 @@ describe('public native wrappers', () => {
       })
     );
     expect(() => addCardRemovedListener(listener)).toThrow(
+      expect.objectContaining({
+        code: 'UNSUPPORTED_PLATFORM',
+      })
+    );
+    expect(() => addCardMonitorErrorListener(listener)).toThrow(
       expect.objectContaining({
         code: 'UNSUPPORTED_PLATFORM',
       })

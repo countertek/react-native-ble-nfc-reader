@@ -4,6 +4,7 @@ import {
   ApduResponse,
   AuthenticateBlockOptions,
   BleNfcReaderError,
+  CardMonitorErrorEvent,
   CardMonitorOptions,
   createUnsupportedPlatformError,
   HexString,
@@ -294,6 +295,13 @@ export function addCardRemovedListener(
 ): ReaderDiscoverySubscription {
   assertNativeListenerAvailable();
   return nativeModule.addListener('onCardRemoved', listener);
+}
+
+export function addCardMonitorErrorListener(
+  listener: (event: CardMonitorErrorEvent) => void
+): ReaderDiscoverySubscription {
+  assertNativeListenerAvailable();
+  return nativeModule.addListener('onCardMonitorError', listener);
 }
 
 function assertNativeListenerAvailable(): void {

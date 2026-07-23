@@ -33,6 +33,11 @@ export type ReaderCardEvent = {
   readerId: ReaderId;
 };
 
+export type CardMonitorErrorEvent = {
+  readerId: ReaderId;
+  message: string;
+};
+
 export type ReaderDiscoverySubscription = {
   remove(): void;
 };

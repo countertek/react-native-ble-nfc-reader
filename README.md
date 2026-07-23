@@ -83,9 +83,10 @@ Starting a new `scanReaders()` while one is active supersedes the prior scan: th
 
 After connecting a Reader:
 
-- `addCardPresentListener()` / `addCardRemovedListener()` — subscribe to card presence events.
+- `addCardPresentListener()` / `addCardRemovedListener()` — subscribe to Card Presence Events (`{ readerId }`).
+- `addCardMonitorErrorListener()` — subscribe to card-monitor polling/transport failures (`{ readerId, message }`). Emitted when Card Presence Event monitoring hits a genuine Reader polling or transport failure (for example, an ACS terminal I/O error while polling card presence or waiting for a card change). Does not fire when monitoring ends via an explicit `stopCardMonitor()`, cancellation/interruption of the monitor thread, or configured `autoStopAfterMs` — those paths stop silently.
 - `startCardMonitor(readerId, options?)` — explicitly start Card Presence Event monitoring. Connecting a Reader no longer starts monitoring by default in v0.2.0.
-- `stopCardMonitor(readerId)` — stop monitoring silently. A manual stop or auto-stop does not mean the card was physically removed and does not emit a card removal event.
+- `stopCardMonitor(readerId)` — stop monitoring silently. An explicit stop, configured auto-stop, or cancellation does not mean the card was physically removed; it does not emit a Card Presence Event or a card-monitor error.
 - `readCardUid(readerId)` — card UID as a Hex String.
 - `transmit(readerId, apdu)` — send a raw APDU Hex String; resolves with `responseData` (APDU Response Data) and `status` (APDU Status). Non-`9000` statuses are returned, not thrown.
 
@@ -100,12 +101,16 @@ const present = addCardPresentListener(({ readerId }) => {
 const removed = addCardRemovedListener(({ readerId }) => {
   console.log('Card removed', readerId);
 });
+const monitorError = addCardMonitorErrorListener(({ readerId, message }) => {
+  console.log('Card monitor error', readerId, message);
+});
 
 const reader = await connectReader(readerId);
 await startCardMonitor(reader.id, { pollingIntervalMs: 1000, autoStopAfterMs: 30000 });
 await stopCardMonitor(reader.id);
 await disconnectReader(reader.id);
 
+monitorError.remove();
 present.remove();
 removed.remove();
 ```
