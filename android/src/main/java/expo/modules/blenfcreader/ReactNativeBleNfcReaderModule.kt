@@ -57,7 +57,6 @@ class ReactNativeBleNfcReaderModule : Module() {
   private var cardMonitorGeneration = 0
   private var activeCardMonitorReaderId: String? = null
   private var activeCardMonitorOptions: NormalizedCardMonitorOptions? = null
-  private var pendingMonitorErrorGeneration: Int? = null
   private var scanPromise: Promise? = null
   private var scanStopRunnable: Runnable? = null
   private var scanTypeRunnable: Runnable? = null
@@ -573,12 +572,17 @@ class ReactNativeBleNfcReaderModule : Module() {
         throw ReaderNotConnectedException(readerId)
       }
 
-      if (cardMonitorThread != null) {
+      val monitorThread = cardMonitorThread
+      if (monitorThread != null && monitorThread.isAlive) {
         if (activeCardMonitorReaderId == readerId && activeCardMonitorOptions == normalizedOptions) {
           return
         }
 
         throw CardMonitorAlreadyActiveException()
+      }
+
+      if (monitorThread != null) {
+        clearInactiveCardMonitorLocked()
       }
 
       activeReaderTerminal ?: throw ReaderNotConnectedException(readerId)
@@ -676,32 +680,31 @@ class ReactNativeBleNfcReaderModule : Module() {
 
   private fun clearCardMonitorIfCurrent(generation: Int) {
     synchronized(readerLock) {
-      if (pendingMonitorErrorGeneration == generation) {
-        return
-      }
-
       if (cardMonitorGeneration != generation || cardMonitorThread != Thread.currentThread()) {
         return
       }
 
-      cardMonitorGeneration += 1
-      cardMonitorAutoStopRunnable?.let(scanHandler::removeCallbacks)
-      cardMonitorAutoStopRunnable = null
-      cardMonitorThread = null
-      activeCardMonitorReaderId = null
-      activeCardMonitorOptions = null
+      clearActiveCardMonitorLocked()
     }
+  }
+
+  private fun clearInactiveCardMonitorLocked() {
+    cardMonitorAutoStopRunnable?.let(scanHandler::removeCallbacks)
+    cardMonitorAutoStopRunnable = null
+    cardMonitorThread = null
+    activeCardMonitorReaderId = null
+    activeCardMonitorOptions = null
+  }
+
+  private fun clearActiveCardMonitorLocked() {
+    cardMonitorGeneration += 1
+    clearInactiveCardMonitorLocked()
   }
 
   private fun stopCardMonitorInternal() {
     val thread = synchronized(readerLock) {
-      cardMonitorGeneration += 1
-      cardMonitorAutoStopRunnable?.let(scanHandler::removeCallbacks)
-      cardMonitorAutoStopRunnable = null
       val currentThread = cardMonitorThread
-      cardMonitorThread = null
-      activeCardMonitorReaderId = null
-      activeCardMonitorOptions = null
+      clearActiveCardMonitorLocked()
       currentThread
     }
     thread?.interrupt()
@@ -783,77 +786,36 @@ class ReactNativeBleNfcReaderModule : Module() {
     return Thread.currentThread().isInterrupted || !isCurrentCardMonitor(generation)
   }
 
-  private fun tryClaimPendingMonitorError(generation: Int): Boolean {
-    synchronized(readerLock) {
-      if (cardMonitorGeneration != generation || cardMonitorThread != Thread.currentThread()) {
-        return false
-      }
-
-      if (pendingMonitorErrorGeneration == generation) {
-        return false
-      }
-
-      pendingMonitorErrorGeneration = generation
-      return true
-    }
-  }
-
-  private fun shouldDeliverCardMonitorError(readerId: String, generation: Int): Boolean {
-    return activeReaderId == readerId &&
-      cardMonitorGeneration == generation &&
-      cardMonitorThread != null &&
-      pendingMonitorErrorGeneration == generation
-  }
-
   private fun terminateCardMonitorWithError(readerId: String, generation: Int, error: CardException) {
-    if (!tryClaimPendingMonitorError(generation)) {
-      return
+    val message = error.message ?: DEFAULT_CARD_MONITOR_ERROR_MESSAGE
+    val deliveryGeneration = synchronized(readerLock) {
+      if (cardMonitorGeneration != generation || cardMonitorThread != Thread.currentThread()) {
+        return
+      }
+
+      val send = activeReaderId == readerId
+      // Clear immediately so a same-options restart is not treated as an idempotent no-op
+      // while async error delivery is still pending.
+      clearActiveCardMonitorLocked()
+      if (!send) {
+        return
+      }
+      cardMonitorGeneration
     }
 
-    deliverCardMonitorError(
-      readerId,
-      generation,
-      error.message ?: DEFAULT_CARD_MONITOR_ERROR_MESSAGE
-    )
-  }
-
-  private fun deliverCardMonitorError(readerId: String, generation: Int, message: String) {
     scanHandler.post {
-      try {
-        val shouldSend = synchronized(readerLock) {
-          shouldDeliverCardMonitorError(readerId, generation)
-        }
-
-        if (shouldSend) {
-          sendEvent(CARD_MONITOR_ERROR_EVENT, Bundle().apply {
-            putString("readerId", readerId)
-            putString("message", message)
-          })
-        }
-      } finally {
-        finalizePendingCardMonitorErrorCleanup(generation)
-      }
-    }
-  }
-
-  private fun finalizePendingCardMonitorErrorCleanup(generation: Int) {
-    synchronized(readerLock) {
-      if (pendingMonitorErrorGeneration != generation) {
-        return
+      val shouldSend = synchronized(readerLock) {
+        activeReaderId == readerId && cardMonitorGeneration == deliveryGeneration
       }
 
-      pendingMonitorErrorGeneration = null
-
-      if (cardMonitorGeneration != generation) {
-        return
+      if (!shouldSend) {
+        return@post
       }
 
-      cardMonitorGeneration += 1
-      cardMonitorAutoStopRunnable?.let(scanHandler::removeCallbacks)
-      cardMonitorAutoStopRunnable = null
-      cardMonitorThread = null
-      activeCardMonitorReaderId = null
-      activeCardMonitorOptions = null
+      sendEvent(CARD_MONITOR_ERROR_EVENT, Bundle().apply {
+        putString("readerId", readerId)
+        putString("message", message)
+      })
     }
   }
 
