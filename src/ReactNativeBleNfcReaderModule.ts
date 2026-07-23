@@ -2,6 +2,7 @@ import { NativeModule, requireNativeModule } from 'expo';
 
 import {
   AuthenticateBlockOptions,
+  CardMonitorErrorEvent,
   CardMonitorOptions,
   HexString,
   Reader,
@@ -18,6 +19,7 @@ type ReactNativeBleNfcReaderModuleEvents = {
   onReaderDiscovered(event: ReaderDiscoveredEvent): void;
   onCardPresent(event: ReaderCardEvent): void;
   onCardRemoved(event: ReaderCardEvent): void;
+  onCardMonitorError(event: CardMonitorErrorEvent): void;
 };
 
 export declare class ReactNativeBleNfcReaderModule extends NativeModule<ReactNativeBleNfcReaderModuleEvents> {

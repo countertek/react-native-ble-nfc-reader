@@ -25,6 +25,8 @@ import javax.smartcardio.CommandAPDU
 private const val READER_DISCOVERED_EVENT = "onReaderDiscovered"
 private const val CARD_PRESENT_EVENT = "onCardPresent"
 private const val CARD_REMOVED_EVENT = "onCardRemoved"
+private const val CARD_MONITOR_ERROR_EVENT = "onCardMonitorError"
+private const val DEFAULT_CARD_MONITOR_ERROR_MESSAGE = "Card monitor failed"
 private const val DEFAULT_SCAN_TIMEOUT_MS = 5000.0
 private const val DEFAULT_CARD_MONITOR_POLLING_INTERVAL_MS = 1000.0
 private const val MIN_CARD_MONITOR_POLLING_INTERVAL_MS = 100.0
@@ -55,6 +57,7 @@ class ReactNativeBleNfcReaderModule : Module() {
   private var cardMonitorGeneration = 0
   private var activeCardMonitorReaderId: String? = null
   private var activeCardMonitorOptions: NormalizedCardMonitorOptions? = null
+  private var pendingMonitorErrorGeneration: Int? = null
   private var scanPromise: Promise? = null
   private var scanStopRunnable: Runnable? = null
   private var scanTypeRunnable: Runnable? = null
@@ -65,7 +68,12 @@ class ReactNativeBleNfcReaderModule : Module() {
   override fun definition() = ModuleDefinition {
     Name("ReactNativeBleNfcReader")
 
-    Events(READER_DISCOVERED_EVENT, CARD_PRESENT_EVENT, CARD_REMOVED_EVENT)
+    Events(
+      READER_DISCOVERED_EVENT,
+      CARD_PRESENT_EVENT,
+      CARD_REMOVED_EVENT,
+      CARD_MONITOR_ERROR_EVENT
+    )
 
     AsyncFunction("getReaderPermissionStatus") {
       getReaderPermissionStatus()
@@ -584,33 +592,44 @@ class ReactNativeBleNfcReaderModule : Module() {
       try {
         var wasPresent: Boolean? = null
 
-        while (!Thread.currentThread().isInterrupted && isCurrentCardMonitor(generation)) {
-          val present = cardPresent(terminal)
+        monitorLoop@ while (!Thread.currentThread().isInterrupted && isCurrentCardMonitor(generation)) {
+          try {
+            val present = pollCardPresent(terminal, generation) ?: break@monitorLoop
 
-          if (present == null) {
-            sleepCardMonitor(normalizedOptions.pollingIntervalMs)
-            continue
-          }
-
-          if (present && wasPresent != true) {
-            sendCardEvent(CARD_PRESENT_EVENT, readerId, generation)
-          }
-
-          if (!present && wasPresent == true) {
-            if (!cardStillAbsent(terminal)) {
-              continue
+            if (present && wasPresent != true) {
+              sendCardEvent(CARD_PRESENT_EVENT, readerId, generation)
             }
 
-            synchronized(terminalIoLock) {
-              disconnectActiveCardLocked()
+            if (!present && wasPresent == true) {
+              when (val stillAbsent = confirmCardAbsent(terminal, generation)) {
+                null -> break@monitorLoop
+                false -> continue@monitorLoop
+                true -> {
+                  synchronized(terminalIoLock) {
+                    disconnectActiveCardLocked()
+                  }
+                  sendCardEvent(CARD_REMOVED_EVENT, readerId, generation)
+                }
+              }
             }
-            sendCardEvent(CARD_REMOVED_EVENT, readerId, generation)
-          }
 
-          wasPresent = present
+            wasPresent = present
 
-          if (!waitForCardChange(terminal, present, normalizedOptions.pollingIntervalMs)) {
-            break
+            if (!waitForCardChange(
+                terminal,
+                present,
+                normalizedOptions.pollingIntervalMs,
+                generation
+              )
+            ) {
+              break@monitorLoop
+            }
+          } catch (error: CardException) {
+            if (isCardMonitorStopRequested(generation) || error.cause is InterruptedException) {
+              break@monitorLoop
+            }
+            terminateCardMonitorWithError(readerId, generation, error)
+            break@monitorLoop
           }
         }
       } finally {
@@ -657,6 +676,10 @@ class ReactNativeBleNfcReaderModule : Module() {
 
   private fun clearCardMonitorIfCurrent(generation: Int) {
     synchronized(readerLock) {
+      if (pendingMonitorErrorGeneration == generation) {
+        return
+      }
+
       if (cardMonitorGeneration != generation || cardMonitorThread != Thread.currentThread()) {
         return
       }
@@ -700,22 +723,44 @@ class ReactNativeBleNfcReaderModule : Module() {
     }
   }
 
-  private fun cardPresent(terminal: CardTerminal): Boolean? {
+  private fun pollCardPresent(terminal: CardTerminal, generation: Int): Boolean? {
+    if (isCardMonitorStopRequested(generation)) {
+      return null
+    }
+
     return synchronized(terminalIoLock) {
       try {
         terminal.isCardPresent
-      } catch (_: CardException) {
-        null
+      } catch (error: CardException) {
+        if (error.cause is InterruptedException) {
+          null
+        } else {
+          throw error
+        }
       }
     }
   }
 
-  private fun cardStillAbsent(terminal: CardTerminal): Boolean {
+  private fun confirmCardAbsent(terminal: CardTerminal, generation: Int): Boolean? {
     sleepCardMonitor(250)
-    return cardPresent(terminal) != true
+    if (isCardMonitorStopRequested(generation)) {
+      return null
+    }
+
+    val present = pollCardPresent(terminal, generation) ?: return null
+    return !present
   }
 
-  private fun waitForCardChange(terminal: CardTerminal, present: Boolean, pollingIntervalMs: Long): Boolean {
+  private fun waitForCardChange(
+    terminal: CardTerminal,
+    present: Boolean,
+    pollingIntervalMs: Long,
+    generation: Int
+  ): Boolean {
+    if (isCardMonitorStopRequested(generation)) {
+      return false
+    }
+
     return synchronized(terminalIoLock) {
       try {
         if (present) {
@@ -725,8 +770,90 @@ class ReactNativeBleNfcReaderModule : Module() {
         }
         true
       } catch (error: CardException) {
-        error.cause !is InterruptedException
+        if (error.cause is InterruptedException) {
+          false
+        } else {
+          throw error
+        }
       }
+    }
+  }
+
+  private fun isCardMonitorStopRequested(generation: Int): Boolean {
+    return Thread.currentThread().isInterrupted || !isCurrentCardMonitor(generation)
+  }
+
+  private fun tryClaimPendingMonitorError(generation: Int): Boolean {
+    synchronized(readerLock) {
+      if (cardMonitorGeneration != generation || cardMonitorThread != Thread.currentThread()) {
+        return false
+      }
+
+      if (pendingMonitorErrorGeneration == generation) {
+        return false
+      }
+
+      pendingMonitorErrorGeneration = generation
+      return true
+    }
+  }
+
+  private fun shouldDeliverCardMonitorError(readerId: String, generation: Int): Boolean {
+    return activeReaderId == readerId &&
+      cardMonitorGeneration == generation &&
+      cardMonitorThread != null &&
+      pendingMonitorErrorGeneration == generation
+  }
+
+  private fun terminateCardMonitorWithError(readerId: String, generation: Int, error: CardException) {
+    if (!tryClaimPendingMonitorError(generation)) {
+      return
+    }
+
+    deliverCardMonitorError(
+      readerId,
+      generation,
+      error.message ?: DEFAULT_CARD_MONITOR_ERROR_MESSAGE
+    )
+  }
+
+  private fun deliverCardMonitorError(readerId: String, generation: Int, message: String) {
+    scanHandler.post {
+      try {
+        val shouldSend = synchronized(readerLock) {
+          shouldDeliverCardMonitorError(readerId, generation)
+        }
+
+        if (shouldSend) {
+          sendEvent(CARD_MONITOR_ERROR_EVENT, Bundle().apply {
+            putString("readerId", readerId)
+            putString("message", message)
+          })
+        }
+      } finally {
+        finalizePendingCardMonitorErrorCleanup(generation)
+      }
+    }
+  }
+
+  private fun finalizePendingCardMonitorErrorCleanup(generation: Int) {
+    synchronized(readerLock) {
+      if (pendingMonitorErrorGeneration != generation) {
+        return
+      }
+
+      pendingMonitorErrorGeneration = null
+
+      if (cardMonitorGeneration != generation) {
+        return
+      }
+
+      cardMonitorGeneration += 1
+      cardMonitorAutoStopRunnable?.let(scanHandler::removeCallbacks)
+      cardMonitorAutoStopRunnable = null
+      cardMonitorThread = null
+      activeCardMonitorReaderId = null
+      activeCardMonitorOptions = null
     }
   }
 

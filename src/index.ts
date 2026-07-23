@@ -1,4 +1,5 @@
 export {
+  addCardMonitorErrorListener,
   addCardPresentListener,
   addCardRemovedListener,
   addReaderDiscoveredListener,
