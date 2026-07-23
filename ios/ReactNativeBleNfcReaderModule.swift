@@ -661,7 +661,7 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
 
   private func terminateCardMonitorWithError(readerId: String, generation: Int, error: Error) {
     let message = error.localizedDescription
-    let shouldSend = withReaderStateLock { () -> Bool? in
+    let deliveryGeneration = withReaderStateLock { () -> Int? in
       if cardMonitorGeneration != generation || cardMonitorThread !== Thread.current {
         return nil
       }
@@ -670,10 +670,13 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
       // Clear immediately so a same-options restart is not treated as an idempotent no-op
       // while async error delivery is still pending.
       clearActiveCardMonitorLocked()
-      return send
+      guard send else {
+        return nil
+      }
+      return cardMonitorGeneration
     }
 
-    guard shouldSend == true else {
+    guard let deliveryGeneration else {
       return
     }
 
@@ -682,11 +685,11 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
         return
       }
 
-      let stillConnected = self.withReaderStateLock {
-        self.activeReader?.id == readerId
+      let shouldSend = self.withReaderStateLock {
+        self.activeReader?.id == readerId && self.cardMonitorGeneration == deliveryGeneration
       }
 
-      guard stillConnected else {
+      guard shouldSend else {
         return
       }
 

@@ -788,7 +788,7 @@ class ReactNativeBleNfcReaderModule : Module() {
 
   private fun terminateCardMonitorWithError(readerId: String, generation: Int, error: CardException) {
     val message = error.message ?: DEFAULT_CARD_MONITOR_ERROR_MESSAGE
-    val shouldSend = synchronized(readerLock) {
+    val deliveryGeneration = synchronized(readerLock) {
       if (cardMonitorGeneration != generation || cardMonitorThread != Thread.currentThread()) {
         return
       }
@@ -797,19 +797,18 @@ class ReactNativeBleNfcReaderModule : Module() {
       // Clear immediately so a same-options restart is not treated as an idempotent no-op
       // while async error delivery is still pending.
       clearActiveCardMonitorLocked()
-      send
-    }
-
-    if (!shouldSend) {
-      return
+      if (!send) {
+        return
+      }
+      cardMonitorGeneration
     }
 
     scanHandler.post {
-      val stillConnected = synchronized(readerLock) {
-        activeReaderId == readerId
+      val shouldSend = synchronized(readerLock) {
+        activeReaderId == readerId && cardMonitorGeneration == deliveryGeneration
       }
 
-      if (!stillConnected) {
+      if (!shouldSend) {
         return@post
       }
 
