@@ -40,6 +40,7 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
   private var cardMonitorThread: Thread?
   private var cardMonitorAutoStopTimer: Timer?
   private var cardMonitorGeneration = 0
+  private var pendingMonitorErrorGeneration: Int?
   private var activeCardMonitorReaderId: String?
   private var activeCardMonitorOptions: NormalizedCardMonitorOptions?
   private let readerStateLock = NSLock()
@@ -543,97 +544,53 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
     generation: Int,
     pollingIntervalMs: Int
   ) {
-    defer {
-      clearCardMonitorIfCurrent(generation)
-    }
-
     var wasPresent: Bool?
-    var didReportMonitorError = false
 
-    while !Thread.current.isCancelled && isCurrentCardMonitor(generation) {
-      let present: Bool
+    monitorLoop: while !Thread.current.isCancelled && isCurrentCardMonitor(generation) {
       do {
-        present = try cardPresent(terminal)
-      } catch {
-        reportCardMonitorFailure(
-          readerId: readerId,
-          generation: generation,
-          error: error,
-          didReport: &didReportMonitorError
-        )
-        break
-      }
+        let present = try cardPresent(terminal)
 
-      if present && wasPresent != true {
-        sendCardEvent(cardPresentEvent, readerId: readerId, generation: generation)
-      }
-
-      if !present && wasPresent == true {
-        let stillAbsent: Bool
-        do {
-          stillAbsent = try cardStillAbsent(terminal)
-        } catch {
-          reportCardMonitorFailure(
-            readerId: readerId,
-            generation: generation,
-            error: error,
-            didReport: &didReportMonitorError
-          )
-          break
+        if present && wasPresent != true {
+          sendCardEvent(cardPresentEvent, readerId: readerId, generation: generation)
         }
 
-        if Thread.current.isCancelled {
-          break
+        if !present && wasPresent == true {
+          let stillAbsent = try cardStillAbsent(terminal)
+          if isCardMonitorStopRequested(generation) {
+            break monitorLoop
+          }
+
+          if !stillAbsent {
+            continue monitorLoop
+          }
+
+          withTerminalLock {
+            disconnectActiveCard()
+          }
+          sendCardEvent(cardRemovedEvent, readerId: readerId, generation: generation)
         }
 
-        if !stillAbsent {
-          continue
-        }
+        wasPresent = present
 
-        withTerminalLock {
-          disconnectActiveCard()
-        }
-        sendCardEvent(cardRemovedEvent, readerId: readerId, generation: generation)
-      }
-
-      wasPresent = present
-
-      let shouldContinue: Bool
-      do {
-        shouldContinue = try waitForCardChange(
+        let shouldContinue = try waitForCardChange(
           terminal,
           present: present,
           pollingIntervalMs: pollingIntervalMs
         )
+        if !shouldContinue {
+          break monitorLoop
+        }
       } catch {
-        reportCardMonitorFailure(
-          readerId: readerId,
-          generation: generation,
-          error: error,
-          didReport: &didReportMonitorError
-        )
-        break
-      }
+        if isCardMonitorStopRequested(generation) {
+          break monitorLoop
+        }
 
-      if !shouldContinue {
-        break
+        terminateCardMonitorWithError(readerId: readerId, generation: generation, error: error)
+        break monitorLoop
       }
     }
-  }
 
-  private func clearCardMonitorIfCurrent(_ generation: Int) {
-    withReaderStateLock {
-      if cardMonitorGeneration != generation || cardMonitorThread !== Thread.current {
-        return
-      }
-
-      cardMonitorGeneration += 1
-      cardMonitorAutoStopTimer?.invalidate()
-      cardMonitorAutoStopTimer = nil
-      cardMonitorThread = nil
-      activeCardMonitorReaderId = nil
-      activeCardMonitorOptions = nil
-    }
+    scheduleCardMonitorCleanup(generation: generation)
   }
 
   private func isCurrentCardMonitor(_ generation: Int) -> Bool {
@@ -700,45 +657,45 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
     return try block()
   }
 
-  private func reportCardMonitorFailure(
-    readerId: String,
-    generation: Int,
-    error: Error,
-    didReport: inout Bool
-  ) {
-    if Thread.current.isCancelled {
+  private func isCardMonitorStopRequested(_ generation: Int) -> Bool {
+    return Thread.current.isCancelled || !isCurrentCardMonitor(generation)
+  }
+
+  private func tryClaimPendingMonitorError(_ generation: Int) -> Bool {
+    return withReaderStateLock {
+      if cardMonitorGeneration != generation || cardMonitorThread !== Thread.current {
+        return false
+      }
+
+      if pendingMonitorErrorGeneration == generation {
+        return false
+      }
+
+      pendingMonitorErrorGeneration = generation
+      return true
+    }
+  }
+
+  private func shouldDeliverCardMonitorError(readerId: String, generation: Int) -> Bool {
+    return activeReader?.id == readerId &&
+      cardMonitorGeneration == generation &&
+      cardMonitorThread != nil &&
+      pendingMonitorErrorGeneration == generation
+  }
+
+  private func terminateCardMonitorWithError(readerId: String, generation: Int, error: Error) {
+    guard tryClaimPendingMonitorError(generation) else {
       return
     }
 
-    guard !didReport else {
-      return
-    }
-
-    didReport = true
-    sendCardMonitorError(
+    deliverCardMonitorError(
       readerId: readerId,
       generation: generation,
       message: error.localizedDescription
     )
   }
 
-  private func shouldDeliverCardMonitorError(readerId: String, generation: Int) -> Bool {
-    guard activeReader?.id == readerId else {
-      return false
-    }
-
-    if cardMonitorGeneration == generation {
-      return true
-    }
-
-    if cardMonitorGeneration == generation + 1 && cardMonitorThread == nil {
-      return true
-    }
-
-    return false
-  }
-
-  private func sendCardMonitorError(readerId: String, generation: Int, message: String) {
+  private func deliverCardMonitorError(readerId: String, generation: Int, message: String) {
     DispatchQueue.main.async { [weak self] in
       guard let self else {
         return
@@ -748,14 +705,60 @@ public class ReactNativeBleNfcReaderModule: Module, BluetoothTerminalManagerDele
         self.shouldDeliverCardMonitorError(readerId: readerId, generation: generation)
       }
 
-      guard shouldSend else {
+      if shouldSend {
+        self.sendEvent(cardMonitorErrorEvent, [
+          "readerId": readerId,
+          "message": message,
+        ])
+      }
+
+      self.finalizePendingCardMonitorErrorCleanup(generation: generation)
+    }
+  }
+
+  private func finalizePendingCardMonitorErrorCleanup(generation: Int) {
+    withReaderStateLock {
+      if pendingMonitorErrorGeneration != generation {
         return
       }
 
-      self.sendEvent(cardMonitorErrorEvent, [
-        "readerId": readerId,
-        "message": message,
-      ])
+      pendingMonitorErrorGeneration = nil
+
+      if cardMonitorGeneration != generation {
+        return
+      }
+
+      cardMonitorGeneration += 1
+      cardMonitorAutoStopTimer?.invalidate()
+      cardMonitorAutoStopTimer = nil
+      cardMonitorThread = nil
+      activeCardMonitorReaderId = nil
+      activeCardMonitorOptions = nil
+    }
+  }
+
+  private func scheduleCardMonitorCleanup(generation: Int) {
+    DispatchQueue.main.async { [weak self] in
+      self?.finalizeCardMonitorCleanup(generation: generation)
+    }
+  }
+
+  private func finalizeCardMonitorCleanup(generation: Int) {
+    withReaderStateLock {
+      if pendingMonitorErrorGeneration == generation {
+        return
+      }
+
+      if cardMonitorGeneration != generation {
+        return
+      }
+
+      cardMonitorGeneration += 1
+      cardMonitorAutoStopTimer?.invalidate()
+      cardMonitorAutoStopTimer = nil
+      cardMonitorThread = nil
+      activeCardMonitorReaderId = nil
+      activeCardMonitorOptions = nil
     }
   }
 

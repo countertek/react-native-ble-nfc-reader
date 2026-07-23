@@ -593,60 +593,43 @@ class ReactNativeBleNfcReaderModule : Module() {
         var wasPresent: Boolean? = null
 
         monitorLoop@ while (!Thread.currentThread().isInterrupted && isCurrentCardMonitor(generation)) {
-          when (val pollStep = pollCardPresent(terminal, generation)) {
-            CardMonitorStep.Stop -> break@monitorLoop
-            is CardMonitorStep.Error -> {
-              terminateCardMonitorWithError(readerId, generation, pollStep.error)
+          try {
+            val present = pollCardPresent(terminal, generation) ?: break@monitorLoop
+
+            if (present && wasPresent != true) {
+              sendCardEvent(CARD_PRESENT_EVENT, readerId, generation)
+            }
+
+            if (!present && wasPresent == true) {
+              when (val stillAbsent = confirmCardAbsent(terminal, generation)) {
+                null -> break@monitorLoop
+                false -> continue@monitorLoop
+                true -> {
+                  synchronized(terminalIoLock) {
+                    disconnectActiveCardLocked()
+                  }
+                  sendCardEvent(CARD_REMOVED_EVENT, readerId, generation)
+                }
+              }
+            }
+
+            wasPresent = present
+
+            if (!waitForCardChange(
+                terminal,
+                present,
+                normalizedOptions.pollingIntervalMs,
+                generation
+              )
+            ) {
               break@monitorLoop
             }
-            is CardMonitorStep.CardState -> {
-              val present = pollStep.isPresent
-
-              if (present && wasPresent != true) {
-                sendCardEvent(CARD_PRESENT_EVENT, readerId, generation)
-              }
-
-              if (!present && wasPresent == true) {
-                when (val absentStep = confirmCardAbsent(terminal, generation)) {
-                  CardMonitorStep.Stop -> break@monitorLoop
-                  is CardMonitorStep.Error -> {
-                    terminateCardMonitorWithError(readerId, generation, absentStep.error)
-                    break@monitorLoop
-                  }
-                  is CardMonitorStep.CardState -> {
-                    if (absentStep.isPresent) {
-                      continue@monitorLoop
-                    }
-
-                    synchronized(terminalIoLock) {
-                      disconnectActiveCardLocked()
-                    }
-                    sendCardEvent(CARD_REMOVED_EVENT, readerId, generation)
-                  }
-                  CardMonitorStep.Continue -> break@monitorLoop
-                }
-              }
-
-              wasPresent = present
-
-              when (
-                val waitStep = waitForCardChange(
-                  terminal,
-                  present,
-                  normalizedOptions.pollingIntervalMs,
-                  generation
-                )
-              ) {
-                CardMonitorStep.Continue -> Unit
-                CardMonitorStep.Stop -> break@monitorLoop
-                is CardMonitorStep.Error -> {
-                  terminateCardMonitorWithError(readerId, generation, waitStep.error)
-                  break@monitorLoop
-                }
-                is CardMonitorStep.CardState -> break@monitorLoop
-              }
+          } catch (error: CardException) {
+            if (isCardMonitorStopRequested(generation) || error.cause is InterruptedException) {
+              break@monitorLoop
             }
-            CardMonitorStep.Continue -> break@monitorLoop
+            terminateCardMonitorWithError(readerId, generation, error)
+            break@monitorLoop
           }
         }
       } finally {
@@ -740,23 +723,32 @@ class ReactNativeBleNfcReaderModule : Module() {
     }
   }
 
-  private fun pollCardPresent(terminal: CardTerminal, generation: Int): CardMonitorStep {
+  private fun pollCardPresent(terminal: CardTerminal, generation: Int): Boolean? {
     if (isCardMonitorStopRequested(generation)) {
-      return CardMonitorStep.Stop
+      return null
     }
 
     return synchronized(terminalIoLock) {
       try {
-        CardMonitorStep.CardState(terminal.isCardPresent)
+        terminal.isCardPresent
       } catch (error: CardException) {
-        cardMonitorFailureStep(error, generation)
+        if (error.cause is InterruptedException) {
+          null
+        } else {
+          throw error
+        }
       }
     }
   }
 
-  private fun confirmCardAbsent(terminal: CardTerminal, generation: Int): CardMonitorStep {
+  private fun confirmCardAbsent(terminal: CardTerminal, generation: Int): Boolean? {
     sleepCardMonitor(250)
-    return pollCardPresent(terminal, generation)
+    if (isCardMonitorStopRequested(generation)) {
+      return null
+    }
+
+    val present = pollCardPresent(terminal, generation) ?: return null
+    return !present
   }
 
   private fun waitForCardChange(
@@ -764,9 +756,9 @@ class ReactNativeBleNfcReaderModule : Module() {
     present: Boolean,
     pollingIntervalMs: Long,
     generation: Int
-  ): CardMonitorStep {
+  ): Boolean {
     if (isCardMonitorStopRequested(generation)) {
-      return CardMonitorStep.Stop
+      return false
     }
 
     return synchronized(terminalIoLock) {
@@ -776,29 +768,48 @@ class ReactNativeBleNfcReaderModule : Module() {
         } else {
           terminal.waitForCardPresent(pollingIntervalMs)
         }
-        CardMonitorStep.Continue
+        true
       } catch (error: CardException) {
-        cardMonitorFailureStep(error, generation)
+        if (error.cause is InterruptedException) {
+          false
+        } else {
+          throw error
+        }
       }
     }
-  }
-
-  private fun cardMonitorFailureStep(error: CardException, generation: Int): CardMonitorStep {
-    if (isCardMonitorStopRequested(generation) || error.cause is InterruptedException) {
-      return CardMonitorStep.Stop
-    }
-
-    return CardMonitorStep.Error(error)
   }
 
   private fun isCardMonitorStopRequested(generation: Int): Boolean {
     return Thread.currentThread().isInterrupted || !isCurrentCardMonitor(generation)
   }
 
-  private fun terminateCardMonitorWithError(readerId: String, generation: Int, error: CardException) {
+  private fun tryClaimPendingMonitorError(generation: Int): Boolean {
     synchronized(readerLock) {
+      if (cardMonitorGeneration != generation || cardMonitorThread != Thread.currentThread()) {
+        return false
+      }
+
+      if (pendingMonitorErrorGeneration == generation) {
+        return false
+      }
+
       pendingMonitorErrorGeneration = generation
+      return true
     }
+  }
+
+  private fun shouldDeliverCardMonitorError(readerId: String, generation: Int): Boolean {
+    return activeReaderId == readerId &&
+      cardMonitorGeneration == generation &&
+      cardMonitorThread != null &&
+      pendingMonitorErrorGeneration == generation
+  }
+
+  private fun terminateCardMonitorWithError(readerId: String, generation: Int, error: CardException) {
+    if (!tryClaimPendingMonitorError(generation)) {
+      return
+    }
+
     deliverCardMonitorError(
       readerId,
       generation,
@@ -810,7 +821,7 @@ class ReactNativeBleNfcReaderModule : Module() {
     scanHandler.post {
       try {
         val shouldSend = synchronized(readerLock) {
-          activeReaderId == readerId && cardMonitorGeneration == generation
+          shouldDeliverCardMonitorError(readerId, generation)
         }
 
         if (shouldSend) {
@@ -1167,13 +1178,3 @@ private class CardCommandFailedException(status: String) : CodedException(
   "Card command failed with APDU Status $status",
   null
 )
-
-private sealed class CardMonitorStep {
-  data object Continue : CardMonitorStep()
-
-  data object Stop : CardMonitorStep()
-
-  data class CardState(val isPresent: Boolean) : CardMonitorStep()
-
-  data class Error(val error: CardException) : CardMonitorStep()
-}

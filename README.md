@@ -84,7 +84,7 @@ Starting a new `scanReaders()` while one is active supersedes the prior scan: th
 After connecting a Reader:
 
 - `addCardPresentListener()` / `addCardRemovedListener()` — subscribe to Card Presence Events (`{ readerId }`).
-- `addCardMonitorErrorListener()` — subscribe to card-monitor polling/transport failures (`{ readerId, message }`). Emitted when Card Presence Event monitoring hits a genuine Reader polling or transport failure (for example, an ACS terminal I/O error while polling card presence or waiting for a card change). Does not fire when monitoring ends via an explicit `stopCardMonitor()`, cancellation/interruption of the monitor thread, or configured `autoStopAfterMs` — those paths stop silently.
+- `addCardMonitorErrorListener()` — subscribe to card-monitor polling/transport failures (`{ readerId, message }`). Emitted when Card Presence Event monitoring hits a genuine Reader polling or transport failure (for example, a Reader I/O error while polling card presence or waiting for a card change). Does not fire when monitoring ends via an explicit `stopCardMonitor()`, cancellation/interruption of the monitor thread, or configured `autoStopAfterMs` — those paths stop silently.
 - `startCardMonitor(readerId, options?)` — explicitly start Card Presence Event monitoring. Connecting a Reader no longer starts monitoring by default in v0.2.0.
 - `stopCardMonitor(readerId)` — stop monitoring silently. An explicit stop, configured auto-stop, or cancellation does not mean the card was physically removed; it does not emit a Card Presence Event or a card-monitor error.
 - `readCardUid(readerId)` — card UID as a Hex String.
@@ -136,12 +136,13 @@ Run these checks on real hardware when changing Reader, card, or MIFARE behavior
 5. Confirm no Card Presence Events arrive after `connectReader()` alone.
 6. Start Card Presence Event monitoring; present and remove a card; confirm presence events update.
 7. Start monitoring while a card is already present; confirm an immediate Card Presence Event.
-8. Stop monitoring; confirm stop is silent and later card changes do not emit events.
-9. Start monitoring with `autoStopAfterMs`; confirm auto-stop is silent.
-10. Read the card UID without monitoring running.
-11. Transmit `FFCA000000`; confirm APDU Response Data and APDU Status are shown separately.
-12. Authenticate a MIFARE Classic block with a caller-owned key, read the block, write 16 bytes, read it back.
-13. Disconnect; confirm a second connect works only after disconnect.
+8. Stop monitoring via `stopCardMonitor()`; confirm stop is silent — no Card Presence Event, no card-monitor error, and later card changes do not emit events.
+9. Start monitoring with `autoStopAfterMs`; confirm auto-stop is silent — no Card Presence Event and no card-monitor error.
+10. Induce one genuine Reader polling/transport failure while monitoring; confirm exactly one card-monitor error `{ readerId, message }` and no synthetic card-removal event.
+11. Read the card UID without monitoring running.
+12. Transmit `FFCA000000`; confirm APDU Response Data and APDU Status are shown separately.
+13. Authenticate a MIFARE Classic block with a caller-owned key, read the block, write 16 bytes, read it back.
+14. Disconnect; confirm a second connect works only after disconnect.
 
 **iOS**
 
@@ -152,12 +153,13 @@ Run these checks on real hardware when changing Reader, card, or MIFARE behavior
 5. Confirm no Card Presence Events arrive after `connectReader()` alone.
 6. Start Card Presence Event monitoring; present and remove a card; confirm presence events update.
 7. Start monitoring while a card is already present; confirm an immediate Card Presence Event.
-8. Stop monitoring; confirm stop is silent and later card changes do not emit events.
-9. Start monitoring with `autoStopAfterMs`; confirm auto-stop is silent.
-10. Read the card UID without monitoring running.
-11. Transmit `FFCA000000`; confirm APDU Response Data and APDU Status are shown separately.
-12. Authenticate a MIFARE Classic block with a caller-owned key, read the block, write 16 bytes, read it back.
-13. Disconnect; confirm a second connect works only after disconnect.
+8. Stop monitoring via `stopCardMonitor()`; confirm stop is silent — no Card Presence Event, no card-monitor error, and later card changes do not emit events.
+9. Start monitoring with `autoStopAfterMs`; confirm auto-stop is silent — no Card Presence Event and no card-monitor error.
+10. Induce one genuine Reader polling/transport failure while monitoring; confirm exactly one card-monitor error `{ readerId, message }` and no synthetic card-removal event.
+11. Read the card UID without monitoring running.
+12. Transmit `FFCA000000`; confirm APDU Response Data and APDU Status are shown separately.
+13. Authenticate a MIFARE Classic block with a caller-owned key, read the block, write 16 bytes, read it back.
+14. Disconnect; confirm a second connect works only after disconnect.
 
 ## ACS SDK
 
